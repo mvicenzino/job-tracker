@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <header class="page-header">
+        <h1>Dashboard</h1>
+        <p class="subtitle">Your job hunt at a glance</p>
+    </header>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ dashboard.summary.active_applications }}</div>
+            <div class="stat-label">Active Applications</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ dashboard.summary.total_applications }}</div>
+            <div class="stat-label">Total Applied</div>
+        </div>
+        <div class="stat-card highlight">
+            <div class="stat-value">{{ dashboard.summary.events_today }}</div>
+            <div class="stat-label">Events Today</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ dashboard.summary.events_this_week }}</div>
+            <div class="stat-label">This Week</div>
+        </div>
+        <div class="stat-card {% if dashboard.summary.contacts_need_followup > 0 %}warning{% endif %}">
+            <div class="stat-value">{{ dashboard.summary.contacts_need_followup }}</div>
+            <div class="stat-label">Need Follow-up</div>
+        </div>
+        <div class="stat-card {% if dashboard.summary.apps_awaiting_response > 0 %}warning{% endif %}">
+            <div class="stat-value">{{ dashboard.summary.apps_awaiting_response }}</div>
+            <div class="stat-label">Awaiting Response</div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Today's Events -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Today's Events</h2>
+            </div>
+            <div class="card-body">
+                {% if dashboard.today %}
+                    <ul class="event-list">
+                        {% for event in dashboard.today %}
+                        <li class="event-item">
+                            <span class="event-icon">{{ event.event_type.value|event_type_icon }}</span>
+                            <div class="event-details">
+                                <div class="event-time">{{ event.start_time.strftime('%H:%M') }}</div>
+                                <div class="event-title">{{ event.title }}</div>
+                                {% if event.meeting_link %}
+                                <a href="{{ event.meeting_link }}" target="_blank" class="event-link">Join Meeting</a>
+                                {% endif %}
+                            </div>
+                            {% if not event.completed %}
+                            <form action="{{ url_for('complete_event', event_id=event.id) }}" method="post" class="inline-form">
+                                <button type="submit" name="went_well" value="true" class="btn btn-sm btn-success" title="Went well">✓</button>
+                            </form>
+                            {% else %}
+                            <span class="badge badge-success">Done</span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="empty-state">No events scheduled for today</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Upcoming Events -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Upcoming</h2>
+                <a href="{{ url_for('schedule') }}" class="card-link">View All</a>
+            </div>
+            <div class="card-body">
+                {% if dashboard.upcoming %}
+                    <ul class="event-list">
+                        {% for event in dashboard.upcoming %}
+                        <li class="event-item">
+                            <span class="event-icon">{{ event.event_type.value|event_type_icon }}</span>
+                            <div class="event-details">
+                                <div class="event-date">{{ event.start_time.strftime('%a, %b %d') }}</div>
+                                <div class="event-time">{{ event.start_time.strftime('%H:%M') }}</div>
+                                <div class="event-title">{{ event.title }}</div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="empty-state">No upcoming events</p>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('new_event') }}" class="btn btn-secondary">+ Add Event</a>
+                <a href="{{ url_for('new_interview') }}" class="btn btn-primary">+ Schedule Interview</a>
+            </div>
+        </section>
+
+        <!-- Pipeline Summary -->
+        <section class="card wide">
+            <div class="card-header">
+                <h2>Pipeline</h2>
+                <a href="{{ url_for('pipeline') }}" class="card-link">View Full Pipeline</a>
+            </div>
+            <div class="card-body">
+                <div class="pipeline-mini">
+                    {% for status in ['applied', 'screening', 'interviewing', 'final_round', 'offer'] %}
+                        <div class="pipeline-stage">
+                            <div class="stage-bar" style="background-color: {{ status|status_color }}">
+                                <span class="stage-count">{{ pipeline.get(status, [])|length }}</span>
+                            </div>
+                            <div class="stage-label">{{ status|replace('_', ' ')|title }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Needs Attention -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Needs Attention</h2>
+            </div>
+            <div class="card-body">
+                {% if dashboard.needs_attention.stale_applications %}
+                    <h3 class="subsection-title">Awaiting Response (14+ days)</h3>
+                    <ul class="app-list">
+                        {% for app in dashboard.needs_attention.stale_applications[:3] %}
+                        <li class="app-item">
+                            <a href="{{ url_for('application_detail', app_id=app.id) }}">
+                                {{ app.job.title }} @ {{ app.job.company.name }}
+                            </a>
+                            <span class="app-date">Applied {{ app.date_applied }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if dashboard.needs_attention.followup_contacts %}
+                    <h3 class="subsection-title">Contacts to Follow Up</h3>
+                    <ul class="contact-list">
+                        {% for contact in dashboard.needs_attention.followup_contacts %}
+                        <li class="contact-item">
+                            <span class="contact-name">{{ contact.name }}</span>
+                            {% if contact.company %}
+                            <span class="contact-company">{{ contact.company.name }}</span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if not dashboard.needs_attention.stale_applications and not dashboard.needs_attention.followup_contacts %}
+                    <p class="empty-state success">All caught up! 🎉</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Quick Stats -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Stats</h2>
+            </div>
+            <div class="card-body">
+                {% if dashboard.stats.by_status %}
+                    <ul class="stats-list">
+                        {% for status, count in dashboard.stats.by_status.items() %}
+                        <li class="stats-item">
+                            <span class="status-dot" style="background-color: {{ status|status_color }}"></span>
+                            <span class="status-name">{{ status|replace('_', ' ')|title }}</span>
+                            <span class="status-count">{{ count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="empty-state">No applications yet</p>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('new_application') }}" class="btn btn-primary btn-block">+ Quick Apply</a>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

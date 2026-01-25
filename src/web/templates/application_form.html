@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Quick Apply - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <header class="page-header">
+        <h1>Quick Apply</h1>
+        <p class="subtitle">Track a new job application</p>
+    </header>
+
+    <form method="post" class="form card">
+        <div class="form-group">
+            <label for="company">Company *</label>
+            <input type="text" id="company" name="company" required placeholder="e.g., Google, Stripe, Acme Corp">
+        </div>
+
+        <div class="form-group">
+            <label for="title">Job Title *</label>
+            <input type="text" id="title" name="title" required placeholder="e.g., Senior Software Engineer">
+        </div>
+
+        <div class="form-group">
+            <label for="url">Job Posting URL</label>
+            <input type="url" id="url" name="url" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+            <label for="source">Source</label>
+            <select id="source" name="source">
+                <option value="">Select where you found this job</option>
+                <option value="LinkedIn">LinkedIn</option>
+                <option value="Indeed">Indeed</option>
+                <option value="Glassdoor">Glassdoor</option>
+                <option value="Company Website">Company Website</option>
+                <option value="Referral">Referral</option>
+                <option value="Recruiter">Recruiter</option>
+                <option value="Networking">Networking</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('pipeline') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Create Application</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Schedule Event - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <header class="page-header">
+        <h1>Schedule Event</h1>
+    </header>
+
+    <form method="post" class="form card">
+        <div class="form-group">
+            <label for="title">Event Title *</label>
+            <input type="text" id="title" name="title" required placeholder="e.g., Coffee chat with John">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="date">Date *</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="time">Time *</label>
+                <input type="time" id="time" name="time" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="event_type">Event Type</label>
+            <select id="event_type" name="event_type">
+                {% for et in EventType %}
+                <option value="{{ et.value }}">{{ et.value|replace('_', ' ')|title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="application_id">Related Application</label>
+                <select id="application_id" name="application_id">
+                    <option value="">None</option>
+                    {% for app in applications %}
+                    <option value="{{ app.id }}">{{ app.job.title }} @ {{ app.job.company.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="contact_id">Related Contact</label>
+                <select id="contact_id" name="contact_id">
+                    <option value="">None</option>
+                    {% for contact in contacts %}
+                    <option value="{{ contact.id }}">{{ contact.name }}{% if contact.company %} ({{ contact.company.name }}){% endif %}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" placeholder="Address or venue">
+        </div>
+
+        <div class="form-group">
+            <label for="meeting_link">Meeting Link</label>
+            <input type="url" id="meeting_link" name="meeting_link" placeholder="https://zoom.us/...">
+        </div>
+
+        <div class="form-group">
+            <label for="prep_notes">Preparation Notes</label>
+            <textarea id="prep_notes" name="prep_notes" rows="3" placeholder="What to prepare or remember"></textarea>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('schedule') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Schedule Event</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

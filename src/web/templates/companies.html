@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Companies - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="list-page">
+    <header class="page-header">
+        <h1>Companies</h1>
+        <a href="{{ url_for('new_company') }}" class="btn btn-primary">+ Add Company</a>
+    </header>
+
+    <form class="search-form" method="get">
+        <input type="text" name="search" placeholder="Search companies..." value="{{ search or '' }}">
+        <button type="submit" class="btn btn-secondary">Search</button>
+        {% if search %}
+        <a href="{{ url_for('companies') }}" class="btn btn-link">Clear</a>
+        {% endif %}
+    </form>
+
+    {% if companies %}
+    <div class="card-grid">
+        {% for company in companies %}
+        <div class="card company-card">
+            <div class="card-body">
+                <h3>{{ company.name }}</h3>
+                {% if company.industry %}
+                <p class="company-industry">{{ company.industry }}</p>
+                {% endif %}
+                {% if company.location %}
+                <p class="company-location">📍 {{ company.location }}</p>
+                {% endif %}
+                {% if company.size %}
+                <p class="company-size">👥 {{ company.size }}</p>
+                {% endif %}
+                {% if company.website %}
+                <a href="{{ company.website }}" target="_blank" class="company-website">Visit Website →</a>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <span class="job-count">{{ company.jobs|length }} jobs</span>
+                <span class="contact-count">{{ company.contacts|length }} contacts</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state-large">
+        <p>No companies found{% if search %} for "{{ search }}"{% endif %}</p>
+        <a href="{{ url_for('new_company') }}" class="btn btn-primary">Add Your First Company</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

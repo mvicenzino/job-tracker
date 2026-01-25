@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Job - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <header class="page-header">
+        <h1>Edit Job</h1>
+        <p class="subtitle">{{ job.title }} at {{ job.company.name }}</p>
+    </header>
+
+    <form method="post" class="form card">
+        <div class="form-group">
+            <label for="title">Job Title *</label>
+            <input type="text" id="title" name="title" required value="{{ job.title }}">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="salary_min">Salary Min ($)</label>
+                <input type="number" id="salary_min" name="salary_min"
+                       value="{{ job.salary_min or '' }}" placeholder="100000">
+            </div>
+            <div class="form-group">
+                <label for="salary_max">Salary Max ($)</label>
+                <input type="number" id="salary_max" name="salary_max"
+                       value="{{ job.salary_max or '' }}" placeholder="150000">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location"
+                       value="{{ job.location or '' }}" placeholder="San Francisco, CA">
+            </div>
+            <div class="form-group">
+                <label for="remote_type">Work Type</label>
+                <select id="remote_type" name="remote_type">
+                    <option value="">Select...</option>
+                    <option value="remote" {% if job.remote_type == 'remote' %}selected{% endif %}>Remote</option>
+                    <option value="hybrid" {% if job.remote_type == 'hybrid' %}selected{% endif %}>Hybrid</option>
+                    <option value="onsite" {% if job.remote_type == 'onsite' %}selected{% endif %}>Onsite</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="job_url">Job Posting URL</label>
+            <input type="url" id="job_url" name="job_url"
+                   value="{{ job.job_url or '' }}" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+            <label for="source">Source</label>
+            <select id="source" name="source">
+                <option value="">Select...</option>
+                {% for src in ['LinkedIn', 'Indeed', 'Glassdoor', 'Company Website', 'Referral', 'Recruiter', 'Networking', 'Other'] %}
+                <option value="{{ src }}" {% if job.source == src %}selected{% endif %}>{{ src }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Job Description</label>
+            <textarea id="description" name="description" rows="6"
+                      placeholder="Paste the job description">{{ job.description or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="requirements">Requirements</label>
+            <textarea id="requirements" name="requirements" rows="4"
+                      placeholder="Key requirements for this role">{{ job.requirements or '' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ request.referrer or url_for('applications') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

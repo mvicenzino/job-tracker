@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Application - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <header class="page-header">
+        <div class="header-content">
+            <a href="{{ url_for('application_detail', app_id=app.id) }}" class="back-link">← Back to Application</a>
+            <h1>Edit Application</h1>
+            <p class="subtitle">{{ app.job.title }} at {{ app.job.company.name }}</p>
+        </div>
+    </header>
+
+    <form method="post" class="form card">
+        <div class="form-group">
+            <label for="excitement_level">Excitement Level (1-5)</label>
+            <select id="excitement_level" name="excitement_level">
+                <option value="">Not rated</option>
+                {% for i in range(1, 6) %}
+                <option value="{{ i }}" {% if app.excitement_level == i %}selected{% endif %}>
+                    {{ '⭐' * i }} ({{ i }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="resume_version">Resume Version Used</label>
+            <input type="text" id="resume_version" name="resume_version"
+                   value="{{ app.resume_version or '' }}"
+                   placeholder="e.g., v2-technical, general-2024">
+        </div>
+
+        <div class="form-group">
+            <label for="cover_letter">Cover Letter</label>
+            <textarea id="cover_letter" name="cover_letter" rows="6"
+                      placeholder="Paste or type your cover letter">{{ app.cover_letter or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="lessons_learned">Lessons Learned</label>
+            <textarea id="lessons_learned" name="lessons_learned" rows="4"
+                      placeholder="What did you learn from this application process?">{{ app.lessons_learned or '' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('application_detail', app_id=app.id) }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

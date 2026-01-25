@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Schedule - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="schedule-page">
+    <header class="page-header">
+        <h1>Schedule</h1>
+        <div class="header-actions">
+            <a href="{{ url_for('new_event') }}" class="btn btn-secondary">+ Add Event</a>
+            <a href="{{ url_for('new_interview') }}" class="btn btn-primary">+ Schedule Interview</a>
+        </div>
+    </header>
+
+    <div class="schedule-filters">
+        <a href="{{ url_for('schedule', days=7) }}" class="btn {% if days == 7 %}btn-primary{% else %}btn-secondary{% endif %}">7 Days</a>
+        <a href="{{ url_for('schedule', days=14) }}" class="btn {% if days == 14 %}btn-primary{% else %}btn-secondary{% endif %}">14 Days</a>
+        <a href="{{ url_for('schedule', days=30) }}" class="btn {% if days == 30 %}btn-primary{% else %}btn-secondary{% endif %}">30 Days</a>
+    </div>
+
+    {% if today %}
+    <section class="today-section card">
+        <div class="card-header highlight">
+            <h2>Today</h2>
+        </div>
+        <div class="card-body">
+            <ul class="schedule-list">
+                {% for event in today %}
+                <li class="schedule-item {% if event.completed %}completed{% endif %}">
+                    <div class="event-time-block">
+                        <span class="event-time">{{ event.start_time.strftime('%H:%M') }}</span>
+                    </div>
+                    <div class="event-icon-block">
+                        <span class="event-icon">{{ event.event_type.value|event_type_icon }}</span>
+                    </div>
+                    <div class="event-content">
+                        <div class="event-title">{{ event.title }}</div>
+                        <div class="event-type">{{ event.event_type.value|replace('_', ' ')|title }}</div>
+                        {% if event.location %}
+                        <div class="event-location">📍 {{ event.location }}</div>
+                        {% endif %}
+                        {% if event.meeting_link %}
+                        <a href="{{ event.meeting_link }}" target="_blank" class="btn btn-sm btn-primary">Join Meeting</a>
+                        {% endif %}
+                        {% if event.prep_notes %}
+                        <div class="event-prep">
+                            <strong>Prep:</strong> {{ event.prep_notes }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="event-actions">
+                        {% if not event.completed %}
+                        <form action="{{ url_for('complete_event', event_id=event.id) }}" method="post">
+                            <button type="submit" name="went_well" value="true" class="btn btn-sm btn-success">👍 Done</button>
+                            <button type="submit" name="went_well" value="false" class="btn btn-sm btn-secondary">👎</button>
+                        </form>
+                        {% else %}
+                        <span class="badge badge-success">Completed</span>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if schedule %}
+    <section class="upcoming-section">
+        <h2>Upcoming</h2>
+        {% for day, events in schedule.items() %}
+        <div class="day-section card">
+            <div class="card-header">
+                <h3>{{ day }}</h3>
+            </div>
+            <div class="card-body">
+                <ul class="schedule-list">
+                    {% for event in events %}
+                    <li class="schedule-item">
+                        <div class="event-time-block">
+                            <span class="event-time">{{ event.start_time.strftime('%H:%M') }}</span>
+                        </div>
+                        <div class="event-icon-block">
+                            <span class="event-icon">{{ event.event_type.value|event_type_icon }}</span>
+                        </div>
+                        <div class="event-content">
+                            <div class="event-title">{{ event.title }}</div>
+                            <div class="event-type">{{ event.event_type.value|replace('_', ' ')|title }}</div>
+                            {% if event.meeting_link %}
+                            <a href="{{ event.meeting_link }}" target="_blank" class="event-link">{{ event.meeting_link[:40] }}...</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+    {% elif not today %}
+    <div class="empty-state-large">
+        <p>No events scheduled for the next {{ days }} days</p>
+        <a href="{{ url_for('new_event') }}" class="btn btn-secondary">Add Event</a>
+        <a href="{{ url_for('new_interview') }}" class="btn btn-primary">Schedule Interview</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

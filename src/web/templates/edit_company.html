@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Company - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <header class="page-header">
+        <h1>Edit Company</h1>
+        <p class="subtitle">{{ company.name }}</p>
+    </header>
+
+    <form method="post" class="form card">
+        <div class="form-group">
+            <label for="name">Company Name *</label>
+            <input type="text" id="name" name="name" required value="{{ company.name }}">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="industry">Industry</label>
+                <input type="text" id="industry" name="industry"
+                       value="{{ company.industry or '' }}" placeholder="Technology, Finance, etc.">
+            </div>
+            <div class="form-group">
+                <label for="size">Company Size</label>
+                <select id="size" name="size">
+                    <option value="">Select...</option>
+                    {% for s in ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'] %}
+                    <option value="{{ s }}" {% if company.size == s %}selected{% endif %}>{{ s }} employees</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Headquarters Location</label>
+            <input type="text" id="location" name="location"
+                   value="{{ company.location or '' }}" placeholder="San Francisco, CA">
+        </div>
+
+        <div class="form-group">
+            <label for="website">Website</label>
+            <input type="url" id="website" name="website"
+                   value="{{ company.website or '' }}" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+            <label for="linkedin_url">LinkedIn URL</label>
+            <input type="url" id="linkedin_url" name="linkedin_url"
+                   value="{{ company.linkedin_url or '' }}" placeholder="https://linkedin.com/company/...">
+        </div>
+
+        <div class="form-group">
+            <label for="glassdoor_rating">Glassdoor Rating</label>
+            <input type="text" id="glassdoor_rating" name="glassdoor_rating"
+                   value="{{ company.glassdoor_rating or '' }}" placeholder="4.2">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4"
+                      placeholder="What does this company do?">{{ company.description or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="culture_notes">Culture Notes</label>
+            <textarea id="culture_notes" name="culture_notes" rows="4"
+                      placeholder="Your notes about company culture, values, work-life balance...">{{ company.culture_notes or '' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ request.referrer or url_for('companies') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

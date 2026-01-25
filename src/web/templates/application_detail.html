@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}{{ details.job.title }} - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+    <header class="page-header">
+        <div class="header-content">
+            <a href="{{ url_for('pipeline') }}" class="back-link">← Pipeline</a>
+            <h1>{{ details.job.title }}</h1>
+            <p class="subtitle">{{ details.company.name }}</p>
+        </div>
+        <div class="status-badge" style="background-color: {{ details.application.status.value|status_color }}">
+            {{ details.application.status.value|replace('_', ' ')|title }}
+        </div>
+    </header>
+
+    <div class="detail-grid">
+        <!-- Main Info -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Application Details</h2>
+                <a href="{{ url_for('edit_application', app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+            </div>
+            <div class="card-body">
+                <dl class="detail-list">
+                    <dt>Status</dt>
+                    <dd>
+                        <form action="{{ url_for('update_status', app_id=details.application.id) }}" method="post" class="inline-form">
+                            <select name="status" onchange="this.form.submit()" class="status-select">
+                                {% for s in ApplicationStatus %}
+                                <option value="{{ s.value }}" {% if s == details.application.status %}selected{% endif %}>
+                                    {{ s.value|replace('_', ' ')|title }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </dd>
+
+                    {% if details.application.date_applied %}
+                    <dt>Date Applied</dt>
+                    <dd>{{ details.application.date_applied.strftime('%B %d, %Y') }}</dd>
+                    {% endif %}
+
+                    {% if details.application.excitement_level %}
+                    <dt>Excitement</dt>
+                    <dd>{% for i in range(details.application.excitement_level) %}⭐{% endfor %}</dd>
+                    {% endif %}
+
+                    {% if details.application.resume_version %}
+                    <dt>Resume Version</dt>
+                    <dd>{{ details.application.resume_version }}</dd>
+                    {% endif %}
+
+                    {% if details.referral %}
+                    <dt>Referral</dt>
+                    <dd>{{ details.referral.name }}</dd>
+                    {% endif %}
+
+                    {% if details.application.offered_salary %}
+                    <dt>Offered Salary</dt>
+                    <dd>${{ "{:,}".format(details.application.offered_salary) }}</dd>
+                    {% endif %}
+                </dl>
+
+                {% if details.application.cover_letter %}
+                <div class="detail-section">
+                    <h3>Cover Letter</h3>
+                    <div class="detail-text">{{ details.application.cover_letter }}</div>
+                </div>
+                {% endif %}
+
+                {% if details.application.lessons_learned %}
+                <div class="detail-section">
+                    <h3>Lessons Learned</h3>
+                    <div class="detail-text">{{ details.application.lessons_learned }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Job Info -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Job Details</h2>
+                <a href="{{ url_for('edit_job', job_id=details.job.id, app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+            </div>
+            <div class="card-body">
+                <dl class="detail-list">
+                    <dt>Title</dt>
+                    <dd>{{ details.job.title }}</dd>
+
+                    {% if details.job.salary_min and details.job.salary_max %}
+                    <dt>Salary Range</dt>
+                    <dd>${{ "{:,}".format(details.job.salary_min) }} - ${{ "{:,}".format(details.job.salary_max) }}</dd>
+                    {% endif %}
+
+                    {% if details.job.remote_type %}
+                    <dt>Work Type</dt>
+                    <dd>{{ details.job.remote_type|title }}</dd>
+                    {% endif %}
+
+                    {% if details.job.location %}
+                    <dt>Location</dt>
+                    <dd>{{ details.job.location }}</dd>
+                    {% endif %}
+
+                    {% if details.job.source %}
+                    <dt>Source</dt>
+                    <dd>{{ details.job.source }}</dd>
+                    {% endif %}
+
+                    {% if details.job.job_url %}
+                    <dt>Job Posting</dt>
+                    <dd><a href="{{ details.job.job_url }}" target="_blank">View Original Posting →</a></dd>
+                    {% endif %}
+                </dl>
+
+                {% if details.job.description %}
+                <div class="detail-section">
+                    <h3>Description</h3>
+                    <div class="detail-text">{{ details.job.description }}</div>
+                </div>
+                {% endif %}
+
+                {% if details.job.requirements %}
+                <div class="detail-section">
+                    <h3>Requirements</h3>
+                    <div class="detail-text">{{ details.job.requirements }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Company Info -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Company</h2>
+                <a href="{{ url_for('edit_company', company_id=details.company.id, app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+            </div>
+            <div class="card-body">
+                <dl class="detail-list">
+                    <dt>Name</dt>
+                    <dd>{{ details.company.name }}</dd>
+
+                    {% if details.company.industry %}
+                    <dt>Industry</dt>
+                    <dd>{{ details.company.industry }}</dd>
+                    {% endif %}
+
+                    {% if details.company.location %}
+                    <dt>Location</dt>
+                    <dd>{{ details.company.location }}</dd>
+                    {% endif %}
+
+                    {% if details.company.size %}
+                    <dt>Size</dt>
+                    <dd>{{ details.company.size }} employees</dd>
+                    {% endif %}
+
+                    {% if details.company.glassdoor_rating %}
+                    <dt>Glassdoor</dt>
+                    <dd>{{ details.company.glassdoor_rating }} ⭐</dd>
+                    {% endif %}
+
+                    {% if details.company.website %}
+                    <dt>Website</dt>
+                    <dd><a href="{{ details.company.website }}" target="_blank">{{ details.company.website }}</a></dd>
+                    {% endif %}
+
+                    {% if details.company.linkedin_url %}
+                    <dt>LinkedIn</dt>
+                    <dd><a href="{{ details.company.linkedin_url }}" target="_blank">View Profile →</a></dd>
+                    {% endif %}
+                </dl>
+
+                {% if details.company.description %}
+                <div class="detail-section">
+                    <h3>About</h3>
+                    <div class="detail-text">{{ details.company.description }}</div>
+                </div>
+                {% endif %}
+
+                {% if details.company.culture_notes %}
+                <div class="detail-section">
+                    <h3>Culture Notes</h3>
+                    <div class="detail-text">{{ details.company.culture_notes }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Events/Interviews -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Events & Interviews</h2>
+                <a href="{{ url_for('new_interview') }}?app_id={{ details.application.id }}" class="btn btn-sm btn-primary">+ Interview</a>
+            </div>
+            <div class="card-body">
+                {% if details.events %}
+                <ul class="timeline">
+                    {% for event in details.events %}
+                    <li class="timeline-item {% if event.completed %}completed{% endif %}">
+                        <div class="timeline-icon">{{ event.event_type.value|event_type_icon }}</div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">{{ event.start_time.strftime('%b %d, %Y at %H:%M') }}</div>
+                            <div class="timeline-title">{{ event.title }}</div>
+                            {% if event.meeting_link %}
+                            <a href="{{ event.meeting_link }}" target="_blank" class="timeline-link">Join Meeting</a>
+                            {% endif %}
+                            {% if event.prep_notes %}
+                            <div class="timeline-prep"><strong>Prep:</strong> {{ event.prep_notes }}</div>
+                            {% endif %}
+                            {% if event.outcome_notes %}
+                            <div class="timeline-notes">{{ event.outcome_notes }}</div>
+                            {% endif %}
+                        </div>
+                        {% if not event.completed %}
+                        <form action="{{ url_for('complete_event', event_id=event.id) }}" method="post" class="timeline-action">
+                            <button type="submit" name="went_well" value="true" class="btn btn-sm btn-success" title="Went well">✓</button>
+                            <button type="submit" name="went_well" value="false" class="btn btn-sm btn-danger" title="Didn't go well">✗</button>
+                        </form>
+                        {% else %}
+                        <span class="timeline-status {% if event.went_well %}success{% else %}danger{% endif %}">
+                            {% if event.went_well %}👍{% else %}👎{% endif %}
+                        </span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="empty-state">No events scheduled yet</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Notes -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Notes</h2>
+            </div>
+            <div class="card-body">
+                <!-- Add Note Form -->
+                <form action="{{ url_for('add_application_note', app_id=details.application.id) }}" method="post" class="note-form">
+                    <div class="form-group">
+                        <input type="text" name="title" placeholder="Note title (optional)" class="note-title-input">
+                    </div>
+                    <div class="form-group">
+                        <textarea name="content" required placeholder="Add a note..." rows="3" class="note-content-input"></textarea>
+                    </div>
+                    <div class="form-row-inline">
+                        <select name="note_type" class="note-type-select">
+                            <option value="general">General</option>
+                            <option value="research">Research</option>
+                            <option value="preparation">Preparation</option>
+                            <option value="followup">Follow-up</option>
+                            <option value="interview">Interview</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Add Note</button>
+                    </div>
+                </form>
+
+                {% if details.notes %}
+                <ul class="notes-list">
+                    {% for note in details.notes %}
+                    <li class="note-item">
+                        <div class="note-header">
+                            {% if note.title %}<strong>{{ note.title }}</strong>{% endif %}
+                            <span class="note-type-badge">{{ note.note_type or 'general' }}</span>
+                        </div>
+                        <p>{{ note.content }}</p>
+                        <span class="note-date">{{ note.created_at.strftime('%b %d, %Y at %H:%M') }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

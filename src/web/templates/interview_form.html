@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Schedule Interview - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <header class="page-header">
+        <h1>Schedule Interview</h1>
+        <p class="subtitle">This will also update the application status to "Interviewing"</p>
+    </header>
+
+    <form method="post" class="form card">
+        <div class="form-group">
+            <label for="application_id">Application *</label>
+            <select id="application_id" name="application_id" required>
+                <option value="">Select an application</option>
+                {% for app in applications %}
+                <option value="{{ app.id }}" {% if request.args.get('app_id') == app.id|string %}selected{% endif %}>
+                    {{ app.job.title }} @ {{ app.job.company.name }} ({{ app.status.value }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="date">Date *</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="time">Time *</label>
+                <input type="time" id="time" name="time" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="interview_type">Interview Type</label>
+            <select id="interview_type" name="interview_type">
+                <option value="phone_screen">Phone Screen</option>
+                <option value="video_interview" selected>Video Interview</option>
+                <option value="onsite_interview">Onsite Interview</option>
+                <option value="technical_interview">Technical Interview</option>
+                <option value="behavioral_interview">Behavioral Interview</option>
+                <option value="panel_interview">Panel Interview</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="meeting_link">Meeting Link</label>
+            <input type="url" id="meeting_link" name="meeting_link" placeholder="https://zoom.us/...">
+        </div>
+
+        <div class="form-group">
+            <label for="prep_notes">Preparation Notes</label>
+            <textarea id="prep_notes" name="prep_notes" rows="4" placeholder="Topics to review, questions to prepare, things to research..."></textarea>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('schedule') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Schedule Interview</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Pipeline - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="pipeline-page">
+    <header class="page-header">
+        <h1>Application Pipeline</h1>
+        <a href="{{ url_for('new_application') }}" class="btn btn-primary">+ Quick Apply</a>
+    </header>
+
+    <div class="pipeline-board">
+        {% set active_statuses = ['interested', 'preparing', 'applied', 'screening', 'interviewing', 'final_round', 'offer', 'negotiating'] %}
+        {% for status in active_statuses %}
+        <div class="pipeline-column" data-status="{{ status }}">
+            <div class="column-header" style="border-top-color: {{ status|status_color }}">
+                <h3>{{ status|replace('_', ' ')|title }}</h3>
+                <span class="column-count">{{ pipeline.get(status, [])|length }}</span>
+            </div>
+            <div class="column-body">
+                {% for app in pipeline.get(status, []) %}
+                <div class="pipeline-card" data-app-id="{{ app.id }}">
+                    <div class="card-company">{{ app.job.company.name }}</div>
+                    <div class="card-title">{{ app.job.title }}</div>
+                    {% if app.date_applied %}
+                    <div class="card-date">Applied {{ app.date_applied.strftime('%b %d') }}</div>
+                    {% endif %}
+                    {% if app.excitement_level %}
+                    <div class="card-excitement">
+                        {% for i in range(app.excitement_level) %}⭐{% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="card-actions">
+                        <a href="{{ url_for('application_detail', app_id=app.id) }}" class="btn btn-sm">View</a>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-secondary dropdown-toggle">Move</button>
+                            <div class="dropdown-menu">
+                                {% for s in ApplicationStatus %}
+                                {% if s.value != status %}
+                                <form action="{{ url_for('update_status', app_id=app.id) }}" method="post">
+                                    <input type="hidden" name="status" value="{{ s.value }}">
+                                    <button type="submit" class="dropdown-item">
+                                        <span class="status-dot" style="background-color: {{ s.value|status_color }}"></span>
+                                        {{ s.value|replace('_', ' ')|title }}
+                                    </button>
+                                </form>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Closed Applications -->
+    {% set closed_statuses = ['accepted', 'rejected', 'withdrawn', 'ghosted'] %}
+    {% set has_closed = false %}
+    {% for status in closed_statuses %}
+        {% if pipeline.get(status) %}{% set has_closed = true %}{% endif %}
+    {% endfor %}
+
+    {% if has_closed %}
+    <section class="closed-section">
+        <h2>Closed</h2>
+        <div class="closed-grid">
+            {% for status in closed_statuses %}
+            {% if pipeline.get(status) %}
+            <div class="closed-column">
+                <h3 style="color: {{ status|status_color }}">
+                    {{ status|replace('_', ' ')|title }} ({{ pipeline.get(status)|length }})
+                </h3>
+                <ul class="closed-list">
+                    {% for app in pipeline.get(status)[:5] %}
+                    <li>
+                        <a href="{{ url_for('application_detail', app_id=app.id) }}">
+                            {{ app.job.title }} @ {{ app.job.company.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

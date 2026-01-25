@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Applications - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="list-page">
+    <header class="page-header">
+        <h1>All Applications</h1>
+        <a href="{{ url_for('new_application') }}" class="btn btn-primary">+ Quick Apply</a>
+    </header>
+
+    {% if applications %}
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Position</th>
+                    <th>Status</th>
+                    <th>Applied</th>
+                    <th>Source</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app, job, company in applications %}
+                <tr>
+                    <td><strong>{{ company.name }}</strong></td>
+                    <td>{{ job.title }}</td>
+                    <td>
+                        <span class="status-badge" style="background-color: {{ app.status.value|status_color }}">
+                            {{ app.status.value|replace('_', ' ')|title }}
+                        </span>
+                    </td>
+                    <td>{{ app.date_applied.strftime('%b %d, %Y') if app.date_applied else '-' }}</td>
+                    <td>{{ job.source or '-' }}</td>
+                    <td>
+                        <a href="{{ url_for('application_detail', app_id=app.id) }}" class="btn btn-sm">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state-large">
+        <p>No applications yet</p>
+        <a href="{{ url_for('new_application') }}" class="btn btn-primary">Create Your First Application</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
