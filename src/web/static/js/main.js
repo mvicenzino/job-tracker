@@ -43,45 +43,67 @@ document.addEventListener('DOMContentLoaded', function() {
 function initMobileMenu() {
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('nav-menu');
+    const navOverlay = document.getElementById('nav-overlay');
+    const navMenuClose = document.getElementById('nav-menu-close');
 
     if (!hamburger || !navMenu) return;
+
+    function openMenu() {
+        hamburger.classList.add('active');
+        navMenu.classList.add('active');
+        if (navOverlay) navOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+        hamburger.classList.remove('active');
+        navMenu.classList.remove('active');
+        if (navOverlay) navOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
 
     // Toggle menu on hamburger click
     hamburger.addEventListener('click', function(e) {
         e.stopPropagation();
-        hamburger.classList.toggle('active');
-        navMenu.classList.toggle('active');
-        document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+        if (navMenu.classList.contains('active')) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
     });
+
+    // Close button in menu header
+    if (navMenuClose) {
+        navMenuClose.addEventListener('click', closeMenu);
+    }
+
+    // Close menu when clicking overlay
+    if (navOverlay) {
+        navOverlay.addEventListener('click', closeMenu);
+    }
 
     // Close menu when clicking a link
-    const navLinks = navMenu.querySelectorAll('a');
+    const navLinks = navMenu.querySelectorAll('.nav-links a');
     navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', function(e) {
-        if (navMenu.classList.contains('active') &&
-            !navMenu.contains(e.target) &&
-            !hamburger.contains(e.target)) {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+        link.addEventListener('click', closeMenu);
     });
 
     // Close menu on escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && navMenu.classList.contains('active')) {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-            document.body.style.overflow = '';
+            closeMenu();
         }
+    });
+
+    // Handle window resize - close menu if resizing to desktop
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            if (window.innerWidth > 768 && navMenu.classList.contains('active')) {
+                closeMenu();
+            }
+        }, 100);
     });
 }
 
@@ -262,4 +284,62 @@ function showToast(message, type = 'success') {
 
 function confirmAction(message) {
     return confirm(message);
+}
+
+// === Form Validation Feedback ===
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add visual feedback for required fields
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn && !submitBtn.classList.contains('loading')) {
+                // Don't add loading state for forms that might fail validation
+                const requiredFields = form.querySelectorAll('[required]');
+                let allValid = true;
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        allValid = false;
+                        field.classList.add('invalid');
+                    } else {
+                        field.classList.remove('invalid');
+                    }
+                });
+            }
+        });
+    });
+
+    // Remove invalid class on input
+    document.querySelectorAll('input, textarea, select').forEach(field => {
+        field.addEventListener('input', function() {
+            this.classList.remove('invalid');
+        });
+    });
+});
+
+// === Dropdown improvements for touch devices ===
+
+if ('ontouchstart' in window) {
+    document.querySelectorAll('.dropdown').forEach(dropdown => {
+        dropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const menu = this.querySelector('.dropdown-menu');
+            if (menu) {
+                const isVisible = menu.style.display === 'block';
+                // Close all other dropdowns
+                document.querySelectorAll('.dropdown-menu').forEach(m => {
+                    m.style.display = 'none';
+                });
+                menu.style.display = isVisible ? 'none' : 'block';
+            }
+        });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.dropdown-menu').forEach(m => {
+            m.style.display = 'none';
+        });
+    });
 }

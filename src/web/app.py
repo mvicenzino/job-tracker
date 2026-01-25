@@ -200,7 +200,8 @@ def create_app(db_path: str = None):
             return render_template('contacts.html',
                                  contacts=contacts,
                                  search=search,
-                                 followup=followup)
+                                 followup=followup,
+                                 today=date.today())
         finally:
             session.close()
 
