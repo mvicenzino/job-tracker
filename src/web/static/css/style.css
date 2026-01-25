@@ -123,6 +123,11 @@ a:hover {
     gap: var(--space-2);
 }
 
+/* Hide mobile nav-actions on desktop */
+.nav-menu .nav-actions {
+    display: none;
+}
+
 .nav-links {
     display: flex;
     gap: var(--space-1);
@@ -1733,7 +1738,8 @@ a:hover {
         padding-left: calc(var(--space-5) - 4px);
     }
 
-    .nav-actions {
+    .nav-menu .nav-actions {
+        display: block;
         padding: var(--space-5);
         border-top: 1px solid var(--color-border-light);
         margin-top: auto;
