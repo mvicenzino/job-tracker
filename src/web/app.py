@@ -460,6 +460,46 @@ def create_app(db_path: str = None):
         finally:
             session.close()
 
+    @app.route('/contacts/<int:contact_id>/edit', methods=['GET', 'POST'])
+    def edit_contact(contact_id):
+        """Edit contact details."""
+        service, session = get_service()
+        try:
+            contact = service.contacts.get_by_id(contact_id)
+            if not contact:
+                flash('Contact not found', 'error')
+                return redirect(url_for('contacts'))
+
+            if request.method == 'POST':
+                contact_type = ContactType(request.form.get('contact_type', 'networking'))
+                updates = {
+                    'name': request.form.get('name', contact.name),
+                    'email': request.form.get('email'),
+                    'phone': request.form.get('phone'),
+                    'title': request.form.get('title'),
+                    'contact_type': contact_type,
+                    'linkedin_url': request.form.get('linkedin_url'),
+                    'how_we_met': request.form.get('how_we_met'),
+                    'notes': request.form.get('notes'),
+                }
+
+                relationship_strength = request.form.get('relationship_strength')
+                if relationship_strength:
+                    updates['relationship_strength'] = int(relationship_strength)
+
+                service.contacts.update(contact_id, **updates)
+                session.commit()
+                flash('Contact updated!', 'success')
+                return redirect(url_for('contacts'))
+
+            companies = service.companies.get_all()
+            return render_template('edit_contact.html',
+                                 contact=contact,
+                                 companies=companies,
+                                 ContactType=ContactType)
+        finally:
+            session.close()
+
     @app.route('/applications/<int:app_id>/notes', methods=['POST'])
     def add_application_note(app_id):
         """Add a note to an application."""

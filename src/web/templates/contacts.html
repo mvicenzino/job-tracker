@@ -62,13 +62,14 @@
                         -
                         {% endif %}
                     </td>
-                    <td>
-                        <form action="{{ url_for('log_contact', contact_id=contact.id) }}" method="post" class="inline-form log-form">
-                            <input type="hidden" name="followup_days" value="14">
-                            <button type="submit" class="btn btn-sm btn-success" title="Log contact, set follow-up in 14 days">
-                                Contacted
-                            </button>
-                        </form>
+                    <td class="actions-cell">
+                        <div class="action-buttons">
+                            <a href="{{ url_for('edit_contact', contact_id=contact.id) }}" class="btn btn-sm btn-secondary" title="Edit contact">Edit</a>
+                            <form action="{{ url_for('log_contact', contact_id=contact.id) }}" method="post" class="inline-form">
+                                <input type="hidden" name="followup_days" value="14">
+                                <button type="submit" class="btn btn-sm btn-success" title="Log contact, set follow-up in 14 days">Contacted</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}

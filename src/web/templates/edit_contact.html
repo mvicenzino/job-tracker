@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Contact - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <header class="page-header">
+        <h1>Edit Contact</h1>
+        <p class="subtitle">{{ contact.name }}</p>
+    </header>
+
+    <form method="post" class="form card">
+        <div class="form-group">
+            <label for="name">Name *</label>
+            <input type="text" id="name" name="name" required value="{{ contact.name }}">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ contact.email or '' }}">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" value="{{ contact.phone or '' }}">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" value="{{ contact.title or '' }}" placeholder="e.g., Engineering Manager">
+            </div>
+            <div class="form-group">
+                <label for="contact_type">Contact Type</label>
+                <select id="contact_type" name="contact_type">
+                    {% for ct in ContactType %}
+                    <option value="{{ ct.value }}" {% if contact.contact_type == ct %}selected{% endif %}>
+                        {{ ct.value|replace('_', ' ')|title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="linkedin_url">LinkedIn URL</label>
+            <input type="url" id="linkedin_url" name="linkedin_url" value="{{ contact.linkedin_url or '' }}" placeholder="https://linkedin.com/in/...">
+        </div>
+
+        <div class="form-group">
+            <label for="relationship_strength">Relationship Strength (1-5)</label>
+            <select id="relationship_strength" name="relationship_strength">
+                <option value="">Not rated</option>
+                {% for i in range(1, 6) %}
+                <option value="{{ i }}" {% if contact.relationship_strength == i %}selected{% endif %}>
+                    {{ '⭐' * i }} ({{ i }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="how_we_met">How We Met</label>
+            <textarea id="how_we_met" name="how_we_met" rows="2" placeholder="Where/how did you meet this person?">{{ contact.how_we_met or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" rows="4" placeholder="Any notes about this contact...">{{ contact.notes or '' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('contacts') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
