@@ -8,26 +8,36 @@ from ..models.base import Base
 class DatabaseConnection:
     """Manages database connection and session creation."""
 
-    def __init__(self, db_path: str = None):
+    def __init__(self, db_path: str = None, database_url: str = None):
         """
         Initialize database connection.
 
         Args:
-            db_path: Path to SQLite database file. If None, uses default location.
+            db_path: Path to SQLite database file (for local development).
+            database_url: Full database URL (for production, e.g., PostgreSQL).
         """
-        if db_path is None:
-            # Default to user's home directory
-            home = os.path.expanduser("~")
-            db_dir = os.path.join(home, ".job-hunt-tracker")
-            os.makedirs(db_dir, exist_ok=True)
-            db_path = os.path.join(db_dir, "job_hunt.db")
+        if database_url:
+            # Use provided database URL (PostgreSQL, etc.)
+            self.db_path = None
+            self.engine = create_engine(
+                database_url,
+                echo=False,
+                pool_pre_ping=True
+            )
+        else:
+            # Fall back to SQLite for local development
+            if db_path is None:
+                home = os.path.expanduser("~")
+                db_dir = os.path.join(home, ".job-hunt-tracker")
+                os.makedirs(db_dir, exist_ok=True)
+                db_path = os.path.join(db_dir, "job_hunt.db")
 
-        self.db_path = db_path
-        self.engine = create_engine(
-            f"sqlite:///{db_path}",
-            echo=False,  # Set to True for SQL debugging
-            connect_args={"check_same_thread": False}  # Needed for SQLite
-        )
+            self.db_path = db_path
+            self.engine = create_engine(
+                f"sqlite:///{db_path}",
+                echo=False,
+                connect_args={"check_same_thread": False}
+            )
         self.SessionLocal = sessionmaker(bind=self.engine, autoflush=False, autocommit=False)
 
     def create_tables(self):

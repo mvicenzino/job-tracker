@@ -8,21 +8,27 @@ from ..services import JobHuntService
 from ..models import ApplicationStatus, EventType, ContactType
 
 
-def create_app(db_path: str = None):
+def create_app(db_path: str = None, database_url: str = None):
     """Create and configure the Flask application."""
     app = Flask(__name__,
                 template_folder='templates',
                 static_folder='static')
-    app.secret_key = os.urandom(24)
+    app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
 
-    # Database setup
-    if db_path is None:
-        home = os.path.expanduser("~")
-        db_dir = os.path.join(home, ".job-hunt-tracker")
-        os.makedirs(db_dir, exist_ok=True)
-        db_path = os.path.join(db_dir, "job_hunt.db")
+    # Database setup - prefer DATABASE_URL for production
+    if database_url is None:
+        database_url = os.environ.get('DATABASE_URL')
 
-    db = DatabaseConnection(db_path)
+    if database_url:
+        db = DatabaseConnection(database_url=database_url)
+    else:
+        if db_path is None:
+            home = os.path.expanduser("~")
+            db_dir = os.path.join(home, ".job-hunt-tracker")
+            os.makedirs(db_dir, exist_ok=True)
+            db_path = os.path.join(db_dir, "job_hunt.db")
+        db = DatabaseConnection(db_path=db_path)
+
     db.create_tables()
 
     def get_service():
