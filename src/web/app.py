@@ -254,6 +254,23 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
         return redirect(request.referrer or url_for('contacts'))
 
+    @app.route('/contacts/<int:contact_id>/delete', methods=['POST'])
+    def delete_contact(contact_id):
+        """Delete a contact."""
+        service, session = get_service()
+        try:
+            contact = service.contacts.get_by_id(contact_id)
+            if contact:
+                name = contact.name
+                service.contacts.delete(contact_id)
+                session.commit()
+                flash(f'Contact {name} deleted.', 'success')
+            else:
+                flash('Contact not found.', 'error')
+        finally:
+            session.close()
+        return redirect(url_for('contacts'))
+
     @app.route('/schedule')
     def schedule():
         """View schedule."""
