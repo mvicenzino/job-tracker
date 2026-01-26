@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Job Hunt Tracker - LinkedIn",
+  "version": "1.0",
+  "description": "Add LinkedIn contacts to your Job Hunt Tracker",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "https://job-hunt-tracker-sand.vercel.app/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/in/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

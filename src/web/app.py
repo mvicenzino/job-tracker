@@ -580,6 +580,53 @@ def create_app(db_path: str = None, database_url: str = None):
         finally:
             session.close()
 
+    @app.route('/api/contacts', methods=['POST', 'OPTIONS'])
+    def api_create_contact():
+        """API: Create a new contact (for Chrome extension)."""
+        # Handle CORS preflight
+        if request.method == 'OPTIONS':
+            response = jsonify({'status': 'ok'})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+            return response
+
+        service, session = get_service()
+        try:
+            data = request.get_json()
+            if not data or not data.get('name'):
+                response = jsonify({'success': False, 'error': 'Name is required'})
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response, 400
+
+            contact_type = ContactType(data.get('contact_type', 'networking'))
+            contact = service.add_contact(
+                name=data['name'],
+                company_name=data.get('company'),
+                email=data.get('email'),
+                phone=data.get('phone'),
+                title=data.get('title'),
+                contact_type=contact_type,
+                linkedin_url=data.get('linkedin_url'),
+                notes=data.get('notes')
+            )
+            response = jsonify({
+                'success': True,
+                'contact': {
+                    'id': contact.id,
+                    'name': contact.name,
+                    'company': contact.company.name if contact.company else None
+                }
+            })
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
+        except Exception as e:
+            response = jsonify({'success': False, 'error': str(e)})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 500
+        finally:
+            session.close()
+
     return app
 
 

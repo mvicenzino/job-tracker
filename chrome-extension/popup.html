@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      width: 320px;
+      padding: 16px;
+      background: #f8fafc;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    .form-group {
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #1e293b;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: white;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3);
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .message {
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .message.success {
+      background: #d1fae5;
+      color: #065f46;
+      display: block;
+    }
+    .message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      display: block;
+    }
+    .not-linkedin {
+      text-align: center;
+      padding: 20px;
+      color: #64748b;
+    }
+    .not-linkedin p {
+      margin-bottom: 8px;
+    }
+    .settings-link {
+      font-size: 11px;
+      color: #6366f1;
+      text-decoration: none;
+      display: block;
+      margin-top: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span>🎯</span>
+    <h1>Add to Job Tracker</h1>
+  </div>
+
+  <div id="content">
+    <div id="message" class="message"></div>
+
+    <form id="contactForm">
+      <div class="form-group">
+        <label>Name *</label>
+        <input type="text" id="name" required>
+      </div>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="title">
+      </div>
+
+      <div class="form-group">
+        <label>Company</label>
+        <input type="text" id="company">
+      </div>
+
+      <div class="form-group">
+        <label>Contact Type</label>
+        <select id="contact_type">
+          <option value="networking">Networking</option>
+          <option value="recruiter">Recruiter</option>
+          <option value="hiring_manager">Hiring Manager</option>
+          <option value="referral">Referral</option>
+          <option value="peer">Peer</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="notes" placeholder="How did you connect? Any context..."></textarea>
+      </div>
+
+      <input type="hidden" id="linkedin_url">
+
+      <button type="submit" class="btn btn-primary" id="submitBtn">
+        Add Contact
+      </button>
+    </form>
+  </div>
+
+  <div id="notLinkedIn" class="not-linkedin" style="display: none;">
+    <p>📍 Navigate to a LinkedIn profile</p>
+    <p style="font-size: 12px;">This extension works on linkedin.com/in/* pages</p>
+  </div>
+
+  <a href="https://job-hunt-tracker-sand.vercel.app/contacts" target="_blank" class="settings-link">
+    View all contacts →
+  </a>
+
+  <script src="popup.js"></script>
+</body>
+</html>
