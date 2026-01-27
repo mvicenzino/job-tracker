@@ -17,15 +17,31 @@
     .header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
       margin-bottom: 16px;
       padding-bottom: 12px;
       border-bottom: 1px solid #e2e8f0;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .header h1 {
       font-size: 16px;
       font-weight: 600;
       color: #1e293b;
+    }
+    .settings-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: #64748b;
+      font-size: 18px;
+    }
+    .settings-btn:hover {
+      color: #6366f1;
     }
     .form-group {
       margin-bottom: 12px;
@@ -77,6 +93,13 @@
       cursor: not-allowed;
       transform: none;
     }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #475569;
+    }
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
     .message {
       padding: 10px;
       border-radius: 6px;
@@ -92,6 +115,11 @@
     .message.error {
       background: #fee2e2;
       color: #991b1b;
+      display: block;
+    }
+    .message.warning {
+      background: #fef3c7;
+      color: #92400e;
       display: block;
     }
     .not-linkedin {
@@ -110,15 +138,62 @@
       margin-top: 12px;
       text-align: center;
     }
+    #settingsPanel {
+      display: none;
+    }
+    .settings-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #1e293b;
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .btn-row .btn {
+      flex: 1;
+    }
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      background: #f1f5f9;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .status-dot.connected {
+      background: #22c55e;
+    }
+    .status-dot.disconnected {
+      background: #ef4444;
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <span>🎯</span>
-    <h1>Add to Job Tracker</h1>
+    <div class="header-left">
+      <span>🎯</span>
+      <h1>Add to Job Tracker</h1>
+    </div>
+    <button class="settings-btn" id="settingsToggle" title="Settings">⚙️</button>
   </div>
 
+  <!-- Main Content -->
   <div id="content">
+    <div id="connectionStatus" class="status-indicator">
+      <span class="status-dot disconnected" id="statusDot"></span>
+      <span id="statusText">Not configured</span>
+    </div>
+
     <div id="message" class="message"></div>
 
     <form id="contactForm">
@@ -162,12 +237,35 @@
     </form>
   </div>
 
+  <!-- Not on LinkedIn -->
   <div id="notLinkedIn" class="not-linkedin" style="display: none;">
     <p>📍 Navigate to a LinkedIn profile</p>
     <p style="font-size: 12px;">This extension works on linkedin.com/in/* pages</p>
   </div>
 
-  <a href="https://job-hunt-tracker-sand.vercel.app/contacts" target="_blank" class="settings-link">
+  <!-- Settings Panel -->
+  <div id="settingsPanel">
+    <div class="settings-title">Extension Settings</div>
+
+    <div id="settingsMessage" class="message"></div>
+
+    <div class="form-group">
+      <label>Server URL *</label>
+      <input type="url" id="serverUrl" placeholder="https://your-app.vercel.app">
+    </div>
+
+    <div class="form-group">
+      <label>API Key *</label>
+      <input type="password" id="apiKey" placeholder="Your API key from Settings page">
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn btn-secondary" id="cancelSettings">Cancel</button>
+      <button type="button" class="btn btn-primary" id="saveSettings">Save Settings</button>
+    </div>
+  </div>
+
+  <a id="viewContactsLink" href="#" target="_blank" class="settings-link">
     View all contacts →
   </a>
 

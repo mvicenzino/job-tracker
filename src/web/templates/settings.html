@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Job Hunt Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Settings</h1>
+</div>
+
+<div class="settings-grid">
+    <div class="card">
+        <div class="card-header">
+            <h2>Chrome Extension API Key</h2>
+        </div>
+        <div class="card-body">
+            <p class="text-secondary mb-4">
+                Use this API key to authenticate the Chrome extension with your account.
+            </p>
+
+            {% if current_user.api_key %}
+            <div class="api-key-display">
+                <label>Your API Key</label>
+                <div class="api-key-wrapper">
+                    <input type="password" id="apiKey" value="{{ current_user.api_key }}" readonly class="api-key-input">
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="toggleApiKey()">
+                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="copyApiKey()">
+                        Copy
+                    </button>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-muted mb-4">No API key generated yet.</p>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('generate_api_key') }}" class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    {% if current_user.api_key %}Regenerate API Key{% else %}Generate API Key{% endif %}
+                </button>
+            </form>
+
+            {% if current_user.api_key %}
+            <div class="alert alert-warning mt-4">
+                <strong>Note:</strong> Regenerating your API key will invalidate the old one. You'll need to update the key in your Chrome extension.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Chrome Extension Setup</h2>
+        </div>
+        <div class="card-body">
+            <ol class="setup-steps">
+                <li>Generate an API key above</li>
+                <li>Install the Chrome extension from the <code>chrome-extension</code> folder</li>
+                <li>Click the extension icon and go to Settings</li>
+                <li>Enter your API key and server URL</li>
+                <li>Visit any LinkedIn profile and click the extension to add contacts</li>
+            </ol>
+
+            <div class="server-url mt-4">
+                <label>Server URL</label>
+                <div class="api-key-wrapper">
+                    <input type="text" id="serverUrl" value="{{ request.url_root.rstrip('/') }}" readonly class="api-key-input">
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="copyServerUrl()">
+                        Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleApiKey() {
+    const input = document.getElementById('apiKey');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function copyApiKey() {
+    const input = document.getElementById('apiKey');
+    navigator.clipboard.writeText(input.value);
+    alert('API key copied to clipboard!');
+}
+
+function copyServerUrl() {
+    const input = document.getElementById('serverUrl');
+    navigator.clipboard.writeText(input.value);
+    alert('Server URL copied to clipboard!');
+}
+</script>
+
+<style>
+.settings-grid {
+    display: grid;
+    gap: var(--space-6);
+    max-width: 800px;
+}
+
+.api-key-display {
+    margin-bottom: var(--space-4);
+}
+
+.api-key-display label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: var(--space-2);
+    color: var(--color-text-secondary);
+}
+
+.api-key-wrapper {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+}
+
+.api-key-input {
+    flex: 1;
+    font-family: monospace;
+    font-size: 0.875rem;
+    padding: var(--space-3);
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+}
+
+.server-url label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: var(--space-2);
+    color: var(--color-text-secondary);
+}
+
+.setup-steps {
+    padding-left: var(--space-6);
+    color: var(--color-text-secondary);
+}
+
+.setup-steps li {
+    margin-bottom: var(--space-3);
+}
+
+.setup-steps code {
+    background: var(--color-bg-subtle);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+}
+
+.mt-4 {
+    margin-top: var(--space-4);
+}
+
+.mb-4 {
+    margin-bottom: var(--space-4);
+}
+
+.text-secondary {
+    color: var(--color-text-secondary);
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+}
+</style>
+{% endblock %}

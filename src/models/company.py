@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base, TimestampMixin
 
@@ -8,6 +8,7 @@ class Company(Base, TimestampMixin):
     __tablename__ = 'companies'
 
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
     name = Column(String(255), nullable=False, index=True)
     website = Column(String(500))
     industry = Column(String(100))
@@ -19,6 +20,7 @@ class Company(Base, TimestampMixin):
     linkedin_url = Column(String(500))
 
     # Relationships
+    user = relationship("User", back_populates="companies")
     jobs = relationship("Job", back_populates="company", cascade="all, delete-orphan")
     contacts = relationship("Contact", back_populates="company", cascade="all, delete-orphan")
     notes = relationship("Note", back_populates="company", cascade="all, delete-orphan",

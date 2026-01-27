@@ -6,7 +6,7 @@ from datetime import datetime, date, timedelta
 
 from src.database.connection import DatabaseConnection
 from src.models import (
-    Company, Job, Application, ApplicationStatus,
+    User, Company, Job, Application, ApplicationStatus,
     Contact, ContactType, Event, EventType, Note, Tag
 )
 
@@ -34,12 +34,23 @@ def session(db):
     session.close()
 
 
+@pytest.fixture
+def test_user(session):
+    """Create a test user for testing."""
+    user = User(email="test@example.com")
+    user.set_password("testpassword")
+    session.add(user)
+    session.commit()
+    return user
+
+
 class TestCompanyModel:
     """Tests for Company model."""
 
-    def test_create_company(self, session):
+    def test_create_company(self, session, test_user):
         """Test creating a basic company."""
         company = Company(
+            user_id=test_user.id,
             name="Acme Corp",
             website="https://acme.com",
             industry="Technology",
@@ -52,9 +63,10 @@ class TestCompanyModel:
         assert company.name == "Acme Corp"
         assert company.created_at is not None
 
-    def test_company_with_all_fields(self, session):
+    def test_company_with_all_fields(self, session, test_user):
         """Test company with all optional fields."""
         company = Company(
+            user_id=test_user.id,
             name="Tech Giants Inc",
             website="https://techgiants.com",
             industry="Software",
@@ -76,9 +88,9 @@ class TestCompanyModel:
 class TestJobModel:
     """Tests for Job model."""
 
-    def test_create_job_with_company(self, session):
+    def test_create_job_with_company(self, session, test_user):
         """Test creating a job linked to a company."""
-        company = Company(name="Startup XYZ")
+        company = Company(user_id=test_user.id, name="Startup XYZ")
         session.add(company)
         session.flush()
 
@@ -97,9 +109,9 @@ class TestJobModel:
         assert job.company.name == "Startup XYZ"
         assert job.is_active is True
 
-    def test_company_job_relationship(self, session):
+    def test_company_job_relationship(self, session, test_user):
         """Test bidirectional relationship between company and jobs."""
-        company = Company(name="Multi-Job Corp")
+        company = Company(user_id=test_user.id, name="Multi-Job Corp")
         job1 = Job(title="Engineer", company=company)
         job2 = Job(title="Designer", company=company)
         session.add_all([company, job1, job2])
@@ -112,9 +124,9 @@ class TestJobModel:
 class TestApplicationModel:
     """Tests for Application model."""
 
-    def test_create_application(self, session):
+    def test_create_application(self, session, test_user):
         """Test creating an application."""
-        company = Company(name="Dream Company")
+        company = Company(user_id=test_user.id, name="Dream Company")
         job = Job(title="Dream Job", company=company)
         session.add_all([company, job])
         session.flush()
@@ -131,9 +143,9 @@ class TestApplicationModel:
         assert application.id is not None
         assert application.status == ApplicationStatus.APPLIED
 
-    def test_application_status_progression(self, session):
+    def test_application_status_progression(self, session, test_user):
         """Test updating application status through stages."""
-        company = Company(name="Test Company")
+        company = Company(user_id=test_user.id, name="Test Company")
         job = Job(title="Test Position", company=company)
         application = Application(job=job, status=ApplicationStatus.INTERESTED)
         session.add_all([company, job, application])
@@ -152,10 +164,10 @@ class TestApplicationModel:
 
         assert application.status == ApplicationStatus.INTERVIEWING
 
-    def test_application_with_referral(self, session):
+    def test_application_with_referral(self, session, test_user):
         """Test application with a referral contact."""
-        company = Company(name="Referral Corp")
-        contact = Contact(name="John Smith", company=company, contact_type=ContactType.REFERRAL)
+        company = Company(user_id=test_user.id, name="Referral Corp")
+        contact = Contact(user_id=test_user.id, name="John Smith", company=company, contact_type=ContactType.REFERRAL)
         job = Job(title="Referred Position", company=company)
         session.add_all([company, contact, job])
         session.flush()
@@ -174,9 +186,10 @@ class TestApplicationModel:
 class TestContactModel:
     """Tests for Contact model."""
 
-    def test_create_contact(self, session):
+    def test_create_contact(self, session, test_user):
         """Test creating a contact."""
         contact = Contact(
+            user_id=test_user.id,
             name="Jane Doe",
             email="jane@example.com",
             title="Engineering Manager",
@@ -188,10 +201,11 @@ class TestContactModel:
         assert contact.id is not None
         assert contact.contact_type == ContactType.HIRING_MANAGER
 
-    def test_contact_with_company(self, session):
+    def test_contact_with_company(self, session, test_user):
         """Test contact linked to a company."""
-        company = Company(name="Network Inc")
+        company = Company(user_id=test_user.id, name="Network Inc")
         contact = Contact(
+            user_id=test_user.id,
             name="Bob Johnson",
             company=company,
             contact_type=ContactType.EMPLOYEE,
@@ -203,9 +217,10 @@ class TestContactModel:
         assert contact.company.name == "Network Inc"
         assert company.contacts[0].name == "Bob Johnson"
 
-    def test_contact_followup_tracking(self, session):
+    def test_contact_followup_tracking(self, session, test_user):
         """Test tracking contact follow-up dates."""
         contact = Contact(
+            user_id=test_user.id,
             name="Recruiter Amy",
             contact_type=ContactType.RECRUITER,
             last_contact_date=date.today() - timedelta(days=7),
@@ -220,9 +235,9 @@ class TestContactModel:
 class TestEventModel:
     """Tests for Event model."""
 
-    def test_create_interview_event(self, session):
+    def test_create_interview_event(self, session, test_user):
         """Test creating an interview event."""
-        company = Company(name="Interview Corp")
+        company = Company(user_id=test_user.id, name="Interview Corp")
         job = Job(title="Interview Position", company=company)
         application = Application(job=job, status=ApplicationStatus.INTERVIEWING)
         session.add_all([company, job, application])
@@ -243,9 +258,9 @@ class TestEventModel:
         assert event.id is not None
         assert event.application.job.title == "Interview Position"
 
-    def test_event_with_contact(self, session):
+    def test_event_with_contact(self, session, test_user):
         """Test event linked to a contact."""
-        contact = Contact(name="Coffee Chat Contact")
+        contact = Contact(user_id=test_user.id, name="Coffee Chat Contact")
         event = Event(
             title="Coffee chat with contact",
             event_type=EventType.COFFEE_CHAT,
@@ -280,9 +295,9 @@ class TestEventModel:
 class TestNoteModel:
     """Tests for Note model."""
 
-    def test_create_note_for_company(self, session):
+    def test_create_note_for_company(self, session, test_user):
         """Test creating a note attached to a company."""
-        company = Company(name="Noted Company")
+        company = Company(user_id=test_user.id, name="Noted Company")
         note = Note(
             company=company,
             title="Research Notes",
@@ -295,9 +310,9 @@ class TestNoteModel:
         assert note.id is not None
         assert company.notes[0].title == "Research Notes"
 
-    def test_create_note_for_application(self, session):
+    def test_create_note_for_application(self, session, test_user):
         """Test creating a note attached to an application."""
-        company = Company(name="App Note Corp")
+        company = Company(user_id=test_user.id, name="App Note Corp")
         job = Job(title="Noted Position", company=company)
         application = Application(job=job)
         note = Note(
@@ -342,9 +357,9 @@ class TestTagModel:
 class TestCascadeDeletes:
     """Tests for cascade delete behavior."""
 
-    def test_delete_company_cascades_to_jobs(self, session):
+    def test_delete_company_cascades_to_jobs(self, session, test_user):
         """Test that deleting a company deletes its jobs."""
-        company = Company(name="Cascade Corp")
+        company = Company(user_id=test_user.id, name="Cascade Corp")
         job = Job(title="Cascade Job", company=company)
         session.add_all([company, job])
         session.commit()
@@ -355,9 +370,9 @@ class TestCascadeDeletes:
 
         assert session.query(Job).filter_by(id=job_id).first() is None
 
-    def test_delete_job_cascades_to_applications(self, session):
+    def test_delete_job_cascades_to_applications(self, session, test_user):
         """Test that deleting a job deletes its applications."""
-        company = Company(name="Delete Corp")
+        company = Company(user_id=test_user.id, name="Delete Corp")
         job = Job(title="Delete Job", company=company)
         application = Application(job=job)
         session.add_all([company, job, application])
@@ -375,8 +390,15 @@ class TestDatabaseConnection:
 
     def test_session_scope_commits(self, db):
         """Test that session_scope commits on success."""
+        # First create a user
         with db.session_scope() as session:
-            company = Company(name="Scope Test Corp")
+            user = User(email="scope_test@example.com")
+            user.set_password("testpassword")
+            session.add(user)
+
+        with db.session_scope() as session:
+            user = session.query(User).filter_by(email="scope_test@example.com").first()
+            company = Company(user_id=user.id, name="Scope Test Corp")
             session.add(company)
 
         # Verify in new session
@@ -386,9 +408,16 @@ class TestDatabaseConnection:
 
     def test_session_scope_rollback_on_error(self, db):
         """Test that session_scope rolls back on error."""
+        # First create a user
+        with db.session_scope() as session:
+            user = User(email="rollback_test@example.com")
+            user.set_password("testpassword")
+            session.add(user)
+
         try:
             with db.session_scope() as session:
-                company = Company(name="Rollback Corp")
+                user = session.query(User).filter_by(email="rollback_test@example.com").first()
+                company = Company(user_id=user.id, name="Rollback Corp")
                 session.add(company)
                 raise ValueError("Simulated error")
         except ValueError:

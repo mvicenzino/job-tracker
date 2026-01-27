@@ -5,7 +5,7 @@ import pytest
 from datetime import datetime, date, timedelta
 
 from src.database.connection import DatabaseConnection
-from src.models import ApplicationStatus, EventType, ContactType
+from src.models import ApplicationStatus, EventType, ContactType, User
 from src.services import JobHuntService
 
 
@@ -27,7 +27,13 @@ def db():
 def service(db):
     """Get a JobHuntService instance for testing."""
     session = db.get_session()
-    svc = JobHuntService(session)
+    # Create a test user
+    user = User(email="test@example.com")
+    user.set_password("testpassword")
+    session.add(user)
+    session.commit()
+
+    svc = JobHuntService(session, user_id=user.id)
     yield svc
     session.close()
 

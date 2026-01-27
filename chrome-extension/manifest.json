@@ -6,7 +6,9 @@
   "permissions": ["activeTab", "storage"],
   "host_permissions": [
     "https://www.linkedin.com/*",
-    "https://job-hunt-tracker-sand.vercel.app/*"
+    "https://*.vercel.app/*",
+    "http://localhost:*/*",
+    "http://127.0.0.1:*/*"
   ],
   "action": {
     "default_popup": "popup.html",

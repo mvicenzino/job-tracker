@@ -2,10 +2,11 @@
 import os
 from datetime import datetime, date, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 from ..database.connection import DatabaseConnection
 from ..services import JobHuntService
-from ..models import ApplicationStatus, EventType, ContactType
+from ..models import ApplicationStatus, EventType, ContactType, User
 
 
 def create_app(db_path: str = None, database_url: str = None):
@@ -31,10 +32,42 @@ def create_app(db_path: str = None, database_url: str = None):
 
     db.create_tables()
 
-    def get_service():
-        """Get a fresh service instance with a new session."""
+    # Initialize Flask-Login
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = 'login'
+    login_manager.login_message = 'Please log in to access this page.'
+    login_manager.login_message_category = 'warning'
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        """Load user by ID for Flask-Login."""
         session = db.get_session()
-        return JobHuntService(session), session
+        try:
+            return session.query(User).get(int(user_id))
+        finally:
+            session.close()
+
+    def get_service():
+        """Get a fresh service instance with a new session for current user."""
+        session = db.get_session()
+        user_id = current_user.id if current_user.is_authenticated else None
+        return JobHuntService(session, user_id=user_id), session
+
+    def get_user_by_api_key(api_key):
+        """Get user by API key for API authentication."""
+        if not api_key:
+            return None
+        session = db.get_session()
+        try:
+            return session.query(User).filter(User.api_key == api_key).first()
+        finally:
+            session.close()
+
+    def get_service_for_user(user_id):
+        """Get a service instance for a specific user."""
+        session = db.get_session()
+        return JobHuntService(session, user_id=user_id), session
 
     # Template filters
     @app.template_filter('status_color')
@@ -77,8 +110,109 @@ def create_app(db_path: str = None, database_url: str = None):
         }
         return icons.get(event_type, '📌')
 
-    # Routes
+    # Auth Routes
+    @app.route('/register', methods=['GET', 'POST'])
+    def register():
+        """User registration page."""
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+
+        if request.method == 'POST':
+            email = request.form.get('email', '').strip().lower()
+            password = request.form.get('password', '')
+            confirm_password = request.form.get('confirm_password', '')
+
+            if not email or not password:
+                flash('Email and password are required.', 'error')
+                return render_template('register.html')
+
+            if password != confirm_password:
+                flash('Passwords do not match.', 'error')
+                return render_template('register.html')
+
+            if len(password) < 8:
+                flash('Password must be at least 8 characters.', 'error')
+                return render_template('register.html')
+
+            session = db.get_session()
+            try:
+                # Check if user already exists
+                existing_user = session.query(User).filter(User.email == email).first()
+                if existing_user:
+                    flash('An account with this email already exists.', 'error')
+                    return render_template('register.html')
+
+                # Create new user
+                user = User(email=email)
+                user.set_password(password)
+                session.add(user)
+                session.commit()
+
+                login_user(user)
+                flash('Account created successfully!', 'success')
+                return redirect(url_for('dashboard'))
+            finally:
+                session.close()
+
+        return render_template('register.html')
+
+    @app.route('/login', methods=['GET', 'POST'])
+    def login():
+        """User login page."""
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+
+        if request.method == 'POST':
+            email = request.form.get('email', '').strip().lower()
+            password = request.form.get('password', '')
+
+            session = db.get_session()
+            try:
+                user = session.query(User).filter(User.email == email).first()
+
+                if user and user.check_password(password):
+                    login_user(user)
+                    next_page = request.args.get('next')
+                    flash('Logged in successfully!', 'success')
+                    return redirect(next_page or url_for('dashboard'))
+                else:
+                    flash('Invalid email or password.', 'error')
+            finally:
+                session.close()
+
+        return render_template('login.html')
+
+    @app.route('/logout')
+    @login_required
+    def logout():
+        """Log out the current user."""
+        logout_user()
+        flash('You have been logged out.', 'success')
+        return redirect(url_for('login'))
+
+    @app.route('/settings')
+    @login_required
+    def settings():
+        """User settings page with API key management."""
+        return render_template('settings.html')
+
+    @app.route('/settings/api-key', methods=['POST'])
+    @login_required
+    def generate_api_key():
+        """Generate a new API key for the current user."""
+        session = db.get_session()
+        try:
+            user = session.query(User).get(current_user.id)
+            user.generate_api_key()
+            session.commit()
+            flash('New API key generated!', 'success')
+        finally:
+            session.close()
+        return redirect(url_for('settings'))
+
+    # Protected Routes
     @app.route('/')
+    @login_required
     def dashboard():
         """Dashboard home page."""
         service, session = get_service()
@@ -93,6 +227,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/pipeline')
+    @login_required
     def pipeline():
         """Application pipeline view."""
         service, session = get_service()
@@ -105,6 +240,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/applications')
+    @login_required
     def applications():
         """List all applications."""
         service, session = get_service()
@@ -115,6 +251,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/applications/new', methods=['GET', 'POST'])
+    @login_required
     def new_application():
         """Create a new application (quick apply)."""
         if request.method == 'POST':
@@ -133,6 +270,7 @@ def create_app(db_path: str = None, database_url: str = None):
         return render_template('application_form.html')
 
     @app.route('/applications/<int:app_id>')
+    @login_required
     def application_detail(app_id):
         """View application details."""
         service, session = get_service()
@@ -149,6 +287,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/applications/<int:app_id>/status', methods=['POST'])
+    @login_required
     def update_status(app_id):
         """Update application status."""
         service, session = get_service()
@@ -161,6 +300,7 @@ def create_app(db_path: str = None, database_url: str = None):
         return redirect(request.referrer or url_for('pipeline'))
 
     @app.route('/companies')
+    @login_required
     def companies():
         """List all companies."""
         service, session = get_service()
@@ -172,6 +312,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/companies/new', methods=['GET', 'POST'])
+    @login_required
     def new_company():
         """Add a new company."""
         if request.method == 'POST':
@@ -191,6 +332,7 @@ def create_app(db_path: str = None, database_url: str = None):
         return render_template('company_form.html')
 
     @app.route('/contacts')
+    @login_required
     def contacts():
         """List all contacts."""
         service, session = get_service()
@@ -212,6 +354,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/contacts/new', methods=['GET', 'POST'])
+    @login_required
     def new_contact():
         """Add a new contact."""
         service, session = get_service()
@@ -238,6 +381,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/contacts/<int:contact_id>/log', methods=['POST'])
+    @login_required
     def log_contact(contact_id):
         """Log an interaction with a contact."""
         service, session = get_service()
@@ -255,6 +399,7 @@ def create_app(db_path: str = None, database_url: str = None):
         return redirect(request.referrer or url_for('contacts'))
 
     @app.route('/contacts/<int:contact_id>/delete', methods=['POST'])
+    @login_required
     def delete_contact(contact_id):
         """Delete a contact."""
         service, session = get_service()
@@ -272,6 +417,7 @@ def create_app(db_path: str = None, database_url: str = None):
         return redirect(url_for('contacts'))
 
     @app.route('/schedule')
+    @login_required
     def schedule():
         """View schedule."""
         service, session = get_service()
@@ -287,6 +433,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/events/new', methods=['GET', 'POST'])
+    @login_required
     def new_event():
         """Schedule a new event."""
         service, session = get_service()
@@ -324,6 +471,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/events/<int:event_id>/complete', methods=['POST'])
+    @login_required
     def complete_event(event_id):
         """Mark an event as complete."""
         service, session = get_service()
@@ -342,6 +490,7 @@ def create_app(db_path: str = None, database_url: str = None):
         return redirect(request.referrer or url_for('schedule'))
 
     @app.route('/interview/new', methods=['GET', 'POST'])
+    @login_required
     def new_interview():
         """Schedule an interview."""
         service, session = get_service()
@@ -373,6 +522,7 @@ def create_app(db_path: str = None, database_url: str = None):
     # === Edit Routes ===
 
     @app.route('/applications/<int:app_id>/edit', methods=['GET', 'POST'])
+    @login_required
     def edit_application(app_id):
         """Edit application details."""
         service, session = get_service()
@@ -406,6 +556,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/jobs/<int:job_id>/edit', methods=['GET', 'POST'])
+    @login_required
     def edit_job(job_id):
         """Edit job details."""
         service, session = get_service()
@@ -448,6 +599,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/companies/<int:company_id>/edit', methods=['GET', 'POST'])
+    @login_required
     def edit_company(company_id):
         """Edit company details."""
         service, session = get_service()
@@ -485,6 +637,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/contacts/<int:contact_id>/edit', methods=['GET', 'POST'])
+    @login_required
     def edit_contact(contact_id):
         """Edit contact details."""
         service, session = get_service()
@@ -525,6 +678,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/applications/<int:app_id>/notes', methods=['POST'])
+    @login_required
     def add_application_note(app_id):
         """Add a note to an application."""
         service, session = get_service()
@@ -542,6 +696,7 @@ def create_app(db_path: str = None, database_url: str = None):
 
     # API endpoints for AJAX operations
     @app.route('/api/applications/<int:app_id>/status', methods=['PATCH'])
+    @login_required
     def api_update_status(app_id):
         """API: Update application status."""
         service, session = get_service()
@@ -556,6 +711,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/api/applications/<int:app_id>', methods=['PATCH'])
+    @login_required
     def api_update_application(app_id):
         """API: Update application fields."""
         service, session = get_service()
@@ -570,6 +726,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/api/jobs/<int:job_id>', methods=['PATCH'])
+    @login_required
     def api_update_job(job_id):
         """API: Update job fields."""
         service, session = get_service()
@@ -584,6 +741,7 @@ def create_app(db_path: str = None, database_url: str = None):
             session.close()
 
     @app.route('/api/companies/<int:company_id>', methods=['PATCH'])
+    @login_required
     def api_update_company(company_id):
         """API: Update company fields."""
         service, session = get_service()
@@ -605,10 +763,23 @@ def create_app(db_path: str = None, database_url: str = None):
             response = jsonify({'status': 'ok'})
             response.headers['Access-Control-Allow-Origin'] = '*'
             response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
-            response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
             return response
 
-        service, session = get_service()
+        # Check for API key authentication
+        api_key = request.headers.get('X-API-Key')
+        user = get_user_by_api_key(api_key) if api_key else None
+
+        # Fall back to session auth
+        if not user and current_user.is_authenticated:
+            user = current_user
+
+        if not user:
+            response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 401
+
+        service, session = get_service_for_user(user.id)
         try:
             data = request.get_json()
             if not data or not data.get('name'):

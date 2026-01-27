@@ -54,10 +54,11 @@
             <div class="nav-actions">
                 <a href="{{ url_for('new_application') }}" class="btn btn-primary">+ Quick Apply</a>
             </div>
-        </div>
-
-        <div class="nav-actions">
-            <a href="{{ url_for('new_application') }}" class="btn btn-primary">+ Quick Apply</a>
+            <div class="nav-user">
+                <span class="user-email">{{ current_user.email }}</span>
+                <a href="{{ url_for('settings') }}" class="btn btn-ghost btn-sm">Settings</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-sm">Logout</a>
+            </div>
         </div>
     </nav>
 

@@ -24,6 +24,7 @@ class Contact(Base, TimestampMixin):
     __tablename__ = 'contacts'
 
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
     company_id = Column(Integer, ForeignKey('companies.id'), index=True)  # Optional
 
     # Basic info
@@ -46,6 +47,7 @@ class Contact(Base, TimestampMixin):
     notes = Column(Text)
 
     # Relationships
+    user = relationship("User", back_populates="contacts")
     company = relationship("Company", back_populates="contacts")
     events = relationship("Event", back_populates="contact", cascade="all, delete-orphan",
                          foreign_keys="Event.contact_id")

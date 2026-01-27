@@ -1,4 +1,5 @@
 from .base import Base
+from .user import User
 from .company import Company
 from .job import Job
 from .application import Application, ApplicationStatus
@@ -9,6 +10,7 @@ from .tag import Tag, entity_tags
 
 __all__ = [
     'Base',
+    'User',
     'Company',
     'Job',
     'Application',

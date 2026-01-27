@@ -6,7 +6,7 @@ from datetime import datetime, date, timedelta
 
 from src.database.connection import DatabaseConnection
 from src.models import (
-    Company, Job, Application, ApplicationStatus,
+    User, Company, Job, Application, ApplicationStatus,
     Contact, ContactType, Event, EventType, Note, Tag
 )
 from src.repositories import (
@@ -37,19 +37,29 @@ def session(db):
     session.close()
 
 
+@pytest.fixture
+def test_user(session):
+    """Create a test user for testing."""
+    user = User(email="test@example.com")
+    user.set_password("testpassword")
+    session.add(user)
+    session.commit()
+    return user
+
+
 class TestCompanyRepository:
     """Tests for CompanyRepository."""
 
-    def test_create_and_get(self, session):
-        repo = CompanyRepository(session)
+    def test_create_and_get(self, session, test_user):
+        repo = CompanyRepository(session, user_id=test_user.id)
         company = repo.create(name="Test Corp", industry="Tech")
         session.commit()
 
         retrieved = repo.get_by_id(company.id)
         assert retrieved.name == "Test Corp"
 
-    def test_search_by_name(self, session):
-        repo = CompanyRepository(session)
+    def test_search_by_name(self, session, test_user):
+        repo = CompanyRepository(session, user_id=test_user.id)
         repo.create(name="Apple Inc")
         repo.create(name="Pineapple Corp")
         repo.create(name="Microsoft")
@@ -58,8 +68,8 @@ class TestCompanyRepository:
         results = repo.search_by_name("apple")
         assert len(results) == 2
 
-    def test_get_by_industry(self, session):
-        repo = CompanyRepository(session)
+    def test_get_by_industry(self, session, test_user):
+        repo = CompanyRepository(session, user_id=test_user.id)
         repo.create(name="TechCo", industry="Technology")
         repo.create(name="FinCo", industry="Finance")
         repo.create(name="TechStart", industry="Technology")
@@ -68,8 +78,8 @@ class TestCompanyRepository:
         results = repo.get_by_industry("Technology")
         assert len(results) == 2
 
-    def test_update(self, session):
-        repo = CompanyRepository(session)
+    def test_update(self, session, test_user):
+        repo = CompanyRepository(session, user_id=test_user.id)
         company = repo.create(name="Old Name")
         session.commit()
 
@@ -80,8 +90,8 @@ class TestCompanyRepository:
         assert retrieved.name == "New Name"
         assert retrieved.industry == "Updated"
 
-    def test_delete(self, session):
-        repo = CompanyRepository(session)
+    def test_delete(self, session, test_user):
+        repo = CompanyRepository(session, user_id=test_user.id)
         company = repo.create(name="ToDelete")
         session.commit()
 
@@ -94,8 +104,8 @@ class TestCompanyRepository:
 class TestJobRepository:
     """Tests for JobRepository."""
 
-    def test_get_active_jobs(self, session):
-        company_repo = CompanyRepository(session)
+    def test_get_active_jobs(self, session, test_user):
+        company_repo = CompanyRepository(session, user_id=test_user.id)
         job_repo = JobRepository(session)
 
         company = company_repo.create(name="Job Corp")
@@ -107,8 +117,8 @@ class TestJobRepository:
         assert len(active) == 1
         assert active[0].title == "Active Job"
 
-    def test_search_by_title(self, session):
-        company_repo = CompanyRepository(session)
+    def test_search_by_title(self, session, test_user):
+        company_repo = CompanyRepository(session, user_id=test_user.id)
         job_repo = JobRepository(session)
 
         company = company_repo.create(name="Search Corp")
@@ -120,8 +130,8 @@ class TestJobRepository:
         results = job_repo.search_by_title("software")
         assert len(results) == 2
 
-    def test_get_by_salary_range(self, session):
-        company_repo = CompanyRepository(session)
+    def test_get_by_salary_range(self, session, test_user):
+        company_repo = CompanyRepository(session, user_id=test_user.id)
         job_repo = JobRepository(session)
 
         company = company_repo.create(name="Salary Corp")
@@ -133,8 +143,8 @@ class TestJobRepository:
         results = job_repo.get_by_salary_range(100000, 160000)
         assert len(results) == 2  # Mid and High
 
-    def test_deactivate(self, session):
-        company_repo = CompanyRepository(session)
+    def test_deactivate(self, session, test_user):
+        company_repo = CompanyRepository(session, user_id=test_user.id)
         job_repo = JobRepository(session)
 
         company = company_repo.create(name="Deactivate Corp")
@@ -150,8 +160,8 @@ class TestJobRepository:
 class TestApplicationRepository:
     """Tests for ApplicationRepository."""
 
-    def test_get_by_status(self, session):
-        company_repo = CompanyRepository(session)
+    def test_get_by_status(self, session, test_user):
+        company_repo = CompanyRepository(session, user_id=test_user.id)
         job_repo = JobRepository(session)
         app_repo = ApplicationRepository(session)
 
@@ -165,8 +175,8 @@ class TestApplicationRepository:
         applied = app_repo.get_by_status(ApplicationStatus.APPLIED)
         assert len(applied) == 2
 
-    def test_get_active_applications(self, session):
-        company_repo = CompanyRepository(session)
+    def test_get_active_applications(self, session, test_user):
+        company_repo = CompanyRepository(session, user_id=test_user.id)
         job_repo = JobRepository(session)
         app_repo = ApplicationRepository(session)
 
@@ -180,8 +190,8 @@ class TestApplicationRepository:
         active = app_repo.get_active_applications()
         assert len(active) == 2  # APPLIED and INTERVIEWING
 
-    def test_update_status(self, session):
-        company_repo = CompanyRepository(session)
+    def test_update_status(self, session, test_user):
+        company_repo = CompanyRepository(session, user_id=test_user.id)
         job_repo = JobRepository(session)
         app_repo = ApplicationRepository(session)
 
@@ -196,8 +206,8 @@ class TestApplicationRepository:
         assert app.status == ApplicationStatus.APPLIED
         assert app.date_applied == date.today()
 
-    def test_get_stats(self, session):
-        company_repo = CompanyRepository(session)
+    def test_get_stats(self, session, test_user):
+        company_repo = CompanyRepository(session, user_id=test_user.id)
         job_repo = JobRepository(session)
         app_repo = ApplicationRepository(session)
 
@@ -217,8 +227,8 @@ class TestApplicationRepository:
 class TestContactRepository:
     """Tests for ContactRepository."""
 
-    def test_get_needing_followup(self, session):
-        contact_repo = ContactRepository(session)
+    def test_get_needing_followup(self, session, test_user):
+        contact_repo = ContactRepository(session, user_id=test_user.id)
 
         contact_repo.create(
             name="Past Due",
@@ -237,8 +247,8 @@ class TestContactRepository:
         needing = contact_repo.get_needing_followup()
         assert len(needing) == 2
 
-    def test_update_last_contact(self, session):
-        contact_repo = ContactRepository(session)
+    def test_update_last_contact(self, session, test_user):
+        contact_repo = ContactRepository(session, user_id=test_user.id)
 
         contact = contact_repo.create(name="Contact Test")
         session.commit()
@@ -249,8 +259,8 @@ class TestContactRepository:
         assert contact.last_contact_date == date.today()
         assert contact.next_followup_date == date.today() + timedelta(days=14)
 
-    def test_get_by_type(self, session):
-        contact_repo = ContactRepository(session)
+    def test_get_by_type(self, session, test_user):
+        contact_repo = ContactRepository(session, user_id=test_user.id)
 
         contact_repo.create(name="Recruiter 1", contact_type=ContactType.RECRUITER)
         contact_repo.create(name="Recruiter 2", contact_type=ContactType.RECRUITER)
@@ -380,8 +390,8 @@ class TestTagRepository:
         assert tag1.id == tag2.id
         assert tag2.color == "#FF0000"
 
-    def test_tag_entity(self, session):
-        company_repo = CompanyRepository(session)
+    def test_tag_entity(self, session, test_user):
+        company_repo = CompanyRepository(session, user_id=test_user.id)
         tag_repo = TagRepository(session)
 
         company = company_repo.create(name="Tagged Corp")
@@ -395,8 +405,8 @@ class TestTagRepository:
         assert len(tags) == 1
         assert tags[0].name == "tech"
 
-    def test_remove_tag_from_entity(self, session):
-        company_repo = CompanyRepository(session)
+    def test_remove_tag_from_entity(self, session, test_user):
+        company_repo = CompanyRepository(session, user_id=test_user.id)
         tag_repo = TagRepository(session)
 
         company = company_repo.create(name="Untagged Corp")
