@@ -260,6 +260,8 @@ def create_app(db_path: str = None, database_url: str = None):
                     {'name': 'CloudScale', 'industry': 'Cloud Infrastructure', 'size': '500-1000', 'location': 'Seattle, WA', 'website': 'https://cloudscale.example.com', 'description': 'Enterprise cloud solutions'},
                     {'name': 'FinTech Pro', 'industry': 'Financial Services', 'size': '100-300', 'location': 'Chicago, IL', 'website': 'https://fintechpro.example.com', 'description': 'Modern banking platform'},
                     {'name': 'GreenEnergy Labs', 'industry': 'CleanTech', 'size': '50-100', 'location': 'Denver, CO', 'website': 'https://greenenergy.example.com', 'description': 'Renewable energy technology'},
+                    {'name': 'Nexus AI', 'industry': 'Artificial Intelligence', 'size': '100-500', 'location': 'Boston, MA', 'website': 'https://nexusai.example.com', 'description': 'Enterprise AI solutions'},
+                    {'name': 'Quantum Systems', 'industry': 'Enterprise Software', 'size': '500-2000', 'location': 'Portland, OR', 'website': 'https://quantumsys.example.com', 'description': 'Next-gen enterprise platform'},
                 ]
 
                 companies = []
@@ -275,6 +277,8 @@ def create_app(db_path: str = None, database_url: str = None):
                     {'company': companies[3], 'title': 'DevOps Engineer', 'location': 'Seattle, WA', 'remote_type': 'hybrid', 'salary_min': 160000, 'salary_max': 190000, 'source': 'Company Website'},
                     {'company': companies[4], 'title': 'Backend Engineer', 'location': 'Chicago, IL', 'remote_type': 'hybrid', 'salary_min': 145000, 'salary_max': 175000, 'source': 'LinkedIn'},
                     {'company': companies[5], 'title': 'Software Architect', 'location': 'Denver, CO', 'remote_type': 'remote', 'salary_min': 190000, 'salary_max': 230000, 'source': 'Recruiter'},
+                    {'company': companies[6], 'title': 'ML Engineer', 'location': 'Boston, MA', 'remote_type': 'hybrid', 'salary_min': 165000, 'salary_max': 195000, 'source': 'LinkedIn'},
+                    {'company': companies[7], 'title': 'Platform Engineer', 'location': 'Portland, OR', 'remote_type': 'remote', 'salary_min': 155000, 'salary_max': 185000, 'source': 'Indeed'},
                 ]
 
                 # Create jobs
@@ -292,11 +296,20 @@ def create_app(db_path: str = None, database_url: str = None):
                     ApplicationStatus.APPLIED,
                     ApplicationStatus.INTERESTED,
                     ApplicationStatus.FINAL_ROUND,
+                    ApplicationStatus.APPLIED,
+                    ApplicationStatus.APPLIED,
                 ]
 
+                apps = []
                 for i, (job, status) in enumerate(zip(jobs, statuses)):
                     app = service.apply_to_job(job_id=job.id)
                     service.update_application_status(app.id, status)
+                    apps.append(app)
+
+                # Backdate APPLIED applications so they appear as stale (14+ days)
+                for app in apps:
+                    if app.status == ApplicationStatus.APPLIED:
+                        app.date_applied = date.today() - timedelta(days=20)
 
                 # Create sample contacts
                 contacts_data = [
@@ -307,22 +320,35 @@ def create_app(db_path: str = None, database_url: str = None):
                     {'name': 'Lisa Martinez', 'company_name': 'FinTech Pro', 'title': 'HR Director', 'contact_type': ContactType.RECRUITER, 'email': 'lisa.m@example.com', 'linkedin_url': 'https://linkedin.com/in/lisamartinez'},
                 ]
 
+                created_contacts = []
                 for data in contacts_data:
-                    service.add_contact(**data)
+                    created_contacts.append(service.add_contact(**data))
+
+                # Set follow-up dates on some contacts so they appear in "Needs Attention"
+                created_contacts[0].next_followup_date = date.today() - timedelta(days=1)
+                created_contacts[0].last_contact_date = date.today() - timedelta(days=8)
+                created_contacts[2].next_followup_date = date.today()
+                created_contacts[2].last_contact_date = date.today() - timedelta(days=5)
+                created_contacts[3].next_followup_date = date.today() - timedelta(days=2)
+                created_contacts[3].last_contact_date = date.today() - timedelta(days=10)
 
                 # Create sample events
+                today_base = datetime.now().replace(minute=0, second=0, microsecond=0)
                 events_data = [
-                    {'title': 'Technical Interview - TechCorp', 'event_type': EventType.TECHNICAL_INTERVIEW, 'days_offset': 2},
-                    {'title': 'Culture Fit Call - StartupXYZ', 'event_type': EventType.BEHAVIORAL_INTERVIEW, 'days_offset': 4},
-                    {'title': 'Final Round - DataDriven', 'event_type': EventType.PANEL_INTERVIEW, 'days_offset': 7},
-                    {'title': 'Coffee Chat - Emily Park', 'event_type': EventType.COFFEE_CHAT, 'days_offset': 1},
-                    {'title': 'Follow up with Mike', 'event_type': EventType.FOLLOW_UP, 'days_offset': 3},
+                    # Today's events
+                    {'title': 'Phone Screen - FinTech Pro', 'event_type': EventType.PHONE_SCREEN, 'start_time': today_base.replace(hour=10)},
+                    {'title': 'Lunch Chat - James Wilson', 'event_type': EventType.COFFEE_CHAT, 'start_time': today_base.replace(hour=12, minute=30)},
+                    {'title': 'Recruiter Call - GreenEnergy Labs', 'event_type': EventType.PHONE_SCREEN, 'start_time': today_base.replace(hour=15)},
+                    # Upcoming events
+                    {'title': 'Coffee Chat - Emily Park', 'event_type': EventType.COFFEE_CHAT, 'start_time': today_base + timedelta(days=1, hours=10)},
+                    {'title': 'Technical Interview - TechCorp', 'event_type': EventType.TECHNICAL_INTERVIEW, 'start_time': today_base + timedelta(days=2, hours=10)},
+                    {'title': 'Follow up with Mike', 'event_type': EventType.FOLLOW_UP, 'start_time': today_base + timedelta(days=3, hours=10)},
+                    {'title': 'Culture Fit Call - StartupXYZ', 'event_type': EventType.BEHAVIORAL_INTERVIEW, 'start_time': today_base + timedelta(days=4, hours=14)},
+                    {'title': 'Final Round - DataDriven', 'event_type': EventType.PANEL_INTERVIEW, 'start_time': today_base + timedelta(days=7, hours=11)},
                 ]
 
                 for data in events_data:
-                    days_offset = data.pop('days_offset')
-                    start_time = datetime.now() + timedelta(days=days_offset, hours=10)
-                    service.schedule_event(start_time=start_time, **data)
+                    service.schedule_event(**data)
 
                 session.commit()
 

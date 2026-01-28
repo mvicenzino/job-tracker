@@ -3275,11 +3275,112 @@ body.demo-active .navbar {
     }
 }
 
+/* === App Footer === */
+.app-footer {
+    padding: var(--space-8) 0 var(--space-6);
+    background: var(--color-text);
+    color: white;
+    margin-top: var(--space-10);
+}
+
+.app-footer-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--space-8);
+}
+
+.app-footer .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: var(--space-6);
+}
+
+.app-footer .footer-brand-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.25rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    letter-spacing: -0.03em;
+    margin-bottom: var(--space-2);
+}
+
+.app-footer .footer-brand-link:hover {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.app-footer .footer-brand p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+}
+
+.app-footer .footer-link-groups {
+    display: flex;
+    gap: var(--space-10);
+}
+
+.app-footer .footer-link-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.app-footer .footer-link-group h4 {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: var(--space-1);
+}
+
+.app-footer .footer-link-group a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.app-footer .footer-link-group a:hover {
+    color: white;
+}
+
+.app-footer .footer-bottom {
+    text-align: center;
+}
+
+.app-footer .footer-bottom p {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    .app-footer-inner {
+        padding: 0 var(--space-5);
+    }
+
+    .app-footer .footer-content {
+        flex-direction: column;
+        gap: var(--space-6);
+    }
+
+    .app-footer .footer-link-groups {
+        gap: var(--space-8);
+    }
+}
+
 /* === Print Styles === */
 @media print {
     .navbar,
     .hamburger,
     .nav-overlay,
+    .app-footer,
     .btn,
     .form-actions,
     .toast {
