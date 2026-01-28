@@ -174,9 +174,15 @@ a:hover {
 }
 
 .nav-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 72px;
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    padding-right: var(--space-8);
+    z-index: 101;
 }
 
 /* Hide mobile nav-actions on desktop */
@@ -2440,13 +2446,16 @@ a:hover {
         position: fixed;
         top: 0;
         left: 0;
+        right: auto;
         bottom: 0;
+        height: auto;
         width: 300px;
         max-width: 85vw;
         background: var(--color-surface);
         flex-direction: column;
         justify-content: flex-start;
         padding: 0;
+        padding-right: 0;
         z-index: 200;
         transform: translateX(-100%);
         transition: transform var(--transition);
