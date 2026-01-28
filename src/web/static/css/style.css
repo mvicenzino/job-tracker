@@ -234,6 +234,11 @@ a:hover {
     z-index: 250;
     border-radius: var(--radius);
     transition: background-color var(--transition-fast);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .hamburger:hover {
@@ -2458,13 +2463,18 @@ a:hover {
         padding-right: 0;
         z-index: 200;
         transform: translateX(-100%);
-        transition: transform var(--transition);
+        -webkit-transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        -webkit-transition: -webkit-transform 0.3s ease;
         box-shadow: var(--shadow-xl);
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        will-change: transform;
     }
 
     .nav-menu.active {
         transform: translateX(0);
+        -webkit-transform: translateX(0);
     }
 
     .nav-menu-header {

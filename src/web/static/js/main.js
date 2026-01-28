@@ -62,24 +62,38 @@ function initMobileMenu() {
         document.body.style.overflow = '';
     }
 
-    // Toggle menu on hamburger click
-    hamburger.addEventListener('click', function(e) {
+    // Toggle menu on hamburger tap/click
+    function toggleMenu(e) {
+        e.preventDefault();
         e.stopPropagation();
         if (navMenu.classList.contains('active')) {
             closeMenu();
         } else {
             openMenu();
         }
-    });
+    }
+    hamburger.addEventListener('click', toggleMenu);
+    hamburger.addEventListener('touchend', toggleMenu);
+
+    // Expose globally for inline onclick fallback
+    window.__toggleMobileMenu = toggleMenu;
 
     // Close button in menu header
     if (navMenuClose) {
         navMenuClose.addEventListener('click', closeMenu);
+        navMenuClose.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            closeMenu();
+        });
     }
 
-    // Close menu when clicking overlay
+    // Close menu when clicking/tapping overlay
     if (navOverlay) {
         navOverlay.addEventListener('click', closeMenu);
+        navOverlay.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            closeMenu();
+        });
     }
 
     // Close menu when clicking a link
