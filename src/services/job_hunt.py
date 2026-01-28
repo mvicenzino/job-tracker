@@ -23,10 +23,10 @@ class JobHuntService:
         self.session = session
         self.user_id = user_id
         self.companies = CompanyRepository(session, user_id=user_id)
-        self.jobs = JobRepository(session)
-        self.applications = ApplicationRepository(session)
+        self.jobs = JobRepository(session, user_id=user_id)
+        self.applications = ApplicationRepository(session, user_id=user_id)
         self.contacts = ContactRepository(session, user_id=user_id)
-        self.events = EventRepository(session)
+        self.events = EventRepository(session, user_id=user_id)
         self.notes = NoteRepository(session)
         self.tags = TagRepository(session)
 

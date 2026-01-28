@@ -9,12 +9,34 @@ from ..models import Application, ApplicationStatus, Job, Company
 class ApplicationRepository(BaseRepository[Application]):
     """Repository for Application operations."""
 
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, user_id: int = None):
         super().__init__(session, Application)
+        self.user_id = user_id
+
+    def _base_query(self):
+        """Get base query filtered by user_id if set."""
+        query = self.session.query(Application)
+        if self.user_id is not None:
+            query = query.filter(Application.user_id == self.user_id)
+        return query
+
+    def get_by_id(self, id: int) -> Optional[Application]:
+        """Get a single record by ID, filtered by user."""
+        return self._base_query().filter(Application.id == id).first()
+
+    def get_all(self, limit: int = 100, offset: int = 0) -> List[Application]:
+        """Get all records with pagination, filtered by user."""
+        return self._base_query().offset(offset).limit(limit).all()
+
+    def create(self, **kwargs) -> Application:
+        """Create a new record with user_id auto-set."""
+        if self.user_id is not None:
+            kwargs['user_id'] = self.user_id
+        return super().create(**kwargs)
 
     def get_by_status(self, status: ApplicationStatus) -> List[Application]:
         """Get all applications with a specific status."""
-        return self.session.query(Application).filter(
+        return self._base_query().filter(
             Application.status == status
         ).all()
 
@@ -26,27 +48,27 @@ class ApplicationRepository(BaseRepository[Application]):
             ApplicationStatus.GHOSTED,
             ApplicationStatus.ACCEPTED
         ]
-        return self.session.query(Application).filter(
+        return self._base_query().filter(
             Application.status.notin_(inactive_statuses)
         ).order_by(desc(Application.updated_at)).all()
 
     def get_by_job(self, job_id: int) -> List[Application]:
         """Get all applications for a specific job."""
-        return self.session.query(Application).filter(
+        return self._base_query().filter(
             Application.job_id == job_id
         ).all()
 
     def get_recent(self, days: int = 30) -> List[Application]:
         """Get applications from the last N days."""
         cutoff = date.today() - timedelta(days=days)
-        return self.session.query(Application).filter(
+        return self._base_query().filter(
             Application.date_applied >= cutoff
         ).order_by(desc(Application.date_applied)).all()
 
     def get_awaiting_response(self, days_threshold: int = 14) -> List[Application]:
         """Get applications that have been waiting for a response."""
         cutoff = date.today() - timedelta(days=days_threshold)
-        return self.session.query(Application).filter(
+        return self._base_query().filter(
             Application.status == ApplicationStatus.APPLIED,
             Application.date_applied <= cutoff,
             Application.date_response.is_(None)
@@ -67,11 +89,11 @@ class ApplicationRepository(BaseRepository[Application]):
 
     def get_stats(self) -> dict:
         """Get application statistics."""
-        total = self.count()
+        total = self._base_query().count()
         stats = {'total': total, 'by_status': {}}
 
         for status in ApplicationStatus:
-            count = self.session.query(Application).filter(
+            count = self._base_query().filter(
                 Application.status == status
             ).count()
             if count > 0:
@@ -81,8 +103,11 @@ class ApplicationRepository(BaseRepository[Application]):
 
     def get_with_company_info(self) -> List[tuple]:
         """Get applications with company and job info."""
-        return self.session.query(Application, Job, Company).join(
+        query = self.session.query(Application, Job, Company).join(
             Job, Application.job_id == Job.id
         ).join(
             Company, Job.company_id == Company.id
-        ).order_by(desc(Application.updated_at)).all()
+        )
+        if self.user_id is not None:
+            query = query.filter(Application.user_id == self.user_id)
+        return query.order_by(desc(Application.updated_at)).all()

@@ -26,6 +26,7 @@ class Application(Base, TimestampMixin):
     __tablename__ = 'applications'
 
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
     job_id = Column(Integer, ForeignKey('jobs.id'), nullable=False, index=True)
     status = Column(Enum(ApplicationStatus), default=ApplicationStatus.INTERESTED, nullable=False, index=True)
 
@@ -50,6 +51,7 @@ class Application(Base, TimestampMixin):
     excitement_level = Column(Integer)  # 1-5 scale of how excited you are
 
     # Relationships
+    user = relationship("User", backref="applications")
     job = relationship("Job", back_populates="applications")
     referral_contact = relationship("Contact", foreign_keys=[referral_contact_id])
     events = relationship("Event", back_populates="application", cascade="all, delete-orphan")

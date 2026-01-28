@@ -7,37 +7,59 @@ from ..models import Job
 class JobRepository(BaseRepository[Job]):
     """Repository for Job operations."""
 
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, user_id: int = None):
         super().__init__(session, Job)
+        self.user_id = user_id
+
+    def _base_query(self):
+        """Get base query filtered by user_id if set."""
+        query = self.session.query(Job)
+        if self.user_id is not None:
+            query = query.filter(Job.user_id == self.user_id)
+        return query
+
+    def get_by_id(self, id: int) -> Optional[Job]:
+        """Get a single record by ID, filtered by user."""
+        return self._base_query().filter(Job.id == id).first()
+
+    def get_all(self, limit: int = 100, offset: int = 0) -> List[Job]:
+        """Get all records with pagination, filtered by user."""
+        return self._base_query().offset(offset).limit(limit).all()
+
+    def create(self, **kwargs) -> Job:
+        """Create a new record with user_id auto-set."""
+        if self.user_id is not None:
+            kwargs['user_id'] = self.user_id
+        return super().create(**kwargs)
 
     def get_by_company(self, company_id: int) -> List[Job]:
         """Get all jobs for a company."""
-        return self.session.query(Job).filter(Job.company_id == company_id).all()
+        return self._base_query().filter(Job.company_id == company_id).all()
 
     def get_active_jobs(self) -> List[Job]:
         """Get all active job postings."""
-        return self.session.query(Job).filter(Job.is_active == True).all()
+        return self._base_query().filter(Job.is_active == True).all()
 
     def search_by_title(self, title: str) -> List[Job]:
         """Search jobs by title (case-insensitive partial match)."""
-        return self.session.query(Job).filter(
+        return self._base_query().filter(
             Job.title.ilike(f"%{title}%")
         ).all()
 
     def get_remote_jobs(self) -> List[Job]:
         """Get all remote jobs."""
-        return self.session.query(Job).filter(Job.remote_type == "remote").all()
+        return self._base_query().filter(Job.remote_type == "remote").all()
 
     def get_by_salary_range(self, min_salary: int, max_salary: int = None) -> List[Job]:
         """Get jobs within a salary range."""
-        query = self.session.query(Job).filter(Job.salary_max >= min_salary)
+        query = self._base_query().filter(Job.salary_max >= min_salary)
         if max_salary:
             query = query.filter(Job.salary_min <= max_salary)
         return query.all()
 
     def get_by_source(self, source: str) -> List[Job]:
         """Get jobs by source (LinkedIn, Indeed, referral, etc.)."""
-        return self.session.query(Job).filter(
+        return self._base_query().filter(
             Job.source.ilike(f"%{source}%")
         ).all()
 

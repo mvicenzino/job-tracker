@@ -9,14 +9,36 @@ from ..models import Event, EventType
 class EventRepository(BaseRepository[Event]):
     """Repository for Event operations."""
 
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, user_id: int = None):
         super().__init__(session, Event)
+        self.user_id = user_id
+
+    def _base_query(self):
+        """Get base query filtered by user_id if set."""
+        query = self.session.query(Event)
+        if self.user_id is not None:
+            query = query.filter(Event.user_id == self.user_id)
+        return query
+
+    def get_by_id(self, id: int) -> Optional[Event]:
+        """Get a single record by ID, filtered by user."""
+        return self._base_query().filter(Event.id == id).first()
+
+    def get_all(self, limit: int = 100, offset: int = 0) -> List[Event]:
+        """Get all records with pagination, filtered by user."""
+        return self._base_query().offset(offset).limit(limit).all()
+
+    def create(self, **kwargs) -> Event:
+        """Create a new record with user_id auto-set."""
+        if self.user_id is not None:
+            kwargs['user_id'] = self.user_id
+        return super().create(**kwargs)
 
     def get_upcoming(self, days: int = 7) -> List[Event]:
         """Get upcoming events in the next N days."""
         now = datetime.now()
         cutoff = now + timedelta(days=days)
-        return self.session.query(Event).filter(
+        return self._base_query().filter(
             Event.start_time >= now,
             Event.start_time <= cutoff,
             Event.completed == False
@@ -26,26 +48,26 @@ class EventRepository(BaseRepository[Event]):
         """Get all events for today."""
         today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         today_end = today_start + timedelta(days=1)
-        return self.session.query(Event).filter(
+        return self._base_query().filter(
             Event.start_time >= today_start,
             Event.start_time < today_end
         ).order_by(Event.start_time).all()
 
     def get_by_application(self, application_id: int) -> List[Event]:
         """Get all events for a specific application."""
-        return self.session.query(Event).filter(
+        return self._base_query().filter(
             Event.application_id == application_id
         ).order_by(Event.start_time).all()
 
     def get_by_contact(self, contact_id: int) -> List[Event]:
         """Get all events with a specific contact."""
-        return self.session.query(Event).filter(
+        return self._base_query().filter(
             Event.contact_id == contact_id
         ).order_by(Event.start_time).all()
 
     def get_by_type(self, event_type: EventType) -> List[Event]:
         """Get all events of a specific type."""
-        return self.session.query(Event).filter(
+        return self._base_query().filter(
             Event.event_type == event_type
         ).all()
 
@@ -59,13 +81,13 @@ class EventRepository(BaseRepository[Event]):
             EventType.BEHAVIORAL_INTERVIEW,
             EventType.PANEL_INTERVIEW
         ]
-        return self.session.query(Event).filter(
+        return self._base_query().filter(
             Event.event_type.in_(interview_types)
         ).order_by(Event.start_time).all()
 
     def get_past_incomplete(self) -> List[Event]:
         """Get past events that haven't been marked complete."""
-        return self.session.query(Event).filter(
+        return self._base_query().filter(
             Event.start_time < datetime.now(),
             Event.completed == False
         ).order_by(desc(Event.start_time)).all()
@@ -86,7 +108,7 @@ class EventRepository(BaseRepository[Event]):
     def get_needs_reminder(self, minutes_before: int = None) -> List[Event]:
         """Get upcoming events that need reminders."""
         now = datetime.now()
-        events = self.session.query(Event).filter(
+        events = self._base_query().filter(
             Event.start_time > now,
             Event.completed == False
         ).all()

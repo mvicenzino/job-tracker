@@ -8,6 +8,7 @@ class Job(Base, TimestampMixin):
     __tablename__ = 'jobs'
 
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
     company_id = Column(Integer, ForeignKey('companies.id'), nullable=False, index=True)
     title = Column(String(255), nullable=False)
     description = Column(Text)
@@ -22,6 +23,7 @@ class Job(Base, TimestampMixin):
     is_active = Column(Boolean, default=True)  # Is the posting still open?
 
     # Relationships
+    user = relationship("User", backref="jobs")
     company = relationship("Company", back_populates="jobs")
     applications = relationship("Application", back_populates="job", cascade="all, delete-orphan")
     notes = relationship("Note", back_populates="job", cascade="all, delete-orphan",

@@ -30,6 +30,7 @@ class Event(Base, TimestampMixin):
     __tablename__ = 'events'
 
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
     application_id = Column(Integer, ForeignKey('applications.id'), index=True)
     contact_id = Column(Integer, ForeignKey('contacts.id'), index=True)
 
@@ -60,6 +61,7 @@ class Event(Base, TimestampMixin):
     reminder_minutes = Column(Integer, default=30)  # Minutes before to remind
 
     # Relationships
+    user = relationship("User", backref="events")
     application = relationship("Application", back_populates="events")
     contact = relationship("Contact", back_populates="events", foreign_keys=[contact_id])
     notes = relationship("Note", back_populates="event", cascade="all, delete-orphan",
