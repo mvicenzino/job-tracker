@@ -3195,15 +3195,30 @@ body.demo-active .navbar {
     align-items: center;
 }
 
+.btn-demo {
+    background: #f97316;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+}
+
+.btn-demo:hover {
+    background: #ea580c;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
+}
+
 .demo-btn-exit {
-    background: transparent;
-    color: var(--color-text-secondary);
-    border: 1px solid var(--color-border);
+    background: #f97316;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
 }
 
 .demo-btn-exit:hover {
-    background: var(--color-bg-subtle);
-    color: var(--color-text);
+    background: #ea580c;
+    color: white;
     transform: none;
 }
 
