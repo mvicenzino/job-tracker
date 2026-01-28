@@ -183,6 +183,11 @@ a:hover {
     gap: var(--space-2);
     padding-right: var(--space-8);
     z-index: 101;
+    pointer-events: none;
+}
+
+.nav-menu > * {
+    pointer-events: auto;
 }
 
 /* Hide mobile nav-actions on desktop */

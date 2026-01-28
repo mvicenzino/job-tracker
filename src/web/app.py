@@ -47,6 +47,17 @@ def create_app(db_path: str = None, database_url: str = None):
 
     db.create_tables()
 
+    # Prevent browsers from caching static files indefinitely
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
+    @app.after_request
+    def add_cache_headers(response):
+        if 'static' in response.headers.get('Content-Type', '') or request.path.startswith('/static/'):
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+        return response
+
     # Initialize Flask-Login
     login_manager = LoginManager()
     login_manager.init_app(app)
