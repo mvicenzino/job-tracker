@@ -49,7 +49,7 @@ def create_app(db_path: str = None, database_url: str = None):
     login_manager = LoginManager()
     login_manager.init_app(app)
     login_manager.login_view = 'login'
-    login_manager.login_message = 'Please log in to access this page.'
+    login_manager.login_message = 'Please sign in to continue.'
     login_manager.login_message_category = 'warning'
 
     @login_manager.user_loader
@@ -201,7 +201,128 @@ def create_app(db_path: str = None, database_url: str = None):
         """Log out the current user."""
         logout_user()
         flash('You have been logged out.', 'success')
-        return redirect(url_for('login'))
+        return redirect(url_for('landing'))
+
+    # Public Routes
+    @app.route('/')
+    def landing():
+        """Landing page for unauthenticated users."""
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        return render_template('landing.html')
+
+    @app.route('/demo')
+    def demo():
+        """Demo mode - log in as demo user with sample data."""
+        DEMO_EMAIL = 'demo@stride-jobs.com'
+        DEMO_PASSWORD = 'demo-user-2024'
+
+        session = db.get_session()
+        try:
+            # Find or create demo user
+            demo_user = session.query(User).filter(User.email == DEMO_EMAIL).first()
+
+            if not demo_user:
+                demo_user = User(email=DEMO_EMAIL)
+                demo_user.set_password(DEMO_PASSWORD)
+                session.add(demo_user)
+                session.commit()
+                session.refresh(demo_user)
+
+            # Check if demo data needs to be created
+            service = JobHuntService(session, user_id=demo_user.id)
+            existing_apps = service.applications.get_all()
+
+            if len(existing_apps) == 0:
+                # Clear any partial data from failed previous attempts
+                for c in service.companies.get_all():
+                    session.delete(c)
+                for ct in service.contacts.get_all():
+                    session.delete(ct)
+                session.commit()
+                # Create sample companies
+                companies_data = [
+                    {'name': 'TechCorp', 'industry': 'Technology', 'size': '1000-5000', 'location': 'San Francisco, CA', 'website': 'https://techcorp.example.com', 'description': 'Leading enterprise software company'},
+                    {'name': 'StartupXYZ', 'industry': 'SaaS', 'size': '50-200', 'location': 'New York, NY', 'website': 'https://startupxyz.example.com', 'description': 'Fast-growing B2B SaaS startup'},
+                    {'name': 'DataDriven Inc', 'industry': 'Data Analytics', 'size': '200-500', 'location': 'Austin, TX', 'website': 'https://datadriven.example.com', 'description': 'AI-powered analytics platform'},
+                    {'name': 'CloudScale', 'industry': 'Cloud Infrastructure', 'size': '500-1000', 'location': 'Seattle, WA', 'website': 'https://cloudscale.example.com', 'description': 'Enterprise cloud solutions'},
+                    {'name': 'FinTech Pro', 'industry': 'Financial Services', 'size': '100-300', 'location': 'Chicago, IL', 'website': 'https://fintechpro.example.com', 'description': 'Modern banking platform'},
+                    {'name': 'GreenEnergy Labs', 'industry': 'CleanTech', 'size': '50-100', 'location': 'Denver, CO', 'website': 'https://greenenergy.example.com', 'description': 'Renewable energy technology'},
+                ]
+
+                companies = []
+                for data in companies_data:
+                    company = service.add_company(**data)
+                    companies.append(company)
+
+                # Create sample jobs and applications
+                jobs_data = [
+                    {'company': companies[0], 'title': 'Senior Software Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 180000, 'salary_max': 220000, 'source': 'LinkedIn'},
+                    {'company': companies[1], 'title': 'Full Stack Developer', 'location': 'Remote', 'remote_type': 'remote', 'salary_min': 140000, 'salary_max': 170000, 'source': 'Referral'},
+                    {'company': companies[2], 'title': 'Data Engineer', 'location': 'Austin, TX', 'remote_type': 'onsite', 'salary_min': 150000, 'salary_max': 180000, 'source': 'Indeed'},
+                    {'company': companies[3], 'title': 'DevOps Engineer', 'location': 'Seattle, WA', 'remote_type': 'hybrid', 'salary_min': 160000, 'salary_max': 190000, 'source': 'Company Website'},
+                    {'company': companies[4], 'title': 'Backend Engineer', 'location': 'Chicago, IL', 'remote_type': 'hybrid', 'salary_min': 145000, 'salary_max': 175000, 'source': 'LinkedIn'},
+                    {'company': companies[5], 'title': 'Software Architect', 'location': 'Denver, CO', 'remote_type': 'remote', 'salary_min': 190000, 'salary_max': 230000, 'source': 'Recruiter'},
+                ]
+
+                # Create jobs
+                jobs = []
+                for data in jobs_data:
+                    company = data.pop('company')
+                    job = service.jobs.create(company_id=company.id, **data)
+                    jobs.append(job)
+
+                # Create applications with various statuses
+                statuses = [
+                    ApplicationStatus.INTERVIEWING,
+                    ApplicationStatus.OFFER,
+                    ApplicationStatus.SCREENING,
+                    ApplicationStatus.APPLIED,
+                    ApplicationStatus.INTERESTED,
+                    ApplicationStatus.FINAL_ROUND,
+                ]
+
+                for i, (job, status) in enumerate(zip(jobs, statuses)):
+                    app = service.apply_to_job(job_id=job.id)
+                    service.update_application_status(app.id, status)
+
+                # Create sample contacts
+                contacts_data = [
+                    {'name': 'Sarah Chen', 'company_name': 'TechCorp', 'title': 'Engineering Manager', 'contact_type': ContactType.HIRING_MANAGER, 'email': 'sarah.chen@example.com', 'linkedin_url': 'https://linkedin.com/in/sarahchen'},
+                    {'name': 'Mike Johnson', 'company_name': 'StartupXYZ', 'title': 'Senior Recruiter', 'contact_type': ContactType.RECRUITER, 'email': 'mike.j@example.com', 'linkedin_url': 'https://linkedin.com/in/mikejohnson'},
+                    {'name': 'Emily Park', 'company_name': 'DataDriven Inc', 'title': 'Tech Lead', 'contact_type': ContactType.EMPLOYEE, 'email': 'emily.park@example.com', 'linkedin_url': 'https://linkedin.com/in/emilypark'},
+                    {'name': 'James Wilson', 'company_name': 'CloudScale', 'title': 'VP of Engineering', 'contact_type': ContactType.REFERRAL, 'email': 'james.w@example.com', 'linkedin_url': 'https://linkedin.com/in/jameswilson'},
+                    {'name': 'Lisa Martinez', 'company_name': 'FinTech Pro', 'title': 'HR Director', 'contact_type': ContactType.RECRUITER, 'email': 'lisa.m@example.com', 'linkedin_url': 'https://linkedin.com/in/lisamartinez'},
+                ]
+
+                for data in contacts_data:
+                    service.add_contact(**data)
+
+                # Create sample events
+                events_data = [
+                    {'title': 'Technical Interview - TechCorp', 'event_type': EventType.TECHNICAL_INTERVIEW, 'days_offset': 2},
+                    {'title': 'Culture Fit Call - StartupXYZ', 'event_type': EventType.BEHAVIORAL_INTERVIEW, 'days_offset': 4},
+                    {'title': 'Final Round - DataDriven', 'event_type': EventType.PANEL_INTERVIEW, 'days_offset': 7},
+                    {'title': 'Coffee Chat - Emily Park', 'event_type': EventType.COFFEE_CHAT, 'days_offset': 1},
+                    {'title': 'Follow up with Mike', 'event_type': EventType.FOLLOW_UP, 'days_offset': 3},
+                ]
+
+                for data in events_data:
+                    days_offset = data.pop('days_offset')
+                    start_time = datetime.now() + timedelta(days=days_offset, hours=10)
+                    service.schedule_event(start_time=start_time, **data)
+
+                session.commit()
+
+            # Log in as demo user
+            login_user(demo_user, remember=False)
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            session.rollback()
+            import traceback
+            return f'<pre>Demo error: {str(e)}\n\n{traceback.format_exc()}</pre>', 500
+        finally:
+            session.close()
 
     @app.route('/settings')
     @login_required
@@ -224,7 +345,7 @@ def create_app(db_path: str = None, database_url: str = None):
         return redirect(url_for('settings'))
 
     # Protected Routes
-    @app.route('/')
+    @app.route('/dashboard')
     @login_required
     def dashboard():
         """Dashboard home page."""
@@ -344,6 +465,83 @@ def create_app(db_path: str = None, database_url: str = None):
                 session.close()
         return render_template('company_form.html')
 
+    @app.route('/jobs')
+    @login_required
+    def jobs():
+        """List all job listings."""
+        service, session = get_service()
+        try:
+            search = request.args.get('search')
+            flagged_only = request.args.get('flagged')
+            if search:
+                jobs = service.jobs.search(search)
+            elif flagged_only:
+                jobs = service.jobs.get_flagged()
+            else:
+                jobs = service.jobs.get_all()
+            return render_template('jobs.html',
+                                 jobs=jobs,
+                                 search=search,
+                                 flagged_only=flagged_only)
+        finally:
+            session.close()
+
+    @app.route('/jobs/new', methods=['GET', 'POST'])
+    @login_required
+    def new_job():
+        """Add a new job listing."""
+        service, session = get_service()
+        try:
+            if request.method == 'POST':
+                company_id = request.form.get('company_id')
+                if not company_id:
+                    # Create company if it doesn't exist
+                    company_name = request.form.get('company_name', '').strip()
+                    if company_name:
+                        existing = service.find_companies(search=company_name)
+                        if existing:
+                            company_id = existing[0].id
+                        else:
+                            company = service.companies.create(name=company_name)
+                            company_id = company.id
+
+                if company_id:
+                    job = service.jobs.create(
+                        company_id=int(company_id),
+                        title=request.form.get('title', '').strip(),
+                        description=request.form.get('description', '').strip(),
+                        location=request.form.get('location', '').strip(),
+                        remote_type=request.form.get('remote_type'),
+                        salary_min=int(request.form.get('salary_min')) if request.form.get('salary_min') else None,
+                        salary_max=int(request.form.get('salary_max')) if request.form.get('salary_max') else None,
+                        job_url=request.form.get('job_url', '').strip(),
+                        source=request.form.get('source', '').strip(),
+                        is_flagged=bool(request.form.get('is_flagged'))
+                    )
+                    flash('Job added successfully!', 'success')
+                    return redirect(url_for('jobs'))
+                else:
+                    flash('Please select or enter a company.', 'error')
+
+            companies = service.companies.get_all()
+            return render_template('job_form.html', companies=companies)
+        finally:
+            session.close()
+
+    @app.route('/jobs/<int:job_id>/flag', methods=['POST'])
+    @login_required
+    def toggle_job_flag(job_id):
+        """Toggle the flagged/saved status of a job."""
+        service, session = get_service()
+        try:
+            job = service.jobs.toggle_flag(job_id)
+            if job:
+                status = 'saved' if job.is_flagged else 'unsaved'
+                flash(f'Job {status}!', 'success')
+            return redirect(request.referrer or url_for('jobs'))
+        finally:
+            session.close()
+
     @app.route('/contacts')
     @login_required
     def contacts():
@@ -363,6 +561,65 @@ def create_app(db_path: str = None, database_url: str = None):
                                  search=search,
                                  followup=followup,
                                  today=date.today())
+        finally:
+            session.close()
+
+    @app.route('/contacts/export')
+    @login_required
+    def export_contacts_csv():
+        """Export contacts to CSV."""
+        import csv
+        from io import StringIO
+        from flask import Response
+
+        service, session = get_service()
+        try:
+            contacts = service.contacts.get_all()
+
+            # Check if user wants Google Sheets format (opens in browser)
+            format_type = request.args.get('format')
+
+            # Create CSV content
+            output = StringIO()
+            writer = csv.writer(output)
+
+            # Header row
+            writer.writerow(['Name', 'Email', 'Phone', 'Company', 'Title', 'Type', 'LinkedIn', 'Last Contact', 'Next Follow-up', 'Notes'])
+
+            # Data rows
+            for contact in contacts:
+                writer.writerow([
+                    contact.name,
+                    contact.email or '',
+                    contact.phone or '',
+                    contact.company.name if contact.company else '',
+                    contact.title or '',
+                    contact.contact_type.value.replace('_', ' ').title(),
+                    contact.linkedin_url or '',
+                    contact.last_contact_date.strftime('%Y-%m-%d') if contact.last_contact_date else '',
+                    contact.next_followup_date.strftime('%Y-%m-%d') if contact.next_followup_date else '',
+                    contact.notes or ''
+                ])
+
+            csv_content = output.getvalue()
+            output.close()
+
+            if format_type == 'sheets':
+                # Redirect to Google Sheets with the CSV data
+                # This creates a new sheet from CSV
+                import urllib.parse
+                encoded_csv = urllib.parse.quote(csv_content)
+                sheets_url = f"https://docs.google.com/spreadsheets/d/create?title=Stride%20Contacts%20Export"
+                # For now, just download - proper Sheets integration requires OAuth
+                # Fall back to CSV download
+                pass
+
+            # Return as downloadable CSV
+            return Response(
+                csv_content,
+                mimetype='text/csv',
+                headers={'Content-Disposition': f'attachment; filename=stride_contacts_{date.today().strftime("%Y%m%d")}.csv'}
+            )
         finally:
             session.close()
 
@@ -817,6 +1074,168 @@ def create_app(db_path: str = None, database_url: str = None):
                     'id': contact.id,
                     'name': contact.name,
                     'company': contact.company.name if contact.company else None
+                }
+            })
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
+        except Exception as e:
+            response = jsonify({'success': False, 'error': str(e)})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 500
+        finally:
+            session.close()
+
+    @app.route('/api/companies', methods=['POST', 'OPTIONS'])
+    def api_create_company():
+        """API: Create a new company (for Chrome extension)."""
+        # Handle CORS preflight
+        if request.method == 'OPTIONS':
+            response = jsonify({'status': 'ok'})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
+            return response
+
+        # Check for API key authentication
+        api_key = request.headers.get('X-API-Key')
+        user = get_user_by_api_key(api_key) if api_key else None
+
+        # Fall back to session auth
+        if not user and current_user.is_authenticated:
+            user = current_user
+
+        if not user:
+            response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 401
+
+        service, session = get_service_for_user(user.id)
+        try:
+            data = request.get_json()
+            if not data or not data.get('name'):
+                response = jsonify({'success': False, 'error': 'Company name is required'})
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response, 400
+
+            # Check if company already exists
+            existing = service.find_companies(search=data['name'])
+            if existing and existing[0].name.lower() == data['name'].lower():
+                company = existing[0]
+                # Update with any new info
+                updates = {}
+                if data.get('industry') and not company.industry:
+                    updates['industry'] = data['industry']
+                if data.get('size') and not company.size:
+                    updates['size'] = data['size']
+                if data.get('location') and not company.location:
+                    updates['location'] = data['location']
+                if data.get('website') and not company.website:
+                    updates['website'] = data['website']
+                if data.get('description') and not company.description:
+                    updates['description'] = data['description']
+                if data.get('linkedin_url') and not company.linkedin_url:
+                    updates['linkedin_url'] = data['linkedin_url']
+                if updates:
+                    service.companies.update(company.id, **updates)
+                    session.commit()
+                response = jsonify({
+                    'success': True,
+                    'company': {
+                        'id': company.id,
+                        'name': company.name
+                    },
+                    'message': 'Company already exists, updated with new info'
+                })
+            else:
+                company = service.add_company(
+                    name=data['name'],
+                    industry=data.get('industry'),
+                    location=data.get('location'),
+                    website=data.get('website'),
+                    description=data.get('description'),
+                    size=data.get('size'),
+                    linkedin_url=data.get('linkedin_url')
+                )
+                response = jsonify({
+                    'success': True,
+                    'company': {
+                        'id': company.id,
+                        'name': company.name
+                    }
+                })
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
+        except Exception as e:
+            response = jsonify({'success': False, 'error': str(e)})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 500
+        finally:
+            session.close()
+
+    @app.route('/api/jobs', methods=['POST', 'OPTIONS'])
+    def api_create_job():
+        """API: Create a new job listing (for Chrome extension)."""
+        # Handle CORS preflight
+        if request.method == 'OPTIONS':
+            response = jsonify({'status': 'ok'})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
+            return response
+
+        # Check for API key authentication
+        api_key = request.headers.get('X-API-Key')
+        user = get_user_by_api_key(api_key) if api_key else None
+
+        # Fall back to session auth
+        if not user and current_user.is_authenticated:
+            user = current_user
+
+        if not user:
+            response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 401
+
+        service, session = get_service_for_user(user.id)
+        try:
+            data = request.get_json()
+            if not data or not data.get('title'):
+                response = jsonify({'success': False, 'error': 'Job title is required'})
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response, 400
+
+            # Find or create company
+            company_id = None
+            company_name = data.get('company_name', '').strip()
+            if company_name:
+                existing = service.find_companies(search=company_name)
+                if existing:
+                    company_id = existing[0].id
+                else:
+                    company = service.companies.create(name=company_name)
+                    company_id = company.id
+
+            if not company_id:
+                response = jsonify({'success': False, 'error': 'Company name is required'})
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response, 400
+
+            job = service.jobs.create(
+                company_id=company_id,
+                title=data['title'],
+                description=data.get('description', ''),
+                location=data.get('location', ''),
+                remote_type=data.get('remote_type', ''),
+                job_url=data.get('job_url', ''),
+                source=data.get('source', 'LinkedIn'),
+                is_flagged=data.get('is_flagged', False)
+            )
+            response = jsonify({
+                'success': True,
+                'job': {
+                    'id': job.id,
+                    'title': job.title,
+                    'company': job.company.name
                 }
             })
             response.headers['Access-Control-Allow-Origin'] = '*'

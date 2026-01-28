@@ -32,6 +32,25 @@
       font-weight: 600;
       color: #1e293b;
     }
+    .page-type-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .badge-contact {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .badge-company {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .badge-job {
+      background: #fef3c7;
+      color: #92400e;
+    }
     .settings-btn {
       background: none;
       border: none;
@@ -69,6 +88,24 @@
     textarea {
       resize: vertical;
       min-height: 60px;
+    }
+    .form-row {
+      display: flex;
+      gap: 8px;
+    }
+    .form-row .form-group {
+      flex: 1;
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #1e293b;
+      cursor: pointer;
+    }
+    .checkbox-label input[type="checkbox"] {
+      width: auto;
     }
     .btn {
       width: 100%;
@@ -176,6 +213,12 @@
     .status-dot.disconnected {
       background: #ef4444;
     }
+    .data-form {
+      display: none;
+    }
+    .data-form.active {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -186,8 +229,9 @@
         <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
       </svg>
       <h1>Add to Stride</h1>
+      <span id="pageTypeBadge" class="page-type-badge"></span>
     </div>
-    <button class="settings-btn" id="settingsToggle" title="Settings">⚙️</button>
+    <button class="settings-btn" id="settingsToggle" title="Settings">&#9881;</button>
   </div>
 
   <!-- Main Content -->
@@ -199,20 +243,21 @@
 
     <div id="message" class="message"></div>
 
-    <form id="contactForm">
+    <!-- Contact Form -->
+    <form id="contactForm" class="data-form">
       <div class="form-group">
         <label>Name *</label>
-        <input type="text" id="name" required>
+        <input type="text" id="contact_name" required>
       </div>
 
       <div class="form-group">
         <label>Title</label>
-        <input type="text" id="title">
+        <input type="text" id="contact_title">
       </div>
 
       <div class="form-group">
         <label>Company</label>
-        <input type="text" id="company">
+        <input type="text" id="contact_company">
       </div>
 
       <div class="form-group">
@@ -229,21 +274,108 @@
 
       <div class="form-group">
         <label>Notes</label>
-        <textarea id="notes" placeholder="How did you connect? Any context..."></textarea>
+        <textarea id="contact_notes" placeholder="How did you connect? Any context..."></textarea>
       </div>
 
-      <input type="hidden" id="linkedin_url">
+      <input type="hidden" id="contact_linkedin_url">
 
-      <button type="submit" class="btn btn-primary" id="submitBtn">
+      <button type="submit" class="btn btn-primary" id="contactSubmitBtn">
         Add Contact
+      </button>
+    </form>
+
+    <!-- Company Form -->
+    <form id="companyForm" class="data-form">
+      <div class="form-group">
+        <label>Company Name *</label>
+        <input type="text" id="company_name" required>
+      </div>
+
+      <div class="form-group">
+        <label>Industry</label>
+        <input type="text" id="company_industry">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Size</label>
+          <input type="text" id="company_size" placeholder="e.g., 1000-5000">
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" id="company_location">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Website</label>
+        <input type="url" id="company_website" placeholder="https://...">
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="company_description" placeholder="About the company..."></textarea>
+      </div>
+
+      <input type="hidden" id="company_linkedin_url">
+
+      <button type="submit" class="btn btn-primary" id="companySubmitBtn">
+        Add Company
+      </button>
+    </form>
+
+    <!-- Job Form -->
+    <form id="jobForm" class="data-form">
+      <div class="form-group">
+        <label>Job Title *</label>
+        <input type="text" id="job_title" required>
+      </div>
+
+      <div class="form-group">
+        <label>Company *</label>
+        <input type="text" id="job_company" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" id="job_location">
+        </div>
+        <div class="form-group">
+          <label>Work Type</label>
+          <select id="job_remote_type">
+            <option value="">Select...</option>
+            <option value="remote">Remote</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="onsite">On-site</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="job_description" placeholder="Job description..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="job_is_flagged">
+          <span>Save this job (bookmark for later)</span>
+        </label>
+      </div>
+
+      <input type="hidden" id="job_url">
+
+      <button type="submit" class="btn btn-primary" id="jobSubmitBtn">
+        Add Job
       </button>
     </form>
   </div>
 
   <!-- Not on LinkedIn -->
   <div id="notLinkedIn" class="not-linkedin" style="display: none;">
-    <p>📍 Navigate to a LinkedIn profile</p>
-    <p style="font-size: 12px;">This extension works on linkedin.com/in/* pages</p>
+    <p>Navigate to a LinkedIn page</p>
+    <p style="font-size: 12px;">Supported: Profiles, Company pages, Job listings</p>
   </div>
 
   <!-- Settings Panel -->
@@ -268,8 +400,8 @@
     </div>
   </div>
 
-  <a id="viewContactsLink" href="#" target="_blank" class="settings-link">
-    View all contacts →
+  <a id="viewLink" href="#" target="_blank" class="settings-link">
+    View in Stride &rarr;
   </a>
 
   <script src="popup.js"></script>

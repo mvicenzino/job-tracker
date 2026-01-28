@@ -44,9 +44,28 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="empty-state-large">
-        <p>No companies found{% if search %} for "{{ search }}"{% endif %}</p>
-        <a href="{{ url_for('new_company') }}" class="btn btn-primary">Add Your First Company</a>
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state-visual">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 21h18"/>
+                        <path d="M9 8h1"/>
+                        <path d="M9 12h1"/>
+                        <path d="M9 16h1"/>
+                        <path d="M14 8h1"/>
+                        <path d="M14 12h1"/>
+                        <path d="M14 16h1"/>
+                        <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
+                    </svg>
+                </div>
+                <p>{% if search %}No companies found for "{{ search }}"{% else %}No companies yet{% endif %}</p>
+                <span class="empty-hint">{% if search %}Try a different search term{% else %}Start tracking the companies you're interested in{% endif %}</span>
+                <div class="empty-actions">
+                    <a href="{{ url_for('new_company') }}" class="btn btn-primary">+ Add Your First Company</a>
+                </div>
+            </div>
+        </div>
     </div>
     {% endif %}
 </div>

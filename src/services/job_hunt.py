@@ -265,13 +265,14 @@ class JobHuntService:
         active_apps = self.applications.get_active_applications()
         app_stats = self.applications.get_stats()
         stale_apps = self.applications.get_awaiting_response(days_threshold=14)
+        all_contacts = self.contacts.get_all()
 
         return {
             'summary': {
                 'active_applications': len(active_apps),
                 'total_applications': app_stats['total'],
                 'events_today': len(today_events),
-                'events_this_week': len(upcoming_events),
+                'total_contacts': len(all_contacts),
                 'contacts_need_followup': len(followups_needed),
                 'apps_awaiting_response': len(stale_apps)
             },

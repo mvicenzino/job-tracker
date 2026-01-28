@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Stride - LinkedIn",
-  "version": "1.0",
-  "description": "Add LinkedIn contacts to Stride",
+  "version": "1.1",
+  "description": "Add LinkedIn contacts, companies, and jobs to Stride",
   "permissions": ["activeTab", "storage"],
   "host_permissions": [
     "https://www.linkedin.com/*",
@@ -20,7 +20,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.linkedin.com/in/*"],
+      "matches": [
+        "https://www.linkedin.com/in/*",
+        "https://www.linkedin.com/company/*",
+        "https://www.linkedin.com/jobs/view/*",
+        "https://www.linkedin.com/jobs/collections/*"
+      ],
       "js": ["content.js"]
     }
   ],

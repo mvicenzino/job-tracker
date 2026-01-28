@@ -98,10 +98,25 @@
         {% endfor %}
     </section>
     {% elif not today %}
-    <div class="empty-state-large">
-        <p>No events scheduled for the next {{ days }} days</p>
-        <a href="{{ url_for('new_event') }}" class="btn btn-secondary">Add Event</a>
-        <a href="{{ url_for('new_interview') }}" class="btn btn-primary">Schedule Interview</a>
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state-visual">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                </div>
+                <p>No events scheduled for the next {{ days }} days</p>
+                <span class="empty-hint">Time to line up some interviews!</span>
+                <div class="empty-actions">
+                    <a href="{{ url_for('new_event') }}" class="btn btn-secondary">+ Add Event</a>
+                    <a href="{{ url_for('new_interview') }}" class="btn btn-primary">+ Schedule Interview</a>
+                </div>
+            </div>
+        </div>
     </div>
     {% endif %}
 </div>

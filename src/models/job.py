@@ -21,6 +21,7 @@ class Job(Base, TimestampMixin):
     job_url = Column(String(500))
     source = Column(String(100))  # Where you found it: LinkedIn, Indeed, referral, etc.
     is_active = Column(Boolean, default=True)  # Is the posting still open?
+    is_flagged = Column(Boolean, default=False)  # Saved/bookmarked job
 
     # Relationships
     user = relationship("User", backref="jobs")

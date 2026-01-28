@@ -5,8 +5,42 @@
 {% block content %}
 <div class="list-page">
     <header class="page-header">
-        <h1>Contacts</h1>
-        <a href="{{ url_for('new_contact') }}" class="btn btn-primary">+ Add Contact</a>
+        <div>
+            <h1>Contacts</h1>
+        </div>
+        <div class="header-actions">
+            {% if contacts %}
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:4px;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Export
+                </button>
+                <div class="dropdown-menu">
+                    <a href="{{ url_for('export_contacts_csv') }}" class="dropdown-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:8px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                        Export to CSV
+                    </a>
+                    <a href="{{ url_for('export_contacts_csv', format='sheets') }}" class="dropdown-item">
+                        <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:8px;">
+                            <path fill="#34A853" d="M19 11V9h-4V5h-2v4H9v2h4v4h2v-4h4z"/>
+                            <path fill="#188038" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+                        </svg>
+                        Open in Google Sheets
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            <a href="{{ url_for('new_contact') }}" class="btn btn-primary">+ Add Contact</a>
+        </div>
     </header>
 
     <div class="filter-bar">
@@ -80,9 +114,24 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state-large">
-        <p>No contacts found{% if search %} for "{{ search }}"{% endif %}</p>
-        <a href="{{ url_for('new_contact') }}" class="btn btn-primary">Add Your First Contact</a>
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state-visual">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <p>{% if search %}No contacts found for "{{ search }}"{% elif followup %}No contacts need follow-up{% else %}No contacts yet{% endif %}</p>
+                <span class="empty-hint">{% if search %}Try a different search term{% elif followup %}Great job staying in touch!{% else %}Build your professional network{% endif %}</span>
+                <div class="empty-actions">
+                    <a href="{{ url_for('new_contact') }}" class="btn btn-primary">+ Add Your First Contact</a>
+                </div>
+            </div>
+        </div>
     </div>
     {% endif %}
 </div>

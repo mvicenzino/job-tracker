@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Job Listings - Stride{% endblock %}
+
+{% block content %}
+<div class="list-page">
+    <header class="page-header">
+        <div>
+            <h1>Job Listings</h1>
+            <p class="subtitle">Save interesting roles before you apply</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('new_job') }}" class="btn btn-primary">+ Add Job</a>
+        </div>
+    </header>
+
+    <div class="filter-bar">
+        <form class="search-form" method="get">
+            <input type="text" name="search" placeholder="Search jobs..." value="{{ search or '' }}">
+            <button type="submit" class="btn btn-secondary">Search</button>
+        </form>
+        <div class="filter-buttons">
+            <a href="{{ url_for('jobs') }}" class="btn {% if not flagged_only %}btn-primary{% else %}btn-secondary{% endif %}">All</a>
+            <a href="{{ url_for('jobs', flagged='true') }}" class="btn {% if flagged_only %}btn-primary{% else %}btn-secondary{% endif %}">Saved</a>
+        </div>
+    </div>
+
+    {% if jobs %}
+    <div class="card-grid">
+        {% for job in jobs %}
+        <div class="card job-card {% if job.is_flagged %}flagged{% endif %}">
+            <div class="card-body">
+                <div class="job-card-header">
+                    <div class="job-info">
+                        <span class="job-company">{{ job.company.name }}</span>
+                        <h3 class="job-title">{{ job.title }}</h3>
+                    </div>
+                    <form action="{{ url_for('toggle_job_flag', job_id=job.id) }}" method="post" class="flag-form">
+                        <button type="submit" class="flag-btn {% if job.is_flagged %}active{% endif %}" title="{% if job.is_flagged %}Remove from saved{% else %}Save job{% endif %}">
+                            {% if job.is_flagged %}
+                            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            {% else %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+
+                <div class="job-meta">
+                    {% if job.location %}
+                    <span class="job-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="meta-icon">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        {{ job.location }}
+                    </span>
+                    {% endif %}
+                    {% if job.remote_type %}
+                    <span class="job-remote badge badge-{{ job.remote_type }}">{{ job.remote_type|title }}</span>
+                    {% endif %}
+                    {% if job.salary_min or job.salary_max %}
+                    <span class="job-salary">
+                        {{ job.salary_currency }}
+                        {% if job.salary_min and job.salary_max %}
+                            {{ "{:,}".format(job.salary_min) }} - {{ "{:,}".format(job.salary_max) }}
+                        {% elif job.salary_min %}
+                            {{ "{:,}".format(job.salary_min) }}+
+                        {% else %}
+                            Up to {{ "{:,}".format(job.salary_max) }}
+                        {% endif %}
+                    </span>
+                    {% endif %}
+                </div>
+
+                {% if job.source %}
+                <div class="job-source">
+                    <span class="source-label">Source:</span> {{ job.source }}
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                {% if job.job_url %}
+                <a href="{{ job.job_url }}" target="_blank" class="btn btn-sm btn-ghost">View Posting</a>
+                {% endif %}
+                <a href="{{ url_for('new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Apply</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state-visual">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                    </svg>
+                </div>
+                <p>{% if search %}No jobs found for "{{ search }}"{% elif flagged_only %}No saved jobs yet{% else %}No job listings yet{% endif %}</p>
+                <span class="empty-hint">{% if flagged_only %}Save jobs you're interested in to review later{% else %}Add jobs you find interesting to track them{% endif %}</span>
+                <div class="empty-actions">
+                    <a href="{{ url_for('new_job') }}" class="btn btn-primary">+ Add Your First Job</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

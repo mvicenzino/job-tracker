@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stride - The modern job search tracker. Organize applications, track interviews, and land your next role faster.">
+    <title>Stride - Land Your Next Role</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body class="landing-body">
+    <!-- Navigation -->
+    <nav class="landing-nav">
+        <div class="landing-nav-container">
+            <a href="{{ url_for('landing') }}" class="landing-brand">
+                <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                </svg>
+                <span>Stride</span>
+                <span class="brand-tagline">Stride into your next role</span>
+            </a>
+            <div class="landing-nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="{{ url_for('demo') }}" class="btn btn-secondary">Try Demo</a>
+                <a href="{{ url_for('login') }}" class="btn btn-ghost">Sign In</a>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started Free</a>
+            </div>
+            <button class="landing-menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="landing-mobile-menu" id="mobileMenu">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="{{ url_for('demo') }}">Try Demo</a>
+        <a href="{{ url_for('login') }}">Sign In</a>
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started Free</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="hero-gradient"></div>
+            <div class="hero-pattern"></div>
+        </div>
+        <div class="hero-container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                Free to use, no credit card required
+            </div>
+            <h1 class="hero-title">
+                Your Job Search,<br>
+                <span class="gradient-text">Finally Organized</span>
+            </h1>
+            <p class="hero-subtitle">
+                Stop losing track of applications in spreadsheets. Stride helps you manage your entire job search pipeline, track interviews, and follow up with contacts — all in one beautiful dashboard.
+            </p>
+            <div class="hero-cta">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                    Start Tracking Free
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="#features" class="btn btn-secondary btn-lg">See How It Works</a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Free Forever</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <span class="stat-number">2 min</span>
+                    <span class="stat-label">Setup Time</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <span class="stat-number">No</span>
+                    <span class="stat-label">Credit Card</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="preview-stack">
+                <!-- Background card - Pipeline -->
+                <div class="dashboard-preview preview-back">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <span class="preview-title">Pipeline</span>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-kanban">
+                            <div class="kanban-col">
+                                <div class="kanban-header">Applied</div>
+                                <div class="kanban-card"></div>
+                                <div class="kanban-card"></div>
+                                <div class="kanban-card"></div>
+                            </div>
+                            <div class="kanban-col">
+                                <div class="kanban-header">Interview</div>
+                                <div class="kanban-card highlight"></div>
+                                <div class="kanban-card"></div>
+                            </div>
+                            <div class="kanban-col">
+                                <div class="kanban-header">Offer</div>
+                                <div class="kanban-card success"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Middle card - Schedule -->
+                <div class="dashboard-preview preview-mid">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <span class="preview-title">Schedule</span>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-events">
+                            <div class="preview-event">
+                                <div class="event-time">10:00</div>
+                                <div class="event-info">
+                                    <span class="event-name">Technical Interview</span>
+                                    <span class="event-company">Acme Corp</span>
+                                </div>
+                            </div>
+                            <div class="preview-event">
+                                <div class="event-time">14:30</div>
+                                <div class="event-info">
+                                    <span class="event-name">Culture Fit Call</span>
+                                    <span class="event-company">StartupXYZ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Front card - Dashboard -->
+                <div class="dashboard-preview preview-front">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <span class="preview-title">Dashboard</span>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-stats">
+                            <div class="preview-stat-card">
+                                <span class="preview-stat-value">12</span>
+                                <span class="preview-stat-label">Active</span>
+                            </div>
+                            <div class="preview-stat-card highlight">
+                                <span class="preview-stat-value">3</span>
+                                <span class="preview-stat-label">Interviews</span>
+                            </div>
+                            <div class="preview-stat-card">
+                                <span class="preview-stat-value">2</span>
+                                <span class="preview-stat-label">Offers</span>
+                            </div>
+                        </div>
+                        <div class="preview-pipeline">
+                            <div class="preview-stage" style="--stage-color: #6366f1">
+                                <span class="stage-count">8</span>
+                                <span class="stage-name">Applied</span>
+                            </div>
+                            <div class="preview-stage" style="--stage-color: #8b5cf6">
+                                <span class="stage-count">4</span>
+                                <span class="stage-name">Screening</span>
+                            </div>
+                            <div class="preview-stage" style="--stage-color: #06b6d4">
+                                <span class="stage-count">3</span>
+                                <span class="stage-name">Interview</span>
+                            </div>
+                            <div class="preview-stage" style="--stage-color: #10b981">
+                                <span class="stage-count">2</span>
+                                <span class="stage-name">Offer</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-tag">Features</span>
+                <h2 class="section-title">Everything You Need to<br>Land Your Next Role</h2>
+                <p class="section-subtitle">
+                    Stride replaces messy spreadsheets with a purpose-built tool designed for modern job seekers.
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="--icon-color: #6366f1; --icon-bg: #eef2ff;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M3 9h18"/>
+                            <path d="M9 21V9"/>
+                        </svg>
+                    </div>
+                    <h3>Visual Pipeline</h3>
+                    <p>See all your applications at a glance with a Kanban-style board. Drag and drop to update status instantly.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="--icon-color: #8b5cf6; --icon-bg: #f3e8ff;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                    </div>
+                    <h3>Interview Scheduler</h3>
+                    <p>Never miss an interview. Track upcoming events, add meeting links, and get reminders for important dates.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="--icon-color: #06b6d4; --icon-bg: #cffafe;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <h3>Contact Management</h3>
+                    <p>Keep track of recruiters, hiring managers, and referrals. Set follow-up reminders to stay top of mind.</p>
+                    <div class="feature-highlight">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="chrome-icon">
+                            <circle cx="12" cy="12" r="10" fill="#4285F4"/>
+                            <circle cx="12" cy="12" r="4" fill="white"/>
+                            <path d="M12 6a6 6 0 0 1 5.196 3H12V6z" fill="#EA4335"/>
+                            <path d="M6.804 9A6 6 0 0 1 12 6v3H6.804z" fill="#FBBC05"/>
+                            <path d="M6.804 9A6 6 0 0 0 12 18v-3a3 3 0 0 1-2.598-4.5L6.804 9z" fill="#34A853"/>
+                            <path d="M12 18a6 6 0 0 0 5.196-9h-2.598A3 3 0 0 1 12 15v3z" fill="#4285F4"/>
+                        </svg>
+                        <span>Chrome extension auto-imports contacts from LinkedIn</span>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="--icon-color: #f59e0b; --icon-bg: #fef3c7;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 21h18"/>
+                            <path d="M9 8h1"/>
+                            <path d="M9 12h1"/>
+                            <path d="M9 16h1"/>
+                            <path d="M14 8h1"/>
+                            <path d="M14 12h1"/>
+                            <path d="M14 16h1"/>
+                            <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
+                        </svg>
+                    </div>
+                    <h3>Company Research</h3>
+                    <p>Store company details, notes, and insights. Know exactly who you're interviewing with.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="--icon-color: #10b981; --icon-bg: #d1fae5;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                    <h3>Progress Dashboard</h3>
+                    <p>Get insights into your job search with stats on applications, response rates, and pipeline health.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="--icon-color: #ef4444; --icon-bg: #fee2e2;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                    </div>
+                    <h3>Smart Reminders</h3>
+                    <p>Get alerts for stale applications and overdue follow-ups. Never let opportunities slip away.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-tag">How It Works</span>
+                <h2 class="section-title">Get Started in Minutes</h2>
+                <p class="section-subtitle">
+                    Three simple steps to transform your job search from chaos to clarity.
+                </p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Create Your Account</h3>
+                    <p>Sign up for free in seconds. No credit card required, no strings attached.</p>
+                </div>
+                <div class="step-connector">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Add Your Applications</h3>
+                    <p>Enter jobs you've applied to or are interested in. Add companies and contacts as you go.</p>
+                </div>
+                <div class="step-connector">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Track & Land Offers</h3>
+                    <p>Update statuses, schedule interviews, and watch your pipeline fill with opportunities.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="section-container">
+            <div class="cta-card">
+                <div class="cta-content">
+                    <h2>Ready to Take Control of Your Job Search?</h2>
+                    <p>Join thousands of job seekers who've ditched spreadsheets for a better way to land their dream role.</p>
+                    <div class="cta-buttons">
+                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                            Get Started Free
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="cta-visual">
+                    <div class="cta-checkmarks">
+                        <div class="checkmark-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Free forever</span>
+                        </div>
+                        <div class="checkmark-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>No credit card</span>
+                        </div>
+                        <div class="checkmark-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Setup in 2 minutes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="section-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="{{ url_for('landing') }}" class="landing-brand">
+                        <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                        </svg>
+                        <span>Stride</span>
+                    </a>
+                    <p>Stride into your next role</p>
+                </div>
+                <div class="footer-links">
+                    <a href="{{ url_for('login') }}">Sign In</a>
+                    <a href="{{ url_for('register') }}">Get Started</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Stride. Built for job seekers, by job seekers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu on link click
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Navbar background on scroll
+        const nav = document.querySelector('.landing-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

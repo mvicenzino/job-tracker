@@ -66,3 +66,23 @@ class JobRepository(BaseRepository[Job]):
     def deactivate(self, job_id: int) -> Optional[Job]:
         """Mark a job as no longer active."""
         return self.update(job_id, is_active=False)
+
+    def get_flagged(self) -> List[Job]:
+        """Get all flagged/saved jobs."""
+        return self._base_query().filter(Job.is_flagged == True).order_by(Job.created_at.desc()).all()
+
+    def toggle_flag(self, job_id: int) -> Optional[Job]:
+        """Toggle the flagged status of a job."""
+        job = self.get_by_id(job_id)
+        if job:
+            job.is_flagged = not job.is_flagged
+            self.session.commit()
+        return job
+
+    def search(self, query: str) -> List[Job]:
+        """Search jobs by title or company name."""
+        from ..models import Company
+        return self._base_query().join(Company).filter(
+            (Job.title.ilike(f"%{query}%")) |
+            (Company.name.ilike(f"%{query}%"))
+        ).order_by(Job.created_at.desc()).all()
