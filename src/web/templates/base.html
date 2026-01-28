@@ -15,13 +15,18 @@
     {% block head %}{% endblock %}
 </head>
 <body{% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %} class="demo-active"{% endif %}>
+    <script>
+    function openMobileMenu(){var h=document.getElementById('hamburger'),m=document.getElementById('nav-menu'),o=document.getElementById('nav-overlay');h.classList.add('active');m.classList.add('active');if(o)o.classList.add('active');document.body.style.overflow='hidden';}
+    function closeMobileMenu(){var h=document.getElementById('hamburger'),m=document.getElementById('nav-menu'),o=document.getElementById('nav-overlay');h.classList.remove('active');m.classList.remove('active');if(o)o.classList.remove('active');document.body.style.overflow='';}
+    function toggleMobileMenu(){var m=document.getElementById('nav-menu');if(m.classList.contains('active')){closeMobileMenu();}else{openMobileMenu();}}
+    </script>
+
     <!-- Mobile overlay -->
-    <div class="nav-overlay" id="nav-overlay"></div>
+    <div class="nav-overlay" id="nav-overlay" onclick="closeMobileMenu()"></div>
 
     <nav class="navbar">
         <div class="nav-left">
-            <button type="button" class="hamburger" id="hamburger" aria-label="Toggle menu"
-                    onclick="if(window.__toggleMobileMenu){return}var m=document.getElementById('nav-menu'),o=document.getElementById('nav-overlay');this.classList.toggle('active');m.classList.toggle('active');if(o)o.classList.toggle('active');document.body.style.overflow=m.classList.contains('active')?'hidden':''">
+            <button type="button" class="hamburger" id="hamburger" aria-label="Toggle menu" onclick="toggleMobileMenu()">
                 <span class="hamburger-line"></span>
                 <span class="hamburger-line"></span>
                 <span class="hamburger-line"></span>
@@ -46,7 +51,7 @@
     <div class="nav-menu" id="nav-menu">
         <div class="nav-menu-header">
             <span class="menu-title">Menu</span>
-            <button class="nav-menu-close" id="nav-menu-close" aria-label="Close menu">&times;</button>
+            <button type="button" class="nav-menu-close" id="nav-menu-close" aria-label="Close menu" onclick="closeMobileMenu()">&times;</button>
         </div>
         {% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %}
         <div class="demo-nav-notice">

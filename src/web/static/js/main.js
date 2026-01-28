@@ -41,71 +41,21 @@ document.addEventListener('DOMContentLoaded', function() {
 // === Mobile Menu ===
 
 function initMobileMenu() {
-    const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('nav-menu');
-    const navOverlay = document.getElementById('nav-overlay');
-    const navMenuClose = document.getElementById('nav-menu-close');
+    if (!navMenu) return;
 
-    if (!hamburger || !navMenu) return;
-
-    function openMenu() {
-        hamburger.classList.add('active');
-        navMenu.classList.add('active');
-        if (navOverlay) navOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeMenu() {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
-        if (navOverlay) navOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    // Toggle menu on hamburger tap/click
-    function toggleMenu(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (navMenu.classList.contains('active')) {
-            closeMenu();
-        } else {
-            openMenu();
-        }
-    }
-    hamburger.addEventListener('click', toggleMenu);
-    hamburger.addEventListener('touchend', toggleMenu);
-
-    // Expose globally for inline onclick fallback
-    window.__toggleMobileMenu = toggleMenu;
-
-    // Close button in menu header
-    if (navMenuClose) {
-        navMenuClose.addEventListener('click', closeMenu);
-        navMenuClose.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            closeMenu();
-        });
-    }
-
-    // Close menu when clicking/tapping overlay
-    if (navOverlay) {
-        navOverlay.addEventListener('click', closeMenu);
-        navOverlay.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            closeMenu();
-        });
-    }
-
-    // Close menu when clicking a link
+    // Close menu when clicking a nav link (page will reload, but close instantly)
     const navLinks = navMenu.querySelectorAll('.nav-links a');
     navLinks.forEach(link => {
-        link.addEventListener('click', closeMenu);
+        link.addEventListener('click', function() {
+            if (typeof closeMobileMenu === 'function') closeMobileMenu();
+        });
     });
 
     // Close menu on escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && navMenu.classList.contains('active')) {
-            closeMenu();
+            if (typeof closeMobileMenu === 'function') closeMobileMenu();
         }
     });
 
@@ -115,7 +65,7 @@ function initMobileMenu() {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function() {
             if (window.innerWidth > 768 && navMenu.classList.contains('active')) {
-                closeMenu();
+                if (typeof closeMobileMenu === 'function') closeMobileMenu();
             }
         }, 100);
     });

@@ -2470,11 +2470,13 @@ a:hover {
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         will-change: transform;
+        pointer-events: none;
     }
 
     .nav-menu.active {
         transform: translateX(0);
         -webkit-transform: translateX(0);
+        pointer-events: auto;
     }
 
     .nav-menu-header {
