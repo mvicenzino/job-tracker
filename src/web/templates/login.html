@@ -34,7 +34,7 @@
                 {% endif %}
             {% endwith %}
 
-            <form method="POST" class="auth-form">
+            <form method="POST" class="auth-form" id="loginForm">
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required autofocus
@@ -59,7 +59,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Sign In</button>
             </form>
 
             <script>
@@ -77,6 +77,13 @@
                         eyeOffIcon.style.display = 'none';
                     }
                 }
+
+                // Show loading state on form submit
+                document.getElementById('loginForm').addEventListener('submit', function() {
+                    const btn = document.getElementById('submitBtn');
+                    btn.disabled = true;
+                    btn.textContent = 'Signing in...';
+                });
             </script>
 
             <div class="auth-footer">
