@@ -1,4 +1,5 @@
 """Flask web application for Job Hunt Tracker."""
+import io
 import os
 from datetime import datetime, date, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
@@ -28,6 +29,7 @@ def create_app(db_path: str = None, database_url: str = None):
     app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
     app.config['REMEMBER_COOKIE_SECURE'] = bool(is_production)
     app.config['REMEMBER_COOKIE_HTTPONLY'] = True
+    app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB upload limit
 
     # Database setup - prefer DATABASE_URL for production
     if database_url is None:
@@ -350,6 +352,78 @@ def create_app(db_path: str = None, database_url: str = None):
             user.generate_api_key()
             session.commit()
             flash('New API key generated!', 'success')
+        finally:
+            session.close()
+        return redirect(url_for('settings'))
+
+    @app.route('/settings/resume', methods=['POST'])
+    @login_required
+    def save_resume():
+        """Save resume text from paste or PDF upload."""
+        session = db.get_session()
+        try:
+            user = session.query(User).get(current_user.id)
+            mode = request.form.get('resume_mode', 'paste')
+
+            if mode == 'upload':
+                file = request.files.get('resume_file')
+                if not file or file.filename == '':
+                    flash('Please select a PDF file to upload.', 'error')
+                    return redirect(url_for('settings'))
+
+                if not file.filename.lower().endswith('.pdf'):
+                    flash('Only PDF files are supported.', 'error')
+                    return redirect(url_for('settings'))
+
+                try:
+                    from PyPDF2 import PdfReader
+                    pdf_bytes = file.read()
+                    reader = PdfReader(io.BytesIO(pdf_bytes))
+                    text = ''
+                    for page in reader.pages:
+                        page_text = page.extract_text()
+                        if page_text:
+                            text += page_text + '\n'
+                    text = text.strip()
+                except Exception:
+                    flash('Could not read PDF file. The file may be corrupted.', 'error')
+                    return redirect(url_for('settings'))
+
+                if not text:
+                    flash('No text could be extracted from this PDF. It may be image-based. Try pasting your resume text instead.', 'error')
+                    return redirect(url_for('settings'))
+
+                user.resume_text = text
+                user.resume_filename = file.filename
+                session.commit()
+                flash('Resume uploaded and saved!', 'success')
+
+            else:  # paste mode
+                text = request.form.get('resume_text', '').strip()
+                if not text:
+                    flash('Please enter your resume text.', 'error')
+                    return redirect(url_for('settings'))
+
+                user.resume_text = text
+                user.resume_filename = None
+                session.commit()
+                flash('Resume saved!', 'success')
+
+        finally:
+            session.close()
+        return redirect(url_for('settings'))
+
+    @app.route('/settings/resume/delete', methods=['POST'])
+    @login_required
+    def delete_resume():
+        """Delete saved resume."""
+        session = db.get_session()
+        try:
+            user = session.query(User).get(current_user.id)
+            user.resume_text = None
+            user.resume_filename = None
+            session.commit()
+            flash('Resume removed.', 'success')
         finally:
             session.close()
         return redirect(url_for('settings'))

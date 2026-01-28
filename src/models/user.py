@@ -2,7 +2,7 @@ import secrets
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text
 from sqlalchemy.orm import relationship
 from .base import Base, TimestampMixin
 
@@ -16,6 +16,8 @@ class User(Base, TimestampMixin, UserMixin):
     password_hash = Column(String(255), nullable=False)
     api_key = Column(String(64), unique=True, index=True)
     is_active = Column(Boolean, default=True, nullable=False)
+    resume_text = Column(Text, nullable=True)
+    resume_filename = Column(String(255), nullable=True)
 
     # Relationships
     companies = relationship("Company", back_populates="user", cascade="all, delete-orphan")

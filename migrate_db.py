@@ -60,6 +60,34 @@ with engine.connect() as conn:
             conn.execute(text("ALTER TABLE users ADD COLUMN api_key VARCHAR(64) UNIQUE;"))
             conn.execute(text("CREATE INDEX ix_users_api_key ON users (api_key);"))
 
+    # Check if resume_text column exists in users
+    result = conn.execute(text("""
+        SELECT EXISTS (
+            SELECT FROM information_schema.columns
+            WHERE table_name = 'users' AND column_name = 'resume_text'
+        );
+    """))
+    if not result.scalar():
+        print("Adding resume_text column to users...")
+        conn.execute(text("ALTER TABLE users ADD COLUMN resume_text TEXT;"))
+        print("resume_text column added!")
+    else:
+        print("Users table already has resume_text.")
+
+    # Check if resume_filename column exists in users
+    result = conn.execute(text("""
+        SELECT EXISTS (
+            SELECT FROM information_schema.columns
+            WHERE table_name = 'users' AND column_name = 'resume_filename'
+        );
+    """))
+    if not result.scalar():
+        print("Adding resume_filename column to users...")
+        conn.execute(text("ALTER TABLE users ADD COLUMN resume_filename VARCHAR(255);"))
+        print("resume_filename column added!")
+    else:
+        print("Users table already has resume_filename.")
+
     # Check if user_id column exists in companies
     result = conn.execute(text("""
         SELECT EXISTS (
