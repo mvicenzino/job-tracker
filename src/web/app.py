@@ -211,6 +211,16 @@ def create_app(db_path: str = None, database_url: str = None):
             return redirect(url_for('dashboard'))
         return render_template('landing.html')
 
+    @app.route('/privacy')
+    def privacy():
+        """Privacy Policy page."""
+        return render_template('privacy.html')
+
+    @app.route('/terms')
+    def terms():
+        """Terms of Service page."""
+        return render_template('terms.html')
+
     @app.route('/demo')
     def demo():
         """Demo mode - log in as demo user with sample data."""

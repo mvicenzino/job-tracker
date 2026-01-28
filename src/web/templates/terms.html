@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stride Terms of Service - Rules and guidelines for using Stride.">
+    <title>Terms of Service - Stride</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+    <style>
+        .legal-page {
+            padding: 120px var(--space-6) var(--space-10);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .legal-page h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: var(--space-2);
+        }
+        .legal-page .legal-updated {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            margin-bottom: var(--space-8);
+        }
+        .legal-page h2 {
+            font-size: 1.375rem;
+            font-weight: 700;
+            margin-top: var(--space-8);
+            margin-bottom: var(--space-4);
+        }
+        .legal-page p, .legal-page li {
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+            margin-bottom: var(--space-4);
+        }
+        .legal-page ul {
+            padding-left: var(--space-6);
+            margin-bottom: var(--space-4);
+        }
+        .legal-page li {
+            margin-bottom: var(--space-2);
+        }
+        .legal-page a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+        .legal-page a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="landing-body">
+    <!-- Navigation -->
+    <nav class="landing-nav scrolled">
+        <div class="landing-nav-container">
+            <a href="{{ url_for('landing') }}" class="landing-brand">
+                <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                </svg>
+                <span>Stride</span>
+            </a>
+            <div class="landing-nav-links">
+                <a href="{{ url_for('landing') }}">Home</a>
+                <a href="{{ url_for('login') }}" class="btn btn-ghost">Sign In</a>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started Free</a>
+            </div>
+            <button class="landing-menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="landing-mobile-menu" id="mobileMenu">
+        <a href="{{ url_for('landing') }}">Home</a>
+        <a href="{{ url_for('login') }}">Sign In</a>
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started Free</a>
+    </div>
+
+    <div class="legal-page">
+        <h1>Terms of Service</h1>
+        <p class="legal-updated">Last updated: January 28, 2026</p>
+
+        <p>Welcome to Stride. By accessing or using our job search tracking application, you agree to be bound by these Terms of Service. Please read them carefully.</p>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>By creating an account or using Stride, you agree to these Terms of Service and our <a href="{{ url_for('privacy') }}">Privacy Policy</a>. If you do not agree, please do not use our service.</p>
+
+        <h2>2. Description of Service</h2>
+        <p>Stride is a job search tracking application that helps you organize job applications, manage contacts, schedule interviews, and track your job search progress. The service is provided free of charge.</p>
+
+        <h2>3. Account Registration</h2>
+        <p>To use Stride, you must create an account with a valid email address and password. You are responsible for:</p>
+        <ul>
+            <li>Maintaining the confidentiality of your account credentials.</li>
+            <li>All activities that occur under your account.</li>
+            <li>Notifying us immediately of any unauthorized use of your account.</li>
+        </ul>
+
+        <h2>4. User Data and Content</h2>
+        <p>You retain ownership of all data you enter into Stride, including job applications, contacts, notes, and other content. By using Stride, you grant us a limited license to store, process, and display your data solely for the purpose of providing the service to you.</p>
+
+        <h2>5. Acceptable Use</h2>
+        <p>You agree not to:</p>
+        <ul>
+            <li>Use Stride for any unlawful purpose or in violation of any applicable laws.</li>
+            <li>Attempt to gain unauthorized access to other users' accounts or data.</li>
+            <li>Interfere with or disrupt the service or servers.</li>
+            <li>Use automated means to access the service without our permission.</li>
+            <li>Upload malicious code or content that could harm the service or other users.</li>
+        </ul>
+
+        <h2>6. API Usage</h2>
+        <p>If you use the Stride API or Chrome extension, you agree to use your API key responsibly and not share it with unauthorized parties. We reserve the right to revoke API access if it is misused.</p>
+
+        <h2>7. Service Availability</h2>
+        <p>We strive to keep Stride available at all times, but we do not guarantee uninterrupted access. The service may be temporarily unavailable due to maintenance, updates, or circumstances beyond our control.</p>
+
+        <h2>8. Limitation of Liability</h2>
+        <p>Stride is provided "as is" without warranties of any kind, either express or implied. To the fullest extent permitted by law:</p>
+        <ul>
+            <li>We are not liable for any indirect, incidental, special, or consequential damages arising from your use of Stride.</li>
+            <li>We are not responsible for any loss of data, missed opportunities, or damages resulting from service interruptions.</li>
+            <li>Our total liability shall not exceed the amount you paid for the service (which is zero for the free tier).</li>
+        </ul>
+
+        <h2>9. Termination</h2>
+        <p>You may delete your account at any time. We reserve the right to suspend or terminate accounts that violate these terms. Upon termination, your data will be deleted in accordance with our Privacy Policy.</p>
+
+        <h2>10. Modifications to Terms</h2>
+        <p>We may update these Terms of Service from time to time. We will notify you of significant changes by updating the "Last updated" date at the top of this page. Continued use of Stride after changes constitutes acceptance of the updated terms.</p>
+
+        <h2>11. Governing Law</h2>
+        <p>These Terms of Service are governed by and construed in accordance with the laws of the United States, without regard to conflict of law principles.</p>
+
+        <h2>12. Contact Us</h2>
+        <p>If you have questions about these Terms of Service, please contact us at <a href="mailto:legal@stride-jobs.com">legal@stride-jobs.com</a>.</p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="section-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="{{ url_for('landing') }}" class="landing-brand">
+                        <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                        </svg>
+                        <span>Stride</span>
+                    </a>
+                    <p>Stride into your next role</p>
+                </div>
+                <div class="footer-link-groups">
+                    <div class="footer-link-group">
+                        <h4>Product</h4>
+                        <a href="{{ url_for('login') }}">Sign In</a>
+                        <a href="{{ url_for('register') }}">Get Started</a>
+                        <a href="{{ url_for('demo') }}">Try Demo</a>
+                    </div>
+                    <div class="footer-link-group">
+                        <h4>Legal</h4>
+                        <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                        <a href="{{ url_for('terms') }}">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Stride. Built for job seekers, by job seekers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

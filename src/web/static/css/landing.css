@@ -830,7 +830,7 @@
 .footer-content {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     padding-bottom: var(--space-6);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: var(--space-6);
@@ -846,19 +846,35 @@
     font-size: 0.875rem;
 }
 
-.footer-links {
+.footer-link-groups {
     display: flex;
-    gap: var(--space-6);
+    gap: var(--space-10);
 }
 
-.footer-links a {
-    color: rgba(255, 255, 255, 0.7);
+.footer-link-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.footer-link-group h4 {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: var(--space-1);
+}
+
+.footer-link-group a {
+    color: rgba(255, 255, 255, 0.6);
     text-decoration: none;
+    font-size: 0.875rem;
     font-weight: 500;
     transition: color var(--transition-fast);
 }
 
-.footer-links a:hover {
+.footer-link-group a:hover {
     color: white;
 }
 
@@ -869,6 +885,11 @@
 .footer-bottom p {
     color: rgba(255, 255, 255, 0.5);
     font-size: 0.875rem;
+}
+
+/* Hero demo button - visible on mobile */
+.hero-demo-btn {
+    display: none;
 }
 
 /* === Mobile Responsive === */
@@ -979,7 +1000,15 @@
 
     .footer-content {
         flex-direction: column;
-        text-align: center;
-        gap: var(--space-6);
+        text-align: left;
+        gap: var(--space-8);
+    }
+
+    .footer-link-groups {
+        gap: var(--space-8);
+    }
+
+    .hero-demo-btn {
+        display: inline-flex;
     }
 }

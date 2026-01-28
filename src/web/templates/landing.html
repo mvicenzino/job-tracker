@@ -74,6 +74,7 @@
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
                 </a>
+                <a href="{{ url_for('demo') }}" class="btn btn-demo btn-lg hero-demo-btn">Try Demo</a>
                 <a href="#features" class="btn btn-secondary btn-lg">See How It Works</a>
             </div>
             <div class="hero-stats">
@@ -393,9 +394,18 @@
                     </a>
                     <p>Stride into your next role</p>
                 </div>
-                <div class="footer-links">
-                    <a href="{{ url_for('login') }}">Sign In</a>
-                    <a href="{{ url_for('register') }}">Get Started</a>
+                <div class="footer-link-groups">
+                    <div class="footer-link-group">
+                        <h4>Product</h4>
+                        <a href="{{ url_for('login') }}">Sign In</a>
+                        <a href="{{ url_for('register') }}">Get Started</a>
+                        <a href="{{ url_for('demo') }}">Try Demo</a>
+                    </div>
+                    <div class="footer-link-group">
+                        <h4>Legal</h4>
+                        <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                        <a href="{{ url_for('terms') }}">Terms of Service</a>
+                    </div>
                 </div>
             </div>
             <div class="footer-bottom">

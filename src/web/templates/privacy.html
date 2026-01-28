@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stride Privacy Policy - How we collect, use, and protect your data.">
+    <title>Privacy Policy - Stride</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+    <style>
+        .legal-page {
+            padding: 120px var(--space-6) var(--space-10);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .legal-page h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: var(--space-2);
+        }
+        .legal-page .legal-updated {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            margin-bottom: var(--space-8);
+        }
+        .legal-page h2 {
+            font-size: 1.375rem;
+            font-weight: 700;
+            margin-top: var(--space-8);
+            margin-bottom: var(--space-4);
+        }
+        .legal-page p, .legal-page li {
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+            margin-bottom: var(--space-4);
+        }
+        .legal-page ul {
+            padding-left: var(--space-6);
+            margin-bottom: var(--space-4);
+        }
+        .legal-page li {
+            margin-bottom: var(--space-2);
+        }
+        .legal-page a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+        .legal-page a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="landing-body">
+    <!-- Navigation -->
+    <nav class="landing-nav scrolled">
+        <div class="landing-nav-container">
+            <a href="{{ url_for('landing') }}" class="landing-brand">
+                <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                </svg>
+                <span>Stride</span>
+            </a>
+            <div class="landing-nav-links">
+                <a href="{{ url_for('landing') }}">Home</a>
+                <a href="{{ url_for('login') }}" class="btn btn-ghost">Sign In</a>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started Free</a>
+            </div>
+            <button class="landing-menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="landing-mobile-menu" id="mobileMenu">
+        <a href="{{ url_for('landing') }}">Home</a>
+        <a href="{{ url_for('login') }}">Sign In</a>
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started Free</a>
+    </div>
+
+    <div class="legal-page">
+        <h1>Privacy Policy</h1>
+        <p class="legal-updated">Last updated: January 28, 2026</p>
+
+        <p>At Stride, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our job search tracking application.</p>
+
+        <h2>1. Information We Collect</h2>
+        <p>We collect information that you voluntarily provide when using Stride:</p>
+        <ul>
+            <li><strong>Account Information:</strong> Your email address and password when you create an account.</li>
+            <li><strong>Job Search Data:</strong> Job applications, companies, contacts, events, and notes you add to track your job search.</li>
+            <li><strong>Usage Data:</strong> How you interact with Stride, including pages visited and features used.</li>
+        </ul>
+
+        <h2>2. How We Use Your Information</h2>
+        <p>We use your information to:</p>
+        <ul>
+            <li>Provide and maintain the Stride application.</li>
+            <li>Authenticate your account and keep your data secure.</li>
+            <li>Improve and optimize the user experience.</li>
+            <li>Respond to your requests or inquiries.</li>
+        </ul>
+
+        <h2>3. Data Storage and Security</h2>
+        <p>Your data is stored securely and we implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+        <p>Passwords are hashed and never stored in plain text. We use HTTPS to encrypt data in transit.</p>
+
+        <h2>4. Data Sharing</h2>
+        <p>We do not sell, trade, or rent your personal information to third parties. Your job search data is yours and remains private. We may share information only in the following circumstances:</p>
+        <ul>
+            <li>With your explicit consent.</li>
+            <li>To comply with legal obligations or valid legal processes.</li>
+            <li>To protect the rights, property, or safety of Stride, our users, or the public.</li>
+        </ul>
+
+        <h2>5. Cookies</h2>
+        <p>Stride uses session cookies to keep you logged in and maintain your preferences. These cookies are essential for the application to function and are not used for advertising or tracking purposes.</p>
+
+        <h2>6. Data Retention</h2>
+        <p>We retain your data for as long as your account is active. If you delete your account, we will remove your personal data from our systems. Some data may be retained in backups for a limited period.</p>
+
+        <h2>7. Your Rights</h2>
+        <p>You have the right to:</p>
+        <ul>
+            <li>Access the personal data we hold about you.</li>
+            <li>Request correction of inaccurate data.</li>
+            <li>Request deletion of your account and data.</li>
+            <li>Export your data at any time.</li>
+        </ul>
+
+        <h2>8. Children's Privacy</h2>
+        <p>Stride is not intended for use by individuals under the age of 16. We do not knowingly collect personal information from children.</p>
+
+        <h2>9. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. We will notify you of any changes by updating the "Last updated" date at the top of this page.</p>
+
+        <h2>10. Contact Us</h2>
+        <p>If you have questions about this Privacy Policy or your data, please contact us at <a href="mailto:privacy@stride-jobs.com">privacy@stride-jobs.com</a>.</p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="section-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="{{ url_for('landing') }}" class="landing-brand">
+                        <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                        </svg>
+                        <span>Stride</span>
+                    </a>
+                    <p>Stride into your next role</p>
+                </div>
+                <div class="footer-link-groups">
+                    <div class="footer-link-group">
+                        <h4>Product</h4>
+                        <a href="{{ url_for('login') }}">Sign In</a>
+                        <a href="{{ url_for('register') }}">Get Started</a>
+                        <a href="{{ url_for('demo') }}">Try Demo</a>
+                    </div>
+                    <div class="footer-link-group">
+                        <h4>Legal</h4>
+                        <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                        <a href="{{ url_for('terms') }}">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Stride. Built for job seekers, by job seekers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
