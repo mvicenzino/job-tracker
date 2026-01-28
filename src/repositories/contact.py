@@ -25,8 +25,8 @@ class ContactRepository(BaseRepository[Contact]):
         return self._base_query().filter(Contact.id == id).first()
 
     def get_all(self, limit: int = 100, offset: int = 0) -> List[Contact]:
-        """Get all records with pagination, filtered by user."""
-        return self._base_query().offset(offset).limit(limit).all()
+        """Get all records with pagination, filtered by user, sorted by name."""
+        return self._base_query().order_by(Contact.name).offset(offset).limit(limit).all()
 
     def create(self, **kwargs) -> Contact:
         """Create a new record with user_id auto-set."""
