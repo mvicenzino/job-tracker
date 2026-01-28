@@ -158,11 +158,15 @@ class JobHuntService:
 
     def add_contact(self, name: str, company_id: int = None,
                    company_name: str = None, **kwargs) -> Contact:
-        """Add a new contact. Optionally links to company."""
+        """Add a new contact. Optionally links to company (creates company if needed)."""
         if company_id is None and company_name:
             companies = self.companies.search_by_name(company_name)
             if companies:
                 company_id = companies[0].id
+            else:
+                # Create the company if it doesn't exist
+                company = self.companies.create(name=company_name)
+                company_id = company.id
 
         contact = self.contacts.create(name=name, company_id=company_id, **kwargs)
         self.session.commit()
