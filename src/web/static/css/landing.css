@@ -149,6 +149,11 @@
     padding: var(--space-3) 0;
 }
 
+.landing-mobile-menu a.btn-primary,
+.landing-mobile-menu a.btn-demo {
+    color: white;
+}
+
 /* === Hero Section === */
 .hero {
     position: relative;

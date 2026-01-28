@@ -326,11 +326,13 @@ a:hover {
 
 .btn-primary:hover {
     background: var(--color-primary-hover);
+    color: white;
     transform: translateY(-2px);
     box-shadow: var(--shadow), 0 6px 20px rgba(99, 102, 241, 0.35);
 }
 
 .btn-primary:active {
+    color: white;
     transform: translateY(0);
 }
 
@@ -357,6 +359,7 @@ a:hover {
 
 .btn-success:hover {
     background: var(--color-success-dark);
+    color: white;
     transform: translateY(-2px);
     box-shadow: var(--shadow), 0 6px 20px rgba(16, 185, 129, 0.35);
 }
@@ -369,6 +372,7 @@ a:hover {
 
 .btn-danger:hover {
     background: #dc2626;
+    color: white;
     transform: translateY(-1px);
 }
 
