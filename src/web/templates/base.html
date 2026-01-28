@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#6366f1">
-    <title>{% block title %}Job Hunt Tracker{% endblock %}</title>
+    <title>{% block title %}Stride{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -25,7 +25,13 @@
                 <span class="hamburger-line"></span>
             </button>
             <div class="nav-brand">
-                <a href="{{ url_for('dashboard') }}">🎯 Job Hunt Tracker</a>
+                <a href="{{ url_for('dashboard') }}">
+                    <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                    </svg>
+                    Stride
+                </a>
             </div>
         </div>
 

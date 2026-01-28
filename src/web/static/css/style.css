@@ -157,6 +157,12 @@ a:hover {
     color: var(--color-primary);
 }
 
+.brand-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--color-primary);
+}
+
 .nav-menu {
     display: flex;
     align-items: center;
@@ -2202,10 +2208,29 @@ textarea:focus-visible {
     margin-bottom: var(--space-8);
 }
 
+.auth-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-accent-light) 100%);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-4);
+}
+
+.auth-logo svg {
+    width: 36px;
+    height: 36px;
+    color: var(--color-primary);
+}
+
 .auth-header h1 {
     font-size: 1.75rem;
     margin-bottom: var(--space-2);
-    color: var(--color-primary);
+    color: var(--color-text);
+    font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
 .auth-header p {

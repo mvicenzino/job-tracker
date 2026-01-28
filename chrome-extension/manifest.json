@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Job Hunt Tracker - LinkedIn",
+  "name": "Stride - LinkedIn",
   "version": "1.0",
-  "description": "Add LinkedIn contacts to your Job Hunt Tracker",
+  "description": "Add LinkedIn contacts to Stride",
   "permissions": ["activeTab", "storage"],
   "host_permissions": [
     "https://www.linkedin.com/*",
