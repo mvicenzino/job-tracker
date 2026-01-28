@@ -523,6 +523,12 @@ a:hover {
     margin-bottom: var(--space-8);
 }
 
+.stat-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 .stat-card {
     display: flex;
     align-items: flex-start;
@@ -535,6 +541,7 @@ a:hover {
     transition: all var(--transition);
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .stat-card::before {
