@@ -8,13 +8,26 @@ from ..database.connection import DatabaseConnection
 from ..services import JobHuntService
 from ..models import ApplicationStatus, EventType, ContactType, User
 
+# Stable fallback secret key for development (production should set SECRET_KEY env var)
+DEFAULT_SECRET_KEY = 'stride-app-dev-key-change-in-production-abc123xyz'
+
 
 def create_app(db_path: str = None, database_url: str = None):
     """Create and configure the Flask application."""
     app = Flask(__name__,
                 template_folder='templates',
                 static_folder='static')
-    app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
+    app.secret_key = os.environ.get('SECRET_KEY', DEFAULT_SECRET_KEY)
+
+    # Session configuration - keep users logged in for 30 days
+    is_production = os.environ.get('VERCEL') or os.environ.get('DATABASE_URL')
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+    app.config['SESSION_COOKIE_SECURE'] = bool(is_production)  # HTTPS only in production
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
+    app.config['REMEMBER_COOKIE_SECURE'] = bool(is_production)
+    app.config['REMEMBER_COOKIE_HTTPONLY'] = True
 
     # Database setup - prefer DATABASE_URL for production
     if database_url is None:
@@ -148,7 +161,7 @@ def create_app(db_path: str = None, database_url: str = None):
                 session.add(user)
                 session.commit()
 
-                login_user(user)
+                login_user(user, remember=True)
                 flash('Account created successfully!', 'success')
                 return redirect(url_for('dashboard'))
             finally:
@@ -171,7 +184,7 @@ def create_app(db_path: str = None, database_url: str = None):
                 user = session.query(User).filter(User.email == email).first()
 
                 if user and user.check_password(password):
-                    login_user(user)
+                    login_user(user, remember=True)
                     next_page = request.args.get('next')
                     flash('Logged in successfully!', 'success')
                     return redirect(next_page or url_for('dashboard'))
