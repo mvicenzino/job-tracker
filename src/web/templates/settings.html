@@ -106,23 +106,10 @@
             <h2>Chrome Extension Setup</h2>
         </div>
         <div class="card-body">
-            <ol class="setup-steps">
-                <li>Generate an API key above</li>
-                <li>Install the Chrome extension from the <code>chrome-extension</code> folder</li>
-                <li>Click the extension icon and go to Settings</li>
-                <li>Enter your API key and server URL</li>
-                <li>Visit any LinkedIn profile and click the extension to add contacts</li>
-            </ol>
-
-            <div class="server-url mt-4">
-                <label>Server URL</label>
-                <div class="api-key-wrapper">
-                    <input type="text" id="serverUrl" value="{{ request.url_root.rstrip('/') }}" readonly class="api-key-input">
-                    <button type="button" class="btn btn-ghost btn-sm" onclick="copyServerUrl()">
-                        Copy
-                    </button>
-                </div>
-            </div>
+            <p class="text-secondary mb-4">
+                Follow our step-by-step guide to install and connect the Stride Chrome extension to your account.
+            </p>
+            <a href="{{ url_for('setup') }}" class="btn btn-primary">Go to Setup Guide</a>
         </div>
     </div>
 </div>
@@ -145,11 +132,7 @@ function copyApiKey() {
     alert('API key copied to clipboard!');
 }
 
-function copyServerUrl() {
-    const input = document.getElementById('serverUrl');
-    navigator.clipboard.writeText(input.value);
-    alert('Server URL copied to clipboard!');
-}
+
 </script>
 
 <style>
@@ -184,29 +167,6 @@ function copyServerUrl() {
     background: var(--color-bg-subtle);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
-}
-
-.server-url label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: var(--space-2);
-    color: var(--color-text-secondary);
-}
-
-.setup-steps {
-    padding-left: var(--space-6);
-    color: var(--color-text-secondary);
-}
-
-.setup-steps li {
-    margin-bottom: var(--space-3);
-}
-
-.setup-steps code {
-    background: var(--color-bg-subtle);
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
 }
 
 .mt-4 {

@@ -373,6 +373,35 @@ def create_app(db_path: str = None, database_url: str = None):
         finally:
             session.close()
 
+    @app.route('/setup')
+    @login_required
+    def setup():
+        """Chrome extension setup guide page."""
+        session = db.get_session()
+        try:
+            user = session.query(User).get(current_user.id)
+            if not user.api_key:
+                user.generate_api_key()
+                session.commit()
+            api_key = user.api_key
+        finally:
+            session.close()
+        server_url = request.url_root.rstrip('/')
+        return render_template('setup.html', api_key=api_key, server_url=server_url)
+
+    @app.route('/setup/generate-key', methods=['POST'])
+    @login_required
+    def setup_generate_key():
+        """Regenerate API key via AJAX for the setup page."""
+        session = db.get_session()
+        try:
+            user = session.query(User).get(current_user.id)
+            user.generate_api_key()
+            session.commit()
+            return jsonify({'api_key': user.api_key})
+        finally:
+            session.close()
+
     @app.route('/settings')
     @login_required
     def settings():

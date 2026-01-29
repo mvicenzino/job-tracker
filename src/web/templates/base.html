@@ -77,6 +77,11 @@
             <a href="{{ url_for('schedule') }}" class="{% if request.endpoint == 'schedule' %}active{% endif %}">
                 <span class="nav-icon">📅</span> Schedule
             </a>
+            {% if current_user.is_authenticated and current_user.email != 'demo@stride-jobs.com' %}
+            <a href="{{ url_for('setup') }}" class="{% if request.endpoint == 'setup' %}active{% endif %}">
+                <span class="nav-icon">🔧</span> Setup
+            </a>
+            {% endif %}
         </div>
         <div class="nav-actions">
             <a href="{{ url_for('new_application') }}" class="btn btn-primary">+ Quick Apply</a>
