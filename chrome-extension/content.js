@@ -81,6 +81,33 @@ function extractProfileData() {
   return data;
 }
 
+// Helper: try an array of CSS selectors, return the first match's trimmed text
+function trySelectors(selectors) {
+  for (const sel of selectors) {
+    const el = document.querySelector(sel);
+    if (el) {
+      const text = el.textContent.trim();
+      if (text) return text;
+    }
+  }
+  return '';
+}
+
+// Helper: find a dt/dd pair in the About section by label text
+// LinkedIn's About tab renders structured data as <dt>Label</dt><dd>Value</dd>
+function getDDByLabel(label) {
+  const dtElements = document.querySelectorAll('dt');
+  for (const dt of dtElements) {
+    if (dt.textContent.trim().toLowerCase().includes(label.toLowerCase())) {
+      const dd = dt.nextElementSibling;
+      if (dd && dd.tagName === 'DD') {
+        return dd.textContent.trim();
+      }
+    }
+  }
+  return '';
+}
+
 // Extract LinkedIn company data
 function extractCompanyData() {
   const data = {
@@ -95,50 +122,92 @@ function extractCompanyData() {
   };
 
   // Company name
-  const nameEl = document.querySelector('h1.org-top-card-summary__title') ||
-                 document.querySelector('h1[class*="org-top-card"]') ||
-                 document.querySelector('.org-top-card-summary h1') ||
-                 document.querySelector('h1');
-  if (nameEl) {
-    data.name = nameEl.textContent.trim();
+  data.name = trySelectors([
+    'h1.org-top-card-summary__title',
+    'h1[class*="org-top-card"]',
+    '.org-top-card-summary h1',
+    'h1[class*="top-card"] span',
+    '[data-test-id="org-name"]',
+    'h1'
+  ]);
+
+  // Industry — prefer dt/dd pair, fall back to top card selectors
+  data.industry = getDDByLabel('industry') ||
+    trySelectors([
+      '.org-top-card-summary-info-list__info-item',
+      '[class*="org-top-card"] .text-body-small',
+      '[data-test-id="about-us__industry"] dd',
+      '[aria-label*="industry"]'
+    ]);
+
+  // Company size — prefer dt/dd pair, fall back to about-module selectors
+  const rawSize = getDDByLabel('company size') ||
+    trySelectors([
+      'dd.org-about-company-module__company-size-definition-text',
+      '[data-test-id="about-us__size"] dd',
+      '[aria-label*="company size"]',
+      '[class*="company-size"] dd'
+    ]);
+  if (rawSize) {
+    // Extract the employee range (e.g. "10,001+" or "1,001-5,000")
+    const rangeMatch = rawSize.match(/[\d,]+-?[\d,]*/);
+    data.size = rangeMatch ? rangeMatch[0] : rawSize.split('\n')[0].trim();
   }
 
-  // Industry
-  const industryEl = document.querySelector('.org-top-card-summary-info-list__info-item') ||
-                     document.querySelector('[class*="org-top-card"] .text-body-small');
-  if (industryEl) {
-    data.industry = industryEl.textContent.trim();
-  }
-
-  // Company size - look in about section
-  const sizeEl = document.querySelector('dd.org-about-company-module__company-size-definition-text') ||
-                 document.querySelector('[data-test-id="about-us__size"] dd');
-  if (sizeEl) {
-    data.size = sizeEl.textContent.trim().split(' ')[0]; // Get just the number range
-  }
-
-  // Location
-  const locationEls = document.querySelectorAll('.org-top-card-summary-info-list__info-item');
-  locationEls.forEach(el => {
-    const text = el.textContent.trim();
-    if (text.includes(',') && !text.includes('employees')) {
-      data.location = text;
+  // Location — prefer dt/dd "Headquarters" pair, fall back to top card heuristic
+  data.location = getDDByLabel('headquarters') ||
+    trySelectors([
+      '[data-test-id="about-us__headquarters"] dd',
+      '[aria-label*="headquarters"]',
+      '[class*="headquarters"] dd'
+    ]);
+  if (!data.location) {
+    const locationEls = document.querySelectorAll('.org-top-card-summary-info-list__info-item');
+    for (const el of locationEls) {
+      const text = el.textContent.trim();
+      if (text.includes(',') && !text.includes('employees')) {
+        data.location = text;
+        break;
+      }
     }
-  });
-
-  // Website
-  const websiteEl = document.querySelector('a[data-test-id="about-us__website"] span') ||
-                    document.querySelector('.org-about-company-module__company-page-url a');
-  if (websiteEl) {
-    data.website = websiteEl.closest('a')?.href || websiteEl.textContent.trim();
   }
 
-  // Description
-  const descEl = document.querySelector('.org-top-card-summary__tagline') ||
-                 document.querySelector('p[class*="org-about-us"]');
-  if (descEl) {
-    data.description = descEl.textContent.trim();
+  // Website — prefer dt/dd pair, then data-test-id link, then any about-section link
+  const websiteDDText = getDDByLabel('website');
+  if (websiteDDText) {
+    // The dd may contain an anchor — try to grab the href
+    const dtElements = document.querySelectorAll('dt');
+    for (const dt of dtElements) {
+      if (dt.textContent.trim().toLowerCase().includes('website')) {
+        const dd = dt.nextElementSibling;
+        if (dd && dd.tagName === 'DD') {
+          const link = dd.querySelector('a');
+          data.website = link ? link.href : websiteDDText;
+          break;
+        }
+      }
+    }
   }
+  if (!data.website) {
+    const websiteEl = document.querySelector('a[data-test-id="about-us__website"]') ||
+                      document.querySelector('.org-about-company-module__company-page-url a') ||
+                      document.querySelector('[class*="about"] a[href^="http"]:not([href*="linkedin.com"])');
+    if (websiteEl) {
+      data.website = websiteEl.href || websiteEl.textContent.trim();
+    }
+  }
+
+  // Description — prefer full About overview text, fall back to tagline
+  data.description = getDDByLabel('overview') ||
+    trySelectors([
+      '[class*="org-about-us"] p',
+      '.org-about-company-module__description',
+      'section[class*="about"] p',
+      '[data-test-id="about-us__description"]',
+      'p[class*="org-about-us"]',
+      '.org-top-card-summary__tagline',
+      '[class*="tagline"]'
+    ]);
 
   return data;
 }
