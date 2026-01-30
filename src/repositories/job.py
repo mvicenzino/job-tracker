@@ -76,7 +76,7 @@ class JobRepository(BaseRepository[Job]):
         job = self.get_by_id(job_id)
         if job:
             job.is_flagged = not job.is_flagged
-            self.session.commit()
+            self.session.flush()
         return job
 
     def search(self, query: str) -> List[Job]:

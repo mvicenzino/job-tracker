@@ -11,28 +11,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260128">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260129">
     {% block head %}{% endblock %}
 </head>
 <body{% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %} class="demo-active"{% endif %}>
-    <script>
-    function openMobileMenu(){var h=document.getElementById('hamburger'),m=document.getElementById('nav-menu'),o=document.getElementById('nav-overlay');h.classList.add('active');m.classList.add('active');if(o)o.classList.add('active');document.body.style.overflow='hidden';}
-    function closeMobileMenu(){var h=document.getElementById('hamburger'),m=document.getElementById('nav-menu'),o=document.getElementById('nav-overlay');h.classList.remove('active');m.classList.remove('active');if(o)o.classList.remove('active');document.body.style.overflow='';}
-    function toggleMobileMenu(){var m=document.getElementById('nav-menu');if(m.classList.contains('active')){closeMobileMenu();}else{openMobileMenu();}}
-    </script>
-
     <!-- Mobile overlay -->
-    <div class="nav-overlay" id="nav-overlay" onclick="closeMobileMenu()"></div>
+    <div class="nav-overlay" id="nav-overlay"></div>
 
     <nav class="navbar">
         <div class="nav-left">
-            <button type="button" class="hamburger" id="hamburger" aria-label="Toggle menu" onclick="toggleMobileMenu()">
+            <button type="button" class="hamburger" id="hamburger" aria-label="Toggle menu">
                 <span class="hamburger-line"></span>
                 <span class="hamburger-line"></span>
                 <span class="hamburger-line"></span>
             </button>
             <div class="nav-brand">
-                <a href="{{ url_for('dashboard') }}">
+                <a href="{{ url_for('dashboard.dashboard') }}">
                     <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
@@ -51,7 +45,7 @@
     <div class="nav-menu" id="nav-menu">
         <div class="nav-menu-header">
             <span class="menu-title">Menu</span>
-            <button type="button" class="nav-menu-close" id="nav-menu-close" aria-label="Close menu" onclick="closeMobileMenu()">&times;</button>
+            <button type="button" class="nav-menu-close" id="nav-menu-close" aria-label="Close menu">&times;</button>
         </div>
         {% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %}
         <div class="demo-nav-notice">
@@ -59,48 +53,102 @@
         </div>
         {% endif %}
         <div class="nav-links">
-            <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="{% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">
                 <span class="nav-icon">📊</span> Dashboard
             </a>
-            <a href="{{ url_for('pipeline') }}" class="{% if request.endpoint == 'pipeline' %}active{% endif %}">
+            <a href="{{ url_for('dashboard.pipeline') }}" class="{% if request.endpoint == 'dashboard.pipeline' %}active{% endif %}">
                 <span class="nav-icon">📋</span> Pipeline
             </a>
-            <a href="{{ url_for('companies') }}" class="{% if request.endpoint == 'companies' %}active{% endif %}">
+            <a href="{{ url_for('companies.companies') }}" class="{% if request.endpoint == 'companies.companies' %}active{% endif %}">
                 <span class="nav-icon">🏢</span> Companies
             </a>
-            <a href="{{ url_for('jobs') }}" class="{% if request.endpoint == 'jobs' %}active{% endif %}">
+            <a href="{{ url_for('jobs.jobs') }}" class="{% if request.endpoint == 'jobs.jobs' %}active{% endif %}">
                 <span class="nav-icon">💼</span> Jobs
             </a>
-            <a href="{{ url_for('contacts') }}" class="{% if request.endpoint == 'contacts' %}active{% endif %}">
+            <a href="{{ url_for('contacts.contacts') }}" class="{% if request.endpoint == 'contacts.contacts' %}active{% endif %}">
                 <span class="nav-icon">👥</span> Contacts
             </a>
-            <a href="{{ url_for('schedule') }}" class="{% if request.endpoint == 'schedule' %}active{% endif %}">
+            <a href="{{ url_for('schedule.schedule') }}" class="{% if request.endpoint == 'schedule.schedule' %}active{% endif %}">
                 <span class="nav-icon">📅</span> Schedule
             </a>
             {% if current_user.is_authenticated and current_user.email != 'demo@stride-jobs.com' %}
-            <a href="{{ url_for('setup') }}" class="{% if request.endpoint == 'setup' %}active{% endif %}">
+            <a href="{{ url_for('settings.setup') }}" class="{% if request.endpoint == 'settings.setup' %}active{% endif %}">
                 <span class="nav-icon">🔧</span> Setup
             </a>
             {% endif %}
         </div>
         <div class="nav-actions">
-            <a href="{{ url_for('new_application') }}" class="btn btn-primary">+ Quick Apply</a>
+            <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Quick Apply</a>
         </div>
         {% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %}
         <div class="nav-user demo-nav-user">
             <div class="demo-nav-actions">
-                <a href="{{ url_for('logout') }}" class="btn btn-sm demo-btn-exit">Exit Demo</a>
-                <a href="{{ url_for('register') }}" class="btn btn-sm demo-btn-signup">Sign Up for Real</a>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-sm demo-btn-exit">Exit Demo</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-sm demo-btn-signup">Sign Up for Real</a>
             </div>
         </div>
         {% else %}
         <div class="nav-user">
             <span class="user-email">{{ current_user.email }}</span>
-            <a href="{{ url_for('settings') }}" class="btn btn-ghost btn-sm">Settings</a>
-            <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-sm">Logout</a>
+            <a href="{{ url_for('settings.settings') }}" class="btn btn-ghost btn-sm">Settings</a>
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-sm">Logout</a>
         </div>
         {% endif %}
     </div>
+
+    <script>
+    (function() {
+        var hamburger = document.getElementById('hamburger');
+        var navMenu = document.getElementById('nav-menu');
+        var navOverlay = document.getElementById('nav-overlay');
+        var closeBtn = document.getElementById('nav-menu-close');
+
+        function openMenu() {
+            hamburger.classList.add('active');
+            navMenu.classList.add('active');
+            if (navOverlay) navOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            if (navOverlay) navOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function toggleMenu(e) {
+            e.preventDefault();
+            if (navMenu.classList.contains('active')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        }
+
+        hamburger.addEventListener('click', toggleMenu);
+        hamburger.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            toggleMenu(e);
+        });
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) { e.preventDefault(); closeMenu(); });
+            closeBtn.addEventListener('touchend', function(e) { e.preventDefault(); closeMenu(); });
+        }
+
+        if (navOverlay) {
+            navOverlay.addEventListener('click', function() { closeMenu(); });
+            navOverlay.addEventListener('touchend', function(e) { e.preventDefault(); closeMenu(); });
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+                closeMenu();
+            }
+        });
+    })();
+    </script>
 
     <main class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -121,7 +169,7 @@
         <div class="app-footer-inner">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <a href="{{ url_for('dashboard') }}" class="footer-brand-link">
+                    <a href="{{ url_for('dashboard.dashboard') }}" class="footer-brand-link">
                         <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
@@ -133,14 +181,14 @@
                 <div class="footer-link-groups">
                     <div class="footer-link-group">
                         <h4>Product</h4>
-                        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                        <a href="{{ url_for('pipeline') }}">Pipeline</a>
-                        <a href="{{ url_for('settings') }}">Settings</a>
+                        <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('dashboard.pipeline') }}">Pipeline</a>
+                        <a href="{{ url_for('settings.settings') }}">Settings</a>
                     </div>
                     <div class="footer-link-group">
                         <h4>Legal</h4>
-                        <a href="{{ url_for('privacy') }}">Privacy Policy</a>
-                        <a href="{{ url_for('terms') }}">Terms of Service</a>
+                        <a href="{{ url_for('public.privacy') }}">Privacy Policy</a>
+                        <a href="{{ url_for('public.terms') }}">Terms of Service</a>
                     </div>
                 </div>
             </div>
@@ -150,7 +198,7 @@
         </div>
     </footer>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}?v=20260128"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=20260129"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -6,7 +6,7 @@
 <div class="list-page">
     <header class="page-header">
         <h1>All Applications</h1>
-        <a href="{{ url_for('new_application') }}" class="btn btn-primary">+ Quick Apply</a>
+        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Quick Apply</a>
     </header>
 
     {% if applications %}
@@ -35,7 +35,7 @@
                     <td>{{ app.date_applied.strftime('%b %d, %Y') if app.date_applied else '-' }}</td>
                     <td>{{ job.source or '-' }}</td>
                     <td>
-                        <a href="{{ url_for('application_detail', app_id=app.id) }}" class="btn btn-sm">View</a>
+                        <a href="{{ url_for('applications.application_detail', app_id=app.id) }}" class="btn btn-sm">View</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -45,7 +45,7 @@
     {% else %}
     <div class="empty-state-large">
         <p>No applications yet</p>
-        <a href="{{ url_for('new_application') }}" class="btn btn-primary">Create Your First Application</a>
+        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">Create Your First Application</a>
     </div>
     {% endif %}
 </div>

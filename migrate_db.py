@@ -167,5 +167,41 @@ with engine.connect() as conn:
     else:
         print("Contacts table already has user_id.")
 
+    # Add user_id to jobs, applications, events if missing
+    for table in ['jobs', 'applications', 'events']:
+        result = conn.execute(text(f"""
+            SELECT EXISTS (
+                SELECT FROM information_schema.columns
+                WHERE table_name = '{table}' AND column_name = 'user_id'
+            );
+        """))
+        if not result.scalar():
+            print(f"Adding user_id column to {table}...")
+            conn.execute(text(f"ALTER TABLE {table} ADD COLUMN user_id INTEGER;"))
+
+            # Assign existing rows to default user if one exists
+            result2 = conn.execute(text("SELECT id FROM users ORDER BY id LIMIT 1;"))
+            row = result2.fetchone()
+            if row:
+                uid = row[0]
+                conn.execute(text(f"UPDATE {table} SET user_id = :uid WHERE user_id IS NULL;"), {"uid": uid})
+                print(f"  Assigned existing {table} rows to user {uid}")
+        else:
+            print(f"{table} table already has user_id.")
+
+    # Add is_flagged to jobs if missing
+    result = conn.execute(text("""
+        SELECT EXISTS (
+            SELECT FROM information_schema.columns
+            WHERE table_name = 'jobs' AND column_name = 'is_flagged'
+        );
+    """))
+    if not result.scalar():
+        print("Adding is_flagged column to jobs...")
+        conn.execute(text("ALTER TABLE jobs ADD COLUMN is_flagged BOOLEAN DEFAULT FALSE;"))
+        print("is_flagged column added!")
+    else:
+        print("Jobs table already has is_flagged.")
+
     conn.commit()
     print("\nMigration complete!")

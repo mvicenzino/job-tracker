@@ -20,7 +20,7 @@
                     Export
                 </button>
                 <div class="dropdown-menu">
-                    <a href="{{ url_for('export_contacts_csv') }}" class="dropdown-item">
+                    <a href="{{ url_for('contacts.export_contacts_csv') }}" class="dropdown-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:8px;">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                             <polyline points="14 2 14 8 20 8"/>
@@ -29,7 +29,7 @@
                         </svg>
                         Export to CSV
                     </a>
-                    <a href="{{ url_for('export_contacts_csv', format='sheets') }}" class="dropdown-item">
+                    <a href="{{ url_for('contacts.export_contacts_csv', format='sheets') }}" class="dropdown-item">
                         <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:8px;">
                             <path fill="#34A853" d="M19 11V9h-4V5h-2v4H9v2h4v4h2v-4h4z"/>
                             <path fill="#188038" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
@@ -39,7 +39,7 @@
                 </div>
             </div>
             {% endif %}
-            <a href="{{ url_for('new_contact') }}" class="btn btn-primary">+ Add Contact</a>
+            <a href="{{ url_for('contacts.new_contact') }}" class="btn btn-primary">+ Add Contact</a>
         </div>
     </header>
 
@@ -49,8 +49,8 @@
             <button type="submit" class="btn btn-secondary">Search</button>
         </form>
         <div class="filter-buttons">
-            <a href="{{ url_for('contacts') }}" class="btn {% if not search and not followup %}btn-primary{% else %}btn-secondary{% endif %}">All</a>
-            <a href="{{ url_for('contacts', followup='true') }}" class="btn {% if followup %}btn-primary{% else %}btn-secondary{% endif %}">Need Follow-up</a>
+            <a href="{{ url_for('contacts.contacts') }}" class="btn {% if not search and not followup %}btn-primary{% else %}btn-secondary{% endif %}">All</a>
+            <a href="{{ url_for('contacts.contacts', followup='true') }}" class="btn {% if followup %}btn-primary{% else %}btn-secondary{% endif %}">Need Follow-up</a>
         </div>
     </div>
 
@@ -98,12 +98,12 @@
                     </td>
                     <td class="actions-cell">
                         <div class="action-buttons">
-                            <a href="{{ url_for('edit_contact', contact_id=contact.id) }}" class="btn btn-sm btn-secondary" title="Edit contact">Edit</a>
-                            <form action="{{ url_for('log_contact', contact_id=contact.id) }}" method="post" class="inline-form">
+                            <a href="{{ url_for('contacts.edit_contact', contact_id=contact.id) }}" class="btn btn-sm btn-secondary" title="Edit contact">Edit</a>
+                            <form action="{{ url_for('contacts.log_contact', contact_id=contact.id) }}" method="post" class="inline-form">
                                 <input type="hidden" name="followup_days" value="14">
                                 <button type="submit" class="btn btn-sm btn-success" title="Log contact, set follow-up in 14 days">Contacted</button>
                             </form>
-                            <form action="{{ url_for('delete_contact', contact_id=contact.id) }}" method="post" class="inline-form" onsubmit="return confirm('Delete {{ contact.name }}?')">
+                            <form action="{{ url_for('contacts.delete_contact', contact_id=contact.id) }}" method="post" class="inline-form" onsubmit="return confirm('Delete {{ contact.name }}?')">
                                 <button type="submit" class="btn btn-sm btn-danger" title="Delete contact">Delete</button>
                             </form>
                         </div>
@@ -128,7 +128,7 @@
                 <p>{% if search %}No contacts found for "{{ search }}"{% elif followup %}No contacts need follow-up{% else %}No contacts yet{% endif %}</p>
                 <span class="empty-hint">{% if search %}Try a different search term{% elif followup %}Great job staying in touch!{% else %}Build your professional network{% endif %}</span>
                 <div class="empty-actions">
-                    <a href="{{ url_for('new_contact') }}" class="btn btn-primary">+ Add Your First Contact</a>
+                    <a href="{{ url_for('contacts.new_contact') }}" class="btn btn-primary">+ Add Your First Contact</a>
                 </div>
             </div>
         </div>

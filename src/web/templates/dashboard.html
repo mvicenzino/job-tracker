@@ -9,12 +9,12 @@
             <h1>Welcome back</h1>
             <p class="subtitle">Here's what's happening with your job search</p>
         </div>
-        <a href="{{ url_for('new_application') }}" class="btn btn-primary">+ Quick Apply</a>
+        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Quick Apply</a>
     </header>
 
     <!-- Stats Cards -->
     <div class="stats-grid">
-        <a href="{{ url_for('pipeline') }}" class="stat-card-link">
+        <a href="{{ url_for('dashboard.pipeline') }}" class="stat-card-link">
             <div class="stat-card">
                 <div class="stat-icon stat-icon-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -27,7 +27,7 @@
                 </div>
             </div>
         </a>
-        <a href="{{ url_for('applications') }}" class="stat-card-link">
+        <a href="{{ url_for('applications.applications') }}" class="stat-card-link">
             <div class="stat-card">
                 <div class="stat-icon stat-icon-secondary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -41,7 +41,7 @@
                 </div>
             </div>
         </a>
-        <a href="{{ url_for('schedule') }}" class="stat-card-link">
+        <a href="{{ url_for('schedule.schedule') }}" class="stat-card-link">
             <div class="stat-card highlight">
                 <div class="stat-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -57,7 +57,7 @@
                 </div>
             </div>
         </a>
-        <a href="{{ url_for('contacts') }}" class="stat-card-link">
+        <a href="{{ url_for('contacts.contacts') }}" class="stat-card-link">
             <div class="stat-card">
                 <div class="stat-icon stat-icon-info">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -73,7 +73,7 @@
                 </div>
             </div>
         </a>
-        <a href="{{ url_for('contacts', followup='true') }}" class="stat-card-link">
+        <a href="{{ url_for('contacts.contacts', followup='true') }}" class="stat-card-link">
             <div class="stat-card {% if dashboard.summary.contacts_need_followup > 0 %}warning{% endif %}">
                 <div class="stat-icon {% if dashboard.summary.contacts_need_followup > 0 %}stat-icon-warning{% else %}stat-icon-muted{% endif %}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -89,7 +89,7 @@
                 </div>
             </div>
         </a>
-        <a href="{{ url_for('applications') }}" class="stat-card-link">
+        <a href="{{ url_for('applications.applications') }}" class="stat-card-link">
             <div class="stat-card {% if dashboard.summary.apps_awaiting_response > 0 %}warning{% endif %}">
                 <div class="stat-icon {% if dashboard.summary.apps_awaiting_response > 0 %}stat-icon-warning{% else %}stat-icon-muted{% endif %}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -110,7 +110,7 @@
     <section class="card pipeline-card-section">
         <div class="card-header">
             <h2>Your Pipeline</h2>
-            <a href="{{ url_for('pipeline') }}" class="card-link">View Full Pipeline →</a>
+            <a href="{{ url_for('dashboard.pipeline') }}" class="card-link">View Full Pipeline →</a>
         </div>
         <div class="card-body">
             <div class="pipeline-visual">
@@ -153,7 +153,7 @@
                                 {% endif %}
                             </div>
                             {% if not event.completed %}
-                            <form action="{{ url_for('complete_event', event_id=event.id) }}" method="post" class="inline-form">
+                            <form action="{{ url_for('schedule.complete_event', event_id=event.id) }}" method="post" class="inline-form">
                                 <button type="submit" name="went_well" value="true" class="btn btn-sm btn-success" title="Mark complete">✓</button>
                             </form>
                             {% else %}
@@ -183,7 +183,7 @@
         <section class="card">
             <div class="card-header">
                 <h2>Coming Up</h2>
-                <a href="{{ url_for('schedule') }}" class="card-link">View All →</a>
+                <a href="{{ url_for('schedule.schedule') }}" class="card-link">View All →</a>
             </div>
             <div class="card-body">
                 {% if dashboard.upcoming %}
@@ -212,8 +212,8 @@
                 {% endif %}
             </div>
             <div class="card-footer">
-                <a href="{{ url_for('new_event') }}" class="btn btn-ghost">+ Event</a>
-                <a href="{{ url_for('new_interview') }}" class="btn btn-primary">+ Interview</a>
+                <a href="{{ url_for('schedule.new_event') }}" class="btn btn-ghost">+ Event</a>
+                <a href="{{ url_for('schedule.new_interview') }}" class="btn btn-primary">+ Interview</a>
             </div>
         </section>
 
@@ -233,7 +233,7 @@
                             <ul class="attention-list">
                                 {% for app in dashboard.needs_attention.stale_applications[:3] %}
                                 <li>
-                                    <a href="{{ url_for('application_detail', app_id=app.id) }}">
+                                    <a href="{{ url_for('applications.application_detail', app_id=app.id) }}">
                                         <strong>{{ app.job.title }}</strong>
                                         <span>{{ app.job.company.name }}</span>
                                     </a>
@@ -252,7 +252,7 @@
                             <ul class="attention-list">
                                 {% for contact in dashboard.needs_attention.followup_contacts %}
                                 <li>
-                                    <a href="{{ url_for('edit_contact', contact_id=contact.id) }}">
+                                    <a href="{{ url_for('contacts.edit_contact', contact_id=contact.id) }}">
                                         <strong>{{ contact.name }}</strong>
                                         {% if contact.company %}<span>{{ contact.company.name }}</span>{% endif %}
                                     </a>

@@ -6,7 +6,7 @@
 <div class="form-page">
     <header class="page-header">
         <div>
-            <a href="{{ url_for('jobs') }}" class="back-link">← Back to Jobs</a>
+            <a href="{{ url_for('jobs.jobs') }}" class="back-link">← Back to Jobs</a>
             <h1>Add Job Listing</h1>
         </div>
     </header>
@@ -84,7 +84,7 @@
             </div>
 
             <div class="form-actions">
-                <a href="{{ url_for('jobs') }}" class="btn btn-secondary">Cancel</a>
+                <a href="{{ url_for('jobs.jobs') }}" class="btn btn-secondary">Cancel</a>
                 <button type="submit" class="btn btn-primary">Add Job</button>
             </div>
         </form>

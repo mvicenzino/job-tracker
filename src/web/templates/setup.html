@@ -131,7 +131,7 @@ function regenerateKey() {
     status.textContent = 'Generating...';
     status.className = 'regen-status';
 
-    fetch('{{ url_for("setup_generate_key") }}', {
+    fetch('{{ url_for("settings.setup_generate_key") }}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
     })

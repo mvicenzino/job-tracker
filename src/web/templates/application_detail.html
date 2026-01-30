@@ -6,7 +6,7 @@
 <div class="detail-page">
     <header class="page-header">
         <div class="header-content">
-            <a href="{{ url_for('pipeline') }}" class="back-link">← Pipeline</a>
+            <a href="{{ url_for('dashboard.pipeline') }}" class="back-link">← Pipeline</a>
             <h1>{{ details.job.title }}</h1>
             <p class="subtitle">{{ details.company.name }}</p>
         </div>
@@ -20,13 +20,13 @@
         <section class="card">
             <div class="card-header">
                 <h2>Application Details</h2>
-                <a href="{{ url_for('edit_application', app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                <a href="{{ url_for('applications.edit_application', app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
             </div>
             <div class="card-body">
                 <dl class="detail-list">
                     <dt>Status</dt>
                     <dd>
-                        <form action="{{ url_for('update_status', app_id=details.application.id) }}" method="post" class="inline-form">
+                        <form action="{{ url_for('applications.update_status', app_id=details.application.id) }}" method="post" class="inline-form">
                             <select name="status" onchange="this.form.submit()" class="status-select">
                                 {% for s in ApplicationStatus %}
                                 <option value="{{ s.value }}" {% if s == details.application.status %}selected{% endif %}>
@@ -83,7 +83,7 @@
         <section class="card">
             <div class="card-header">
                 <h2>Job Details</h2>
-                <a href="{{ url_for('edit_job', job_id=details.job.id, app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                <a href="{{ url_for('jobs.edit_job', job_id=details.job.id, app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
             </div>
             <div class="card-body">
                 <dl class="detail-list">
@@ -136,7 +136,7 @@
         <section class="card">
             <div class="card-header">
                 <h2>Company</h2>
-                <a href="{{ url_for('edit_company', company_id=details.company.id, app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                <a href="{{ url_for('companies.edit_company', company_id=details.company.id, app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
             </div>
             <div class="card-body">
                 <dl class="detail-list">
@@ -194,7 +194,7 @@
         <section class="card">
             <div class="card-header">
                 <h2>Events & Interviews</h2>
-                <a href="{{ url_for('new_interview') }}?app_id={{ details.application.id }}" class="btn btn-sm btn-primary">+ Interview</a>
+                <a href="{{ url_for('schedule.new_interview') }}?app_id={{ details.application.id }}" class="btn btn-sm btn-primary">+ Interview</a>
             </div>
             <div class="card-body">
                 {% if details.events %}
@@ -216,7 +216,7 @@
                             {% endif %}
                         </div>
                         {% if not event.completed %}
-                        <form action="{{ url_for('complete_event', event_id=event.id) }}" method="post" class="timeline-action">
+                        <form action="{{ url_for('schedule.complete_event', event_id=event.id) }}" method="post" class="timeline-action">
                             <button type="submit" name="went_well" value="true" class="btn btn-sm btn-success" title="Went well">✓</button>
                             <button type="submit" name="went_well" value="false" class="btn btn-sm btn-danger" title="Didn't go well">✗</button>
                         </form>
@@ -241,7 +241,7 @@
             </div>
             <div class="card-body">
                 <!-- Add Note Form -->
-                <form action="{{ url_for('add_application_note', app_id=details.application.id) }}" method="post" class="note-form">
+                <form action="{{ url_for('applications.add_application_note', app_id=details.application.id) }}" method="post" class="note-form">
                     <div class="form-group">
                         <input type="text" name="title" placeholder="Note title (optional)" class="note-title-input">
                     </div>

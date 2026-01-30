@@ -177,6 +177,7 @@ a:hover {
     position: fixed;
     top: 0;
     right: 0;
+    left: auto;
     height: 72px;
     display: flex;
     align-items: center;

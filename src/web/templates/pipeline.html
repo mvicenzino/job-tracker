@@ -6,7 +6,7 @@
 <div class="pipeline-page">
     <header class="page-header">
         <h1>Application Pipeline</h1>
-        <a href="{{ url_for('new_application') }}" class="btn btn-primary">+ Quick Apply</a>
+        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Quick Apply</a>
     </header>
 
     <div class="pipeline-board">
@@ -31,13 +31,13 @@
                     </div>
                     {% endif %}
                     <div class="card-actions">
-                        <a href="{{ url_for('application_detail', app_id=app.id) }}" class="btn btn-sm">View</a>
+                        <a href="{{ url_for('applications.application_detail', app_id=app.id) }}" class="btn btn-sm">View</a>
                         <div class="dropdown">
                             <button class="btn btn-sm btn-secondary dropdown-toggle">Move</button>
                             <div class="dropdown-menu">
                                 {% for s in ApplicationStatus %}
                                 {% if s.value != status %}
-                                <form action="{{ url_for('update_status', app_id=app.id) }}" method="post">
+                                <form action="{{ url_for('applications.update_status', app_id=app.id) }}" method="post">
                                     <input type="hidden" name="status" value="{{ s.value }}">
                                     <button type="submit" class="dropdown-item">
                                         <span class="status-dot" style="background-color: {{ s.value|status_color }}"></span>
@@ -76,7 +76,7 @@
                 <ul class="closed-list">
                     {% for app in pipeline.get(status)[:5] %}
                     <li>
-                        <a href="{{ url_for('application_detail', app_id=app.id) }}">
+                        <a href="{{ url_for('applications.application_detail', app_id=app.id) }}">
                             {{ app.job.title }} @ {{ app.job.company.name }}
                         </a>
                     </li>

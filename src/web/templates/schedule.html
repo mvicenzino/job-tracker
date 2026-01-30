@@ -7,15 +7,15 @@
     <header class="page-header">
         <h1>Schedule</h1>
         <div class="header-actions">
-            <a href="{{ url_for('new_event') }}" class="btn btn-secondary">+ Add Event</a>
-            <a href="{{ url_for('new_interview') }}" class="btn btn-primary">+ Schedule Interview</a>
+            <a href="{{ url_for('schedule.new_event') }}" class="btn btn-secondary">+ Add Event</a>
+            <a href="{{ url_for('schedule.new_interview') }}" class="btn btn-primary">+ Schedule Interview</a>
         </div>
     </header>
 
     <div class="schedule-filters">
-        <a href="{{ url_for('schedule', days=7) }}" class="btn {% if days == 7 %}btn-primary{% else %}btn-secondary{% endif %}">7 Days</a>
-        <a href="{{ url_for('schedule', days=14) }}" class="btn {% if days == 14 %}btn-primary{% else %}btn-secondary{% endif %}">14 Days</a>
-        <a href="{{ url_for('schedule', days=30) }}" class="btn {% if days == 30 %}btn-primary{% else %}btn-secondary{% endif %}">30 Days</a>
+        <a href="{{ url_for('schedule.schedule', days=7) }}" class="btn {% if days == 7 %}btn-primary{% else %}btn-secondary{% endif %}">7 Days</a>
+        <a href="{{ url_for('schedule.schedule', days=14) }}" class="btn {% if days == 14 %}btn-primary{% else %}btn-secondary{% endif %}">14 Days</a>
+        <a href="{{ url_for('schedule.schedule', days=30) }}" class="btn {% if days == 30 %}btn-primary{% else %}btn-secondary{% endif %}">30 Days</a>
     </div>
 
     {% if today %}
@@ -50,7 +50,7 @@
                     </div>
                     <div class="event-actions">
                         {% if not event.completed %}
-                        <form action="{{ url_for('complete_event', event_id=event.id) }}" method="post">
+                        <form action="{{ url_for('schedule.complete_event', event_id=event.id) }}" method="post">
                             <button type="submit" name="went_well" value="true" class="btn btn-sm btn-success">👍 Done</button>
                             <button type="submit" name="went_well" value="false" class="btn btn-sm btn-secondary">👎</button>
                         </form>
@@ -112,8 +112,8 @@
                 <p>No events scheduled for the next {{ days }} days</p>
                 <span class="empty-hint">Time to line up some interviews!</span>
                 <div class="empty-actions">
-                    <a href="{{ url_for('new_event') }}" class="btn btn-secondary">+ Add Event</a>
-                    <a href="{{ url_for('new_interview') }}" class="btn btn-primary">+ Schedule Interview</a>
+                    <a href="{{ url_for('schedule.new_event') }}" class="btn btn-secondary">+ Add Event</a>
+                    <a href="{{ url_for('schedule.new_interview') }}" class="btn btn-primary">+ Schedule Interview</a>
                 </div>
             </div>
         </div>

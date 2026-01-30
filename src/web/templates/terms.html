@@ -59,7 +59,7 @@
     <!-- Navigation -->
     <nav class="landing-nav scrolled">
         <div class="landing-nav-container">
-            <a href="{{ url_for('landing') }}" class="landing-brand">
+            <a href="{{ url_for('public.landing') }}" class="landing-brand">
                 <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
@@ -67,9 +67,9 @@
                 <span>Stride</span>
             </a>
             <div class="landing-nav-links">
-                <a href="{{ url_for('landing') }}">Home</a>
-                <a href="{{ url_for('login') }}" class="btn btn-ghost">Sign In</a>
-                <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started Free</a>
+                <a href="{{ url_for('public.landing') }}">Home</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Sign In</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started Free</a>
             </div>
             <button class="landing-menu-toggle" id="menuToggle" aria-label="Toggle menu">
                 <span></span>
@@ -81,9 +81,9 @@
 
     <!-- Mobile Menu -->
     <div class="landing-mobile-menu" id="mobileMenu">
-        <a href="{{ url_for('landing') }}">Home</a>
-        <a href="{{ url_for('login') }}">Sign In</a>
-        <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started Free</a>
+        <a href="{{ url_for('public.landing') }}">Home</a>
+        <a href="{{ url_for('auth.login') }}">Sign In</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started Free</a>
     </div>
 
     <div class="legal-page">
@@ -93,7 +93,7 @@
         <p>Welcome to Stride. By accessing or using our job search tracking application, you agree to be bound by these Terms of Service. Please read them carefully.</p>
 
         <h2>1. Acceptance of Terms</h2>
-        <p>By creating an account or using Stride, you agree to these Terms of Service and our <a href="{{ url_for('privacy') }}">Privacy Policy</a>. If you do not agree, please do not use our service.</p>
+        <p>By creating an account or using Stride, you agree to these Terms of Service and our <a href="{{ url_for('public.privacy') }}">Privacy Policy</a>. If you do not agree, please do not use our service.</p>
 
         <h2>2. Description of Service</h2>
         <p>Stride is a job search tracking application that helps you organize job applications, manage contacts, schedule interviews, and track your job search progress. The service is provided free of charge.</p>
@@ -151,7 +151,7 @@
         <div class="section-container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <a href="{{ url_for('landing') }}" class="landing-brand">
+                    <a href="{{ url_for('public.landing') }}" class="landing-brand">
                         <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
@@ -163,14 +163,14 @@
                 <div class="footer-link-groups">
                     <div class="footer-link-group">
                         <h4>Product</h4>
-                        <a href="{{ url_for('login') }}">Sign In</a>
-                        <a href="{{ url_for('register') }}">Get Started</a>
-                        <a href="{{ url_for('demo') }}">Try Demo</a>
+                        <a href="{{ url_for('auth.login') }}">Sign In</a>
+                        <a href="{{ url_for('auth.register') }}">Get Started</a>
+                        <a href="{{ url_for('public.demo') }}">Try Demo</a>
                     </div>
                     <div class="footer-link-group">
                         <h4>Legal</h4>
-                        <a href="{{ url_for('privacy') }}">Privacy Policy</a>
-                        <a href="{{ url_for('terms') }}">Terms of Service</a>
+                        <a href="{{ url_for('public.privacy') }}">Privacy Policy</a>
+                        <a href="{{ url_for('public.terms') }}">Terms of Service</a>
                     </div>
                 </div>
             </div>
