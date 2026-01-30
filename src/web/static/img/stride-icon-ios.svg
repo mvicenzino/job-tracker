@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="chevGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0e7ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- iOS-style rounded square (Apple's superellipse approximation) -->
+  <rect width="1024" height="1024" rx="228" fill="url(#bgGrad)"/>
+
+  <!-- Double chevron icon - centered and scaled -->
+  <path d="M340 280L512 512L340 744" stroke="url(#chevGrad)" stroke-width="72" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M556 280L728 512L556 744" stroke="url(#chevGrad)" stroke-width="72" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.5"/>
+</svg>

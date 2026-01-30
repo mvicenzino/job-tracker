@@ -163,6 +163,11 @@ a:hover {
     color: var(--color-primary);
 }
 
+.brand-logo {
+    height: 24px;
+    width: auto;
+}
+
 .brand-tagline {
     font-size: 0.6875rem;
     font-weight: 500;

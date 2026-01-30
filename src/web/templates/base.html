@@ -27,11 +27,7 @@
             </button>
             <div class="nav-brand">
                 <a href="{{ url_for('dashboard.dashboard') }}">
-                    <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
-                    </svg>
-                    Stride
+                    <img src="{{ url_for('static', filename='img/stride-logo-transparent.svg') }}" alt="Stride" class="brand-logo">
                     {% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %}
                     <span class="demo-badge">DEMO</span>
                     {% else %}
@@ -170,11 +166,7 @@
             <div class="footer-content">
                 <div class="footer-brand">
                     <a href="{{ url_for('dashboard.dashboard') }}" class="footer-brand-link">
-                        <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M14 12L26 24L14 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M26 12L38 24L26 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
-                        </svg>
-                        <span>Stride</span>
+                        <img src="{{ url_for('static', filename='img/stride-logo-transparent.svg') }}" alt="Stride" class="brand-logo">
                     </a>
                     <p>Stride into your next role</p>
                 </div>
