@@ -74,6 +74,15 @@ class ApplicationRepository(BaseRepository[Application]):
             Application.date_response.is_(None)
         ).all()
 
+    def get_stale_leads(self, days_threshold: int = 14) -> List[Application]:
+        """Get leads in INTERESTED or PREPARING that haven't been updated recently."""
+        from datetime import datetime
+        cutoff = datetime.utcnow() - timedelta(days=days_threshold)
+        return self._base_query().filter(
+            Application.status.in_([ApplicationStatus.INTERESTED, ApplicationStatus.PREPARING]),
+            Application.updated_at <= cutoff
+        ).order_by(Application.updated_at).all()
+
     def update_status(self, app_id: int, new_status: ApplicationStatus) -> Optional[Application]:
         """Update application status with automatic date handling."""
         app = self.get_by_id(app_id)

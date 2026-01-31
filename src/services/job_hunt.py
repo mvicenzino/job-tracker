@@ -285,6 +285,7 @@ class JobHuntService:
         active_apps = self.applications.get_active_applications()
         app_stats = self.applications.get_stats()
         stale_apps = self.applications.get_awaiting_response(days_threshold=14)
+        stale_leads = self.applications.get_stale_leads(days_threshold=14)
         all_contacts = self.contacts.get_all()
 
         return {
@@ -294,12 +295,14 @@ class JobHuntService:
                 'events_today': len(today_events),
                 'total_contacts': len(all_contacts),
                 'contacts_need_followup': len(followups_needed),
-                'apps_awaiting_response': len(stale_apps)
+                'apps_awaiting_response': len(stale_apps),
+                'stale_leads': len(stale_leads)
             },
             'today': today_events,
             'upcoming': upcoming_events[:5],  # Next 5 events
             'needs_attention': {
                 'stale_applications': stale_apps,
+                'stale_leads': stale_leads,
                 'followup_contacts': followups_needed[:5]
             },
             'stats': app_stats

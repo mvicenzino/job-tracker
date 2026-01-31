@@ -223,7 +223,26 @@
                 <h2>Needs Attention</h2>
             </div>
             <div class="card-body">
-                {% if dashboard.needs_attention.stale_applications or dashboard.needs_attention.followup_contacts %}
+                {% if dashboard.needs_attention.stale_leads or dashboard.needs_attention.stale_applications or dashboard.needs_attention.followup_contacts %}
+                    {% if dashboard.needs_attention.stale_leads %}
+                        <div class="attention-section">
+                            <h3 class="attention-title">
+                                <span class="attention-dot warning"></span>
+                                Leads Going Cold (14+ days idle)
+                            </h3>
+                            <ul class="attention-list">
+                                {% for app in dashboard.needs_attention.stale_leads[:3] %}
+                                <li>
+                                    <a href="{{ url_for('applications.application_detail', app_id=app.id) }}">
+                                        <strong>{{ app.job.title }}</strong>
+                                        <span>{{ app.job.company.name }} &mdash; {{ app.status.value|replace('_', ' ')|title }}</span>
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
                     {% if dashboard.needs_attention.stale_applications %}
                         <div class="attention-section">
                             <h3 class="attention-title">
