@@ -138,6 +138,7 @@
         <section class="card">
             <div class="card-header">
                 <h2>Today's Events</h2>
+                <a href="{{ url_for('digest.daily_digest') }}" class="card-link">Daily Digest →</a>
             </div>
             <div class="card-body">
                 {% if dashboard.today %}

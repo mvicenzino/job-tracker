@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize mobile menu
     initMobileMenu();
 
+    // Initialize nav dropdowns
+    initNavDropdowns();
+
     // Auto-dismiss alerts after 5 seconds
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
@@ -68,6 +71,62 @@ function initMobileMenu() {
                 if (typeof closeMobileMenu === 'function') closeMobileMenu();
             }
         }, 100);
+    });
+}
+
+// === Nav Dropdowns (Network, Insights) ===
+
+function initNavDropdowns() {
+    var dropdowns = document.querySelectorAll('.nav-dropdown');
+    if (!dropdowns.length) return;
+
+    dropdowns.forEach(function(dropdown) {
+        var toggle = dropdown.querySelector('.nav-dropdown-toggle');
+        if (!toggle) return;
+
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var isOpen = dropdown.classList.contains('open');
+
+            // Close all other dropdowns first
+            dropdowns.forEach(function(other) {
+                if (other !== dropdown) {
+                    other.classList.remove('open');
+                    var otherToggle = other.querySelector('.nav-dropdown-toggle');
+                    if (otherToggle) otherToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            dropdown.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', String(!isOpen));
+        });
+    });
+
+    // Close all on outside click
+    document.addEventListener('click', function(e) {
+        dropdowns.forEach(function(dropdown) {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('open');
+                var toggle = dropdown.querySelector('.nav-dropdown-toggle');
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    });
+
+    // Close all on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            dropdowns.forEach(function(dropdown) {
+                if (dropdown.classList.contains('open')) {
+                    dropdown.classList.remove('open');
+                    var toggle = dropdown.querySelector('.nav-dropdown-toggle');
+                    if (toggle) {
+                        toggle.setAttribute('aria-expanded', 'false');
+                        toggle.focus();
+                    }
+                }
+            });
+        }
     });
 }
 

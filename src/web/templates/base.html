@@ -36,7 +36,13 @@
                 </a>
             </div>
         </div>
+        <div class="nav-right">
+            <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary btn-sm">+ Add Lead</a>
+        </div>
     </nav>
+
+    {% set network_active = request.endpoint and (request.endpoint.startswith('contacts.') or request.endpoint.startswith('companies.') or request.endpoint.startswith('jobs.')) %}
+    {% set insights_active = request.endpoint and (request.endpoint == 'compare.compare_offers' or 'reflections' in request.endpoint) %}
 
     <div class="nav-menu" id="nav-menu">
         <div class="nav-menu-header">
@@ -49,42 +55,76 @@
         </div>
         {% endif %}
         <div class="nav-links">
+            <!-- Primary nav items -->
+            <span class="nav-section-label">Main</span>
             <a href="{{ url_for('dashboard.dashboard') }}" class="{% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">
                 <span class="nav-icon">📊</span> Dashboard
             </a>
             <a href="{{ url_for('dashboard.pipeline') }}" class="{% if request.endpoint == 'dashboard.pipeline' %}active{% endif %}">
                 <span class="nav-icon">📋</span> Pipeline
             </a>
-            <a href="{{ url_for('companies.companies') }}" class="{% if request.endpoint == 'companies.companies' %}active{% endif %}">
-                <span class="nav-icon">🏢</span> Companies
+            <a href="{{ url_for('applications.applications') }}" class="{% if request.endpoint and request.endpoint.startswith('applications.') %}active{% endif %}">
+                <span class="nav-icon">📄</span> Applications
             </a>
-            <a href="{{ url_for('jobs.jobs') }}" class="{% if request.endpoint == 'jobs.jobs' %}active{% endif %}">
-                <span class="nav-icon">💼</span> Jobs
-            </a>
-            <a href="{{ url_for('contacts.contacts') }}" class="{% if request.endpoint == 'contacts.contacts' %}active{% endif %}">
-                <span class="nav-icon">👥</span> Contacts
-            </a>
-            <a href="{{ url_for('schedule.schedule') }}" class="{% if request.endpoint == 'schedule.schedule' %}active{% endif %}">
+            <a href="{{ url_for('schedule.schedule') }}" class="{% if request.endpoint and request.endpoint.startswith('schedule.') %}active{% endif %}">
                 <span class="nav-icon">📅</span> Schedule
             </a>
-            <a href="{{ url_for('compare.compare_offers') }}" class="{% if request.endpoint == 'compare.compare_offers' %}active{% endif %}">
+
+            <!-- Network dropdown (desktop only) -->
+            <div class="nav-dropdown{% if network_active %} has-active-child{% endif %}">
+                <button type="button" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+                    Network <span class="nav-dropdown-chevron">▾</span>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="{{ url_for('contacts.contacts') }}" class="{% if request.endpoint and request.endpoint.startswith('contacts.') %}active{% endif %}">
+                        <span class="nav-icon">👥</span> Contacts
+                    </a>
+                    <a href="{{ url_for('companies.companies') }}" class="{% if request.endpoint and request.endpoint.startswith('companies.') %}active{% endif %}">
+                        <span class="nav-icon">🏢</span> Companies
+                    </a>
+                    <a href="{{ url_for('jobs.jobs') }}" class="{% if request.endpoint and request.endpoint.startswith('jobs.') %}active{% endif %}">
+                        <span class="nav-icon">💼</span> Jobs
+                    </a>
+                </div>
+            </div>
+
+            <!-- Insights dropdown (desktop only) -->
+            <div class="nav-dropdown{% if insights_active %} has-active-child{% endif %}">
+                <button type="button" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+                    Insights <span class="nav-dropdown-chevron">▾</span>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="{{ url_for('compare.compare_offers') }}" class="{% if request.endpoint == 'compare.compare_offers' %}active{% endif %}">
+                        <span class="nav-icon">⚖️</span> Compare Offers
+                    </a>
+                    <a href="{{ url_for('reflections.reflections') }}" class="{% if request.endpoint and 'reflections' in request.endpoint %}active{% endif %}">
+                        <span class="nav-icon">📝</span> Reflections
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mobile-only sections (hidden on desktop, visible in slide-out menu) -->
+            <span class="nav-section-label">Network</span>
+            <a href="{{ url_for('contacts.contacts') }}" class="nav-mobile-only {% if request.endpoint and request.endpoint.startswith('contacts.') %}active{% endif %}">
+                <span class="nav-icon">👥</span> Contacts
+            </a>
+            <a href="{{ url_for('companies.companies') }}" class="nav-mobile-only {% if request.endpoint and request.endpoint.startswith('companies.') %}active{% endif %}">
+                <span class="nav-icon">🏢</span> Companies
+            </a>
+            <a href="{{ url_for('jobs.jobs') }}" class="nav-mobile-only {% if request.endpoint and request.endpoint.startswith('jobs.') %}active{% endif %}">
+                <span class="nav-icon">💼</span> Jobs
+            </a>
+
+            <span class="nav-section-label">Insights</span>
+            <a href="{{ url_for('compare.compare_offers') }}" class="nav-mobile-only {% if request.endpoint == 'compare.compare_offers' %}active{% endif %}">
                 <span class="nav-icon">⚖️</span> Compare Offers
             </a>
-            <a href="{{ url_for('digest.daily_digest') }}" class="{% if request.endpoint == 'digest.daily_digest' %}active{% endif %}">
-                <span class="nav-icon">📬</span> Daily Digest
-            </a>
-            <a href="{{ url_for('reflections.reflections') }}" class="{% if request.endpoint and 'reflections' in request.endpoint %}active{% endif %}">
+            <a href="{{ url_for('reflections.reflections') }}" class="nav-mobile-only {% if request.endpoint and 'reflections' in request.endpoint %}active{% endif %}">
                 <span class="nav-icon">📝</span> Reflections
             </a>
-            {% if current_user.is_authenticated and current_user.email != 'demo@stride-jobs.com' %}
-            <a href="{{ url_for('settings.setup') }}" class="{% if request.endpoint == 'settings.setup' %}active{% endif %}">
-                <span class="nav-icon">🔧</span> Setup
-            </a>
-            {% endif %}
         </div>
         <div class="nav-actions">
             <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Lead</a>
-            <a href="{{ url_for('feedback.feedback') }}" class="btn btn-ghost">Feedback</a>
         </div>
         {% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %}
         <div class="nav-user demo-nav-user">
@@ -97,6 +137,7 @@
         <div class="nav-user">
             <span class="user-email">{{ current_user.email }}</span>
             <a href="{{ url_for('settings.settings') }}" class="btn btn-ghost btn-sm">Settings</a>
+            <a href="{{ url_for('feedback.feedback') }}" class="btn btn-ghost btn-sm">Feedback</a>
             <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-sm">Logout</a>
         </div>
         {% endif %}
