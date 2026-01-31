@@ -125,6 +125,7 @@ def create_app(db_path: str = None, database_url: str = None):
     from .routes.schedule import bp as schedule_bp
     from .routes.settings import bp as settings_bp
     from .routes.api import bp as api_bp
+    from .routes.digest import bp as digest_bp
     from .routes.feedback import bp as feedback_bp
 
     app.register_blueprint(public_bp)
@@ -137,6 +138,7 @@ def create_app(db_path: str = None, database_url: str = None):
     app.register_blueprint(schedule_bp)
     app.register_blueprint(settings_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(digest_bp)
     app.register_blueprint(feedback_bp)
 
     return app

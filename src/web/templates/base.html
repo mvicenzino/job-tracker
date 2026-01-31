@@ -67,6 +67,9 @@
             <a href="{{ url_for('schedule.schedule') }}" class="{% if request.endpoint == 'schedule.schedule' %}active{% endif %}">
                 <span class="nav-icon">📅</span> Schedule
             </a>
+            <a href="{{ url_for('digest.daily_digest') }}" class="{% if request.endpoint == 'digest.daily_digest' %}active{% endif %}">
+                <span class="nav-icon">📬</span> Daily Digest
+            </a>
             {% if current_user.is_authenticated and current_user.email != 'demo@stride-jobs.com' %}
             <a href="{{ url_for('settings.setup') }}" class="{% if request.endpoint == 'settings.setup' %}active{% endif %}">
                 <span class="nav-icon">🔧</span> Setup

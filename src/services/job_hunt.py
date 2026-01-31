@@ -308,6 +308,38 @@ class JobHuntService:
             'stats': app_stats
         }
 
+    # === Daily Digest ===
+
+    def get_daily_digest(self) -> Dict[str, Any]:
+        """Generate daily digest data: what needs attention today."""
+        today_events = self.events.get_today()
+        upcoming_events = self.events.get_upcoming(days=3)
+        followups_needed = self.contacts.get_needing_followup()
+        stale_leads = self.applications.get_stale_leads(days_threshold=14)
+        stale_apps = self.applications.get_awaiting_response(days_threshold=14)
+        active_apps = self.applications.get_active_applications()
+        recent_apps = self.applications.get_recent(days=7)
+
+        # Count by status for a quick summary
+        status_counts = {}
+        for app in active_apps:
+            status = app.status.value
+            status_counts[status] = status_counts.get(status, 0) + 1
+
+        return {
+            'today_events': today_events,
+            'upcoming_events': upcoming_events,
+            'followups_needed': followups_needed,
+            'stale_leads': stale_leads,
+            'stale_applications': stale_apps,
+            'active_count': len(active_apps),
+            'recent_leads': recent_apps,
+            'status_counts': status_counts,
+            'has_action_items': bool(
+                today_events or followups_needed or stale_leads or stale_apps
+            ),
+        }
+
     # === Notes ===
 
     def add_note(self, content: str, title: str = None,

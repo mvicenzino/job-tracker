@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Daily Digest - Stride{% endblock %}
+
+{% block content %}
+<div class="list-page">
+    <header class="page-header">
+        <div>
+            <h1>Daily Digest</h1>
+            <p class="subtitle">Your job search summary for today</p>
+        </div>
+    </header>
+
+    {% if not digest.has_action_items %}
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state-visual success">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                </div>
+                <p>Nothing urgent today!</p>
+                <span class="empty-hint">Your pipeline is in good shape. Keep the momentum going.</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Stats Bar -->
+    <div class="stats-grid" style="margin-bottom: 1.5rem;">
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="stat-value">{{ digest.active_count }}</div>
+                <div class="stat-label">Active Leads</div>
+            </div>
+        </div>
+        {% for status, count in digest.status_counts.items() %}
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="stat-value">{{ count }}</div>
+                <div class="stat-label">{{ status|replace('_', ' ')|title }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Today's Events -->
+        {% if digest.today_events %}
+        <section class="card">
+            <div class="card-header">
+                <h2>Today's Events</h2>
+            </div>
+            <div class="card-body">
+                <ul class="event-list">
+                    {% for event in digest.today_events %}
+                    <li class="event-item">
+                        <span class="event-icon">{{ event.event_type.value|event_type_icon }}</span>
+                        <div class="event-details">
+                            <div class="event-time">{{ event.start_time.strftime('%H:%M') }}</div>
+                            <div class="event-title">{{ event.title }}</div>
+                            {% if event.meeting_link %}
+                            <a href="{{ event.meeting_link }}" target="_blank" class="event-link">Join Meeting</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Coming Up (next 3 days) -->
+        {% if digest.upcoming_events %}
+        <section class="card">
+            <div class="card-header">
+                <h2>Coming Up (Next 3 Days)</h2>
+            </div>
+            <div class="card-body">
+                <ul class="event-list compact">
+                    {% for event in digest.upcoming_events[:5] %}
+                    <li class="event-item">
+                        <span class="event-icon">{{ event.event_type.value|event_type_icon }}</span>
+                        <div class="event-details">
+                            <div class="event-date">{{ event.start_time.strftime('%a, %b %d at %H:%M') }}</div>
+                            <div class="event-title">{{ event.title }}</div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Leads Going Cold -->
+        {% if digest.stale_leads %}
+        <section class="card">
+            <div class="card-header">
+                <h2>Leads Going Cold</h2>
+            </div>
+            <div class="card-body">
+                <p style="color: var(--text-secondary); margin-bottom: 0.75rem;">These leads have had no activity for 14+ days. Act on them or archive them.</p>
+                <ul class="attention-list">
+                    {% for app in digest.stale_leads %}
+                    <li>
+                        <a href="{{ url_for('applications.application_detail', app_id=app.id) }}">
+                            <strong>{{ app.job.title }}</strong>
+                            <span>{{ app.job.company.name }} &mdash; {{ app.status.value|replace('_', ' ')|title }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Awaiting Response -->
+        {% if digest.stale_applications %}
+        <section class="card">
+            <div class="card-header">
+                <h2>Awaiting Response (14+ days)</h2>
+            </div>
+            <div class="card-body">
+                <p style="color: var(--text-secondary); margin-bottom: 0.75rem;">Consider following up on these applications.</p>
+                <ul class="attention-list">
+                    {% for app in digest.stale_applications %}
+                    <li>
+                        <a href="{{ url_for('applications.application_detail', app_id=app.id) }}">
+                            <strong>{{ app.job.title }}</strong>
+                            <span>{{ app.job.company.name }} &mdash; Applied {{ app.date_applied.strftime('%b %d') }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Follow-ups Due -->
+        {% if digest.followups_needed %}
+        <section class="card">
+            <div class="card-header">
+                <h2>Follow-ups Due</h2>
+            </div>
+            <div class="card-body">
+                <ul class="attention-list">
+                    {% for contact in digest.followups_needed %}
+                    <li>
+                        <a href="{{ url_for('contacts.edit_contact', contact_id=contact.id) }}">
+                            <strong>{{ contact.name }}</strong>
+                            {% if contact.company %}<span>{{ contact.company.name }}</span>{% endif %}
+                            {% if contact.next_followup_date %}
+                            <span>&mdash; Due {{ contact.next_followup_date.strftime('%b %d') }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Recent Leads (last 7 days) -->
+        {% if digest.recent_leads %}
+        <section class="card">
+            <div class="card-header">
+                <h2>Added This Week</h2>
+            </div>
+            <div class="card-body">
+                <ul class="attention-list">
+                    {% for app in digest.recent_leads[:5] %}
+                    <li>
+                        <a href="{{ url_for('applications.application_detail', app_id=app.id) }}">
+                            <strong>{{ app.job.title }}</strong>
+                            <span>{{ app.job.company.name }} &mdash; {{ app.status.value|replace('_', ' ')|title }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
