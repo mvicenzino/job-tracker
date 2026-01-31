@@ -59,7 +59,7 @@
                     <li class="event-item">
                         <span class="event-icon">{{ event.event_type.value|event_type_icon }}</span>
                         <div class="event-details">
-                            <div class="event-time">{{ event.start_time.strftime('%H:%M') }}</div>
+                            <div class="event-time">{{ event.start_time.strftime('%-I:%M %p') }}</div>
                             <div class="event-title">{{ event.title }}</div>
                             {% if event.meeting_link %}
                             <a href="{{ event.meeting_link }}" target="_blank" class="event-link">Join Meeting</a>
@@ -84,7 +84,7 @@
                     <li class="event-item">
                         <span class="event-icon">{{ event.event_type.value|event_type_icon }}</span>
                         <div class="event-details">
-                            <div class="event-date">{{ event.start_time.strftime('%a, %b %d at %H:%M') }}</div>
+                            <div class="event-date">{{ event.start_time.strftime('%a, %b %d at %-I:%M %p') }}</div>
                             <div class="event-title">{{ event.title }}</div>
                         </div>
                     </li>

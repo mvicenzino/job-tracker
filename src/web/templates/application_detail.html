@@ -241,7 +241,7 @@
                     <li class="timeline-item {% if event.completed %}completed{% endif %}">
                         <div class="timeline-icon">{{ event.event_type.value|event_type_icon }}</div>
                         <div class="timeline-content">
-                            <div class="timeline-date">{{ event.start_time.strftime('%b %d, %Y at %H:%M') }}</div>
+                            <div class="timeline-date">{{ event.start_time.strftime('%b %d, %Y at %-I:%M %p') }}</div>
                             <div class="timeline-title">{{ event.title }}</div>
                             {% if event.meeting_link %}
                             <a href="{{ event.meeting_link }}" target="_blank" class="timeline-link">Join Meeting</a>
@@ -307,7 +307,7 @@
                             <span class="note-type-badge">{{ note.note_type or 'general' }}</span>
                         </div>
                         <p>{{ note.content }}</p>
-                        <span class="note-date">{{ note.created_at.strftime('%b %d, %Y at %H:%M') }}</span>
+                        <span class="note-date">{{ note.created_at.strftime('%b %d, %Y at %-I:%M %p') }}</span>
                     </li>
                     {% endfor %}
                 </ul>

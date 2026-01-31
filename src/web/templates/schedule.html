@@ -28,7 +28,7 @@
                 {% for event in today %}
                 <li class="schedule-item {% if event.completed %}completed{% endif %}">
                     <div class="event-time-block">
-                        <span class="event-time">{{ event.start_time.strftime('%H:%M') }}</span>
+                        <span class="event-time">{{ event.start_time.strftime('%-I:%M %p') }}</span>
                     </div>
                     <div class="event-icon-block">
                         <span class="event-icon">{{ event.event_type.value|event_type_icon }}</span>
@@ -78,7 +78,7 @@
                     {% for event in events %}
                     <li class="schedule-item">
                         <div class="event-time-block">
-                            <span class="event-time">{{ event.start_time.strftime('%H:%M') }}</span>
+                            <span class="event-time">{{ event.start_time.strftime('%-I:%M %p') }}</span>
                         </div>
                         <div class="event-icon-block">
                             <span class="event-icon">{{ event.event_type.value|event_type_icon }}</span>

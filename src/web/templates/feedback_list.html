@@ -19,7 +19,7 @@
                     <span class="badge badge-{{ item.category or 'general' }}">{{ (item.category or 'general')|title }}</span>
                 </div>
                 <p style="margin:0.5rem 0;">{{ item.message }}</p>
-                <small style="color:var(--text-secondary);">{{ item.created_at.strftime('%b %d, %Y at %H:%M') }}</small>
+                <small style="color:var(--text-secondary);">{{ item.created_at.strftime('%b %d, %Y at %-I:%M %p') }}</small>
             </div>
         </div>
         {% endfor %}
