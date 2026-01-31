@@ -3434,6 +3434,14 @@ body.demo-active .navbar {
     border-color: var(--primary); background: var(--primary); color: white;
 }
 
+/* Offer comparison table */
+.compare-table { table-layout: fixed; }
+.compare-label-col { width: 160px; }
+.compare-label { font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+.compare-value { text-align: center; }
+.compare-highlight { background: rgba(34, 197, 94, 0.08); font-weight: 600; }
+.text-muted { color: var(--text-secondary); opacity: 0.6; }
+
 @media print {
     .navbar,
     .hamburger,

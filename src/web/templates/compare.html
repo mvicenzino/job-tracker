@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Offers - Stride{% endblock %}
+
+{% block content %}
+<div class="list-page">
+    <header class="page-header">
+        <div>
+            <h1>Compare Offers</h1>
+            <p class="subtitle">Side-by-side comparison of your offers</p>
+        </div>
+    </header>
+
+    {% if offers %}
+    <div class="table-container">
+        <table class="data-table compare-table">
+            <thead>
+                <tr>
+                    <th class="compare-label-col"></th>
+                    {% for app in offers %}
+                    <th class="compare-offer-col">
+                        <a href="{{ url_for('applications.application_detail', app_id=app.id) }}">
+                            <strong>{{ app.job.company.name }}</strong><br>
+                            <span style="font-weight:normal;">{{ app.job.title }}</span>
+                        </a>
+                        <div style="margin-top:0.25rem;">
+                            <span class="status-badge" style="background-color: {{ app.status.value|status_color }}; font-size:0.75rem;">
+                                {{ app.status.value|replace('_', ' ')|title }}
+                            </span>
+                        </div>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="compare-label">Base Salary</td>
+                    {% for app in offers %}
+                    <td class="compare-value {% if app.offered_salary and app.offered_salary == (offers|map(attribute='offered_salary')|select('ne', None)|max) %}compare-highlight{% endif %}">
+                        {% if app.offered_salary %}
+                        ${{ "{:,}".format(app.offered_salary) }}
+                        {% else %}
+                        <span class="text-muted">Not entered</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="compare-label">Bonus</td>
+                    {% for app in offers %}
+                    <td class="compare-value">
+                        {% if app.offered_bonus %}
+                        ${{ "{:,}".format(app.offered_bonus) }}
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="compare-label">Equity</td>
+                    {% for app in offers %}
+                    <td class="compare-value">
+                        {% if app.offered_equity %}
+                        {{ app.offered_equity }}
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="compare-label">Salary Range (Listed)</td>
+                    {% for app in offers %}
+                    <td class="compare-value">
+                        {% if app.job.salary_min and app.job.salary_max %}
+                        ${{ "{:,}".format(app.job.salary_min) }} - ${{ "{:,}".format(app.job.salary_max) }}
+                        {% elif app.job.salary_min %}
+                        ${{ "{:,}".format(app.job.salary_min) }}+
+                        {% elif app.job.salary_max %}
+                        Up to ${{ "{:,}".format(app.job.salary_max) }}
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="compare-label">Work Type</td>
+                    {% for app in offers %}
+                    <td class="compare-value">{{ app.job.remote_type|title if app.job.remote_type else '-' }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="compare-label">Location</td>
+                    {% for app in offers %}
+                    <td class="compare-value">{{ app.job.location or '-' }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="compare-label">Source</td>
+                    {% for app in offers %}
+                    <td class="compare-value">{{ app.job.source or '-' }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="compare-label">Excitement</td>
+                    {% for app in offers %}
+                    <td class="compare-value">
+                        {% if app.excitement_level %}
+                        {% for i in range(app.excitement_level) %}⭐{% endfor %}
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% if offers|selectattr('referral_contact')|list %}
+                <tr>
+                    <td class="compare-label">Referral</td>
+                    {% for app in offers %}
+                    <td class="compare-value">
+                        {% if app.referral_contact %}
+                        {{ app.referral_contact.name }}
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:1rem; color:var(--text-secondary); font-size:0.85rem;">
+        <p>Tip: Edit each application to add salary, bonus, and equity details for a complete comparison.</p>
+    </div>
+
+    {% else %}
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state-visual">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                </div>
+                <p>No offers to compare yet</p>
+                <span class="empty-hint">When applications reach the Offer stage, you can compare them here</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
