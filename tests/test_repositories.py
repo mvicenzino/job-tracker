@@ -106,7 +106,7 @@ class TestJobRepository:
 
     def test_get_active_jobs(self, session, test_user):
         company_repo = CompanyRepository(session, user_id=test_user.id)
-        job_repo = JobRepository(session)
+        job_repo = JobRepository(session, user_id=test_user.id)
 
         company = company_repo.create(name="Job Corp")
         job_repo.create(company_id=company.id, title="Active Job", is_active=True)
@@ -119,7 +119,7 @@ class TestJobRepository:
 
     def test_search_by_title(self, session, test_user):
         company_repo = CompanyRepository(session, user_id=test_user.id)
-        job_repo = JobRepository(session)
+        job_repo = JobRepository(session, user_id=test_user.id)
 
         company = company_repo.create(name="Search Corp")
         job_repo.create(company_id=company.id, title="Senior Software Engineer")
@@ -132,7 +132,7 @@ class TestJobRepository:
 
     def test_get_by_salary_range(self, session, test_user):
         company_repo = CompanyRepository(session, user_id=test_user.id)
-        job_repo = JobRepository(session)
+        job_repo = JobRepository(session, user_id=test_user.id)
 
         company = company_repo.create(name="Salary Corp")
         job_repo.create(company_id=company.id, title="Low", salary_min=50000, salary_max=70000)
@@ -145,7 +145,7 @@ class TestJobRepository:
 
     def test_deactivate(self, session, test_user):
         company_repo = CompanyRepository(session, user_id=test_user.id)
-        job_repo = JobRepository(session)
+        job_repo = JobRepository(session, user_id=test_user.id)
 
         company = company_repo.create(name="Deactivate Corp")
         job = job_repo.create(company_id=company.id, title="Soon Inactive")
@@ -162,8 +162,8 @@ class TestApplicationRepository:
 
     def test_get_by_status(self, session, test_user):
         company_repo = CompanyRepository(session, user_id=test_user.id)
-        job_repo = JobRepository(session)
-        app_repo = ApplicationRepository(session)
+        job_repo = JobRepository(session, user_id=test_user.id)
+        app_repo = ApplicationRepository(session, user_id=test_user.id)
 
         company = company_repo.create(name="Status Corp")
         job = job_repo.create(company_id=company.id, title="Status Job")
@@ -177,8 +177,8 @@ class TestApplicationRepository:
 
     def test_get_active_applications(self, session, test_user):
         company_repo = CompanyRepository(session, user_id=test_user.id)
-        job_repo = JobRepository(session)
-        app_repo = ApplicationRepository(session)
+        job_repo = JobRepository(session, user_id=test_user.id)
+        app_repo = ApplicationRepository(session, user_id=test_user.id)
 
         company = company_repo.create(name="Active Corp")
         job = job_repo.create(company_id=company.id, title="Active Job")
@@ -192,8 +192,8 @@ class TestApplicationRepository:
 
     def test_update_status(self, session, test_user):
         company_repo = CompanyRepository(session, user_id=test_user.id)
-        job_repo = JobRepository(session)
-        app_repo = ApplicationRepository(session)
+        job_repo = JobRepository(session, user_id=test_user.id)
+        app_repo = ApplicationRepository(session, user_id=test_user.id)
 
         company = company_repo.create(name="Update Corp")
         job = job_repo.create(company_id=company.id, title="Update Job")
@@ -208,8 +208,8 @@ class TestApplicationRepository:
 
     def test_get_stats(self, session, test_user):
         company_repo = CompanyRepository(session, user_id=test_user.id)
-        job_repo = JobRepository(session)
-        app_repo = ApplicationRepository(session)
+        job_repo = JobRepository(session, user_id=test_user.id)
+        app_repo = ApplicationRepository(session, user_id=test_user.id)
 
         company = company_repo.create(name="Stats Corp")
         job = job_repo.create(company_id=company.id, title="Stats Job")
@@ -274,8 +274,8 @@ class TestContactRepository:
 class TestEventRepository:
     """Tests for EventRepository."""
 
-    def test_get_upcoming(self, session):
-        event_repo = EventRepository(session)
+    def test_get_upcoming(self, session, test_user):
+        event_repo = EventRepository(session, user_id=test_user.id)
 
         event_repo.create(
             title="Tomorrow",
@@ -294,8 +294,8 @@ class TestEventRepository:
         upcoming = event_repo.get_upcoming(days=7)
         assert len(upcoming) == 2
 
-    def test_get_today(self, session):
-        event_repo = EventRepository(session)
+    def test_get_today(self, session, test_user):
+        event_repo = EventRepository(session, user_id=test_user.id)
 
         now = datetime.now()
         event_repo.create(
@@ -315,8 +315,8 @@ class TestEventRepository:
         today = event_repo.get_today()
         assert len(today) == 2
 
-    def test_mark_complete(self, session):
-        event_repo = EventRepository(session)
+    def test_mark_complete(self, session, test_user):
+        event_repo = EventRepository(session, user_id=test_user.id)
 
         event = event_repo.create(
             title="Complete Me",
@@ -331,8 +331,8 @@ class TestEventRepository:
         assert event.went_well is True
         assert event.outcome_notes == "Great call!"
 
-    def test_get_interviews(self, session):
-        event_repo = EventRepository(session)
+    def test_get_interviews(self, session, test_user):
+        event_repo = EventRepository(session, user_id=test_user.id)
 
         event_repo.create(title="Phone Screen", event_type=EventType.PHONE_SCREEN,
                          start_time=datetime.now())

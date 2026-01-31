@@ -24,6 +24,8 @@
                     <div class="card-title">{{ app.job.title }}</div>
                     {% if app.date_applied %}
                     <div class="card-date">Applied {{ app.date_applied.strftime('%b %d') }}</div>
+                    {% elif app.created_at %}
+                    <div class="card-date">Added {{ app.created_at.strftime('%b %d') }}</div>
                     {% endif %}
                     {% if app.excitement_level %}
                     <div class="card-excitement">

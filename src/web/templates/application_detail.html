@@ -40,6 +40,9 @@
                     {% if details.application.date_applied %}
                     <dt>Date Applied</dt>
                     <dd>{{ details.application.date_applied.strftime('%B %d, %Y') }}</dd>
+                    {% elif details.application.created_at %}
+                    <dt>Date Added</dt>
+                    <dd>{{ details.application.created_at.strftime('%B %d, %Y') }}</dd>
                     {% endif %}
 
                     {% if details.application.excitement_level %}

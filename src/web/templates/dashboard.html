@@ -114,8 +114,8 @@
         </div>
         <div class="card-body">
             <div class="pipeline-visual">
-                {% set statuses = ['applied', 'screening', 'interviewing', 'final_round', 'offer'] %}
-                {% set colors = {'applied': '#6366f1', 'screening': '#8b5cf6', 'interviewing': '#06b6d4', 'final_round': '#f59e0b', 'offer': '#10b981'} %}
+                {% set statuses = ['interested', 'preparing', 'applied', 'screening', 'interviewing', 'final_round', 'offer'] %}
+                {% set colors = {'interested': '#6b7280', 'preparing': '#8b5cf6', 'applied': '#3b82f6', 'screening': '#06b6d4', 'interviewing': '#f59e0b', 'final_round': '#f97316', 'offer': '#10b981'} %}
                 {% set total = pipeline.values()|map('length')|sum %}
                 {% for status in statuses %}
                     {% set count = pipeline.get(status, [])|length %}

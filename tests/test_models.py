@@ -95,6 +95,7 @@ class TestJobModel:
         session.flush()
 
         job = Job(
+            user_id=test_user.id,
             company_id=company.id,
             title="Senior Developer",
             salary_min=120000,
@@ -112,8 +113,8 @@ class TestJobModel:
     def test_company_job_relationship(self, session, test_user):
         """Test bidirectional relationship between company and jobs."""
         company = Company(user_id=test_user.id, name="Multi-Job Corp")
-        job1 = Job(title="Engineer", company=company)
-        job2 = Job(title="Designer", company=company)
+        job1 = Job(user_id=test_user.id, title="Engineer", company=company)
+        job2 = Job(user_id=test_user.id, title="Designer", company=company)
         session.add_all([company, job1, job2])
         session.commit()
 
@@ -127,11 +128,12 @@ class TestApplicationModel:
     def test_create_application(self, session, test_user):
         """Test creating an application."""
         company = Company(user_id=test_user.id, name="Dream Company")
-        job = Job(title="Dream Job", company=company)
+        job = Job(user_id=test_user.id, title="Dream Job", company=company)
         session.add_all([company, job])
         session.flush()
 
         application = Application(
+            user_id=test_user.id,
             job_id=job.id,
             status=ApplicationStatus.APPLIED,
             date_applied=date.today(),
@@ -146,8 +148,8 @@ class TestApplicationModel:
     def test_application_status_progression(self, session, test_user):
         """Test updating application status through stages."""
         company = Company(user_id=test_user.id, name="Test Company")
-        job = Job(title="Test Position", company=company)
-        application = Application(job=job, status=ApplicationStatus.INTERESTED)
+        job = Job(user_id=test_user.id, title="Test Position", company=company)
+        application = Application(user_id=test_user.id, job=job, status=ApplicationStatus.INTERESTED)
         session.add_all([company, job, application])
         session.commit()
 
@@ -168,11 +170,12 @@ class TestApplicationModel:
         """Test application with a referral contact."""
         company = Company(user_id=test_user.id, name="Referral Corp")
         contact = Contact(user_id=test_user.id, name="John Smith", company=company, contact_type=ContactType.REFERRAL)
-        job = Job(title="Referred Position", company=company)
+        job = Job(user_id=test_user.id, title="Referred Position", company=company)
         session.add_all([company, contact, job])
         session.flush()
 
         application = Application(
+            user_id=test_user.id,
             job=job,
             status=ApplicationStatus.APPLIED,
             referral_contact_id=contact.id
@@ -238,12 +241,13 @@ class TestEventModel:
     def test_create_interview_event(self, session, test_user):
         """Test creating an interview event."""
         company = Company(user_id=test_user.id, name="Interview Corp")
-        job = Job(title="Interview Position", company=company)
-        application = Application(job=job, status=ApplicationStatus.INTERVIEWING)
+        job = Job(user_id=test_user.id, title="Interview Position", company=company)
+        application = Application(user_id=test_user.id, job=job, status=ApplicationStatus.INTERVIEWING)
         session.add_all([company, job, application])
         session.flush()
 
         event = Event(
+            user_id=test_user.id,
             application_id=application.id,
             title="Technical Interview Round 1",
             event_type=EventType.TECHNICAL_INTERVIEW,
@@ -262,6 +266,7 @@ class TestEventModel:
         """Test event linked to a contact."""
         contact = Contact(user_id=test_user.id, name="Coffee Chat Contact")
         event = Event(
+            user_id=test_user.id,
             title="Coffee chat with contact",
             event_type=EventType.COFFEE_CHAT,
             contact=contact,
@@ -273,9 +278,10 @@ class TestEventModel:
 
         assert event.contact.name == "Coffee Chat Contact"
 
-    def test_event_completion(self, session):
+    def test_event_completion(self, session, test_user):
         """Test marking an event as completed."""
         event = Event(
+            user_id=test_user.id,
             title="Phone Screen",
             event_type=EventType.PHONE_SCREEN,
             start_time=datetime.now() - timedelta(hours=2)
@@ -313,8 +319,8 @@ class TestNoteModel:
     def test_create_note_for_application(self, session, test_user):
         """Test creating a note attached to an application."""
         company = Company(user_id=test_user.id, name="App Note Corp")
-        job = Job(title="Noted Position", company=company)
-        application = Application(job=job)
+        job = Job(user_id=test_user.id, title="Noted Position", company=company)
+        application = Application(user_id=test_user.id, job=job)
         note = Note(
             application=application,
             title="Interview Prep",
@@ -360,7 +366,7 @@ class TestCascadeDeletes:
     def test_delete_company_cascades_to_jobs(self, session, test_user):
         """Test that deleting a company deletes its jobs."""
         company = Company(user_id=test_user.id, name="Cascade Corp")
-        job = Job(title="Cascade Job", company=company)
+        job = Job(user_id=test_user.id, title="Cascade Job", company=company)
         session.add_all([company, job])
         session.commit()
 
@@ -373,8 +379,8 @@ class TestCascadeDeletes:
     def test_delete_job_cascades_to_applications(self, session, test_user):
         """Test that deleting a job deletes its applications."""
         company = Company(user_id=test_user.id, name="Delete Corp")
-        job = Job(title="Delete Job", company=company)
-        application = Application(job=job)
+        job = Job(user_id=test_user.id, title="Delete Job", company=company)
+        application = Application(user_id=test_user.id, job=job)
         session.add_all([company, job, application])
         session.commit()
 
