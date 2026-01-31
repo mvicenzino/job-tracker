@@ -23,21 +23,33 @@ def applications():
 @bp.route('/applications/new', methods=['GET', 'POST'])
 @login_required
 def new_application():
-    """Create a new application (quick apply)."""
+    """Add a new lead to the pipeline."""
     if request.method == 'POST':
         service, session = get_service()
         try:
-            app = service.quick_apply(
+            company_id = request.form.get('company_id', type=int)
+            referral_contact_id = request.form.get('referral_contact_id', type=int)
+            app = service.add_lead(
                 company_name=request.form['company'],
                 job_title=request.form['title'],
                 job_url=request.form.get('url'),
-                source=request.form.get('source')
+                source=request.form.get('source'),
+                company_id=company_id,
+                referral_contact_id=referral_contact_id
             )
-            flash(f'Application created for {app.job.title} at {app.job.company.name}!', 'success')
+            flash(f'Lead added for {app.job.title} at {app.job.company.name}!', 'success')
             return redirect(url_for('dashboard.pipeline'))
         finally:
             session.close()
-    return render_template('application_form.html')
+
+    # GET: read query params for pre-fill
+    prefill = {
+        'company_name': request.args.get('company_name', ''),
+        'company_id': request.args.get('company_id', ''),
+        'referral_contact_id': request.args.get('referral_contact_id', ''),
+        'referral_name': request.args.get('referral_name', ''),
+    }
+    return render_template('application_form.html', prefill=prefill)
 
 
 @bp.route('/applications/<int:app_id>')

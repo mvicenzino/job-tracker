@@ -107,8 +107,8 @@ class TestApplicationOperations:
         assert app.status == ApplicationStatus.APPLIED
         assert app.date_applied == date.today()
 
-    def test_quick_apply(self, service):
-        app = service.quick_apply(
+    def test_add_lead(self, service):
+        app = service.add_lead(
             company_name="Quick Corp",
             job_title="Quick Position",
             job_url="https://example.com/job",
@@ -116,12 +116,28 @@ class TestApplicationOperations:
         )
 
         assert app.id is not None
-        assert app.status == ApplicationStatus.APPLIED
+        assert app.status == ApplicationStatus.INTERESTED
         assert app.job.title == "Quick Position"
         assert app.job.company.name == "Quick Corp"
 
+    def test_add_lead_with_company_id_and_referral(self, service):
+        company = service.add_company(name="Referral Corp")
+        contact = service.add_contact(name="Jane Referrer", company_id=company.id)
+
+        app = service.add_lead(
+            company_id=company.id,
+            job_title="Referred Position",
+            referral_contact_id=contact.id,
+            source="Referral"
+        )
+
+        assert app.id is not None
+        assert app.status == ApplicationStatus.INTERESTED
+        assert app.job.company.name == "Referral Corp"
+        assert app.referral_contact_id == contact.id
+
     def test_update_application_status(self, service):
-        app = service.quick_apply("Status Corp", "Status Job")
+        app = service.add_lead(company_name="Status Corp", job_title="Status Job")
 
         updated = service.update_application_status(
             app.id,
@@ -131,21 +147,21 @@ class TestApplicationOperations:
         assert updated.status == ApplicationStatus.SCREENING
 
     def test_get_pipeline(self, service):
-        service.quick_apply("Pipeline1", "Job1")
-        service.quick_apply("Pipeline2", "Job2")
+        service.add_lead("Pipeline1", "Job1")
+        service.add_lead("Pipeline2", "Job2")
 
-        app3 = service.quick_apply("Pipeline3", "Job3")
+        app3 = service.add_lead("Pipeline3", "Job3")
         service.update_application_status(app3.id, ApplicationStatus.INTERVIEWING)
 
         pipeline = service.get_pipeline()
 
-        assert 'applied' in pipeline
-        assert len(pipeline['applied']) == 2
+        assert 'interested' in pipeline
+        assert len(pipeline['interested']) == 2
         assert 'interviewing' in pipeline
         assert len(pipeline['interviewing']) == 1
 
     def test_get_application_details(self, service):
-        app = service.quick_apply("Details Corp", "Details Job")
+        app = service.add_lead("Details Corp", "Details Job")
 
         details = service.get_application_details(app.id)
 
@@ -228,7 +244,7 @@ class TestEventOperations:
         assert event.title == "Coffee Chat"
 
     def test_schedule_interview(self, service):
-        app = service.quick_apply("Interview Corp", "Interview Job")
+        app = service.add_lead("Interview Corp", "Interview Job")
         interview_time = datetime.now() + timedelta(days=5)
 
         event = service.schedule_interview(
@@ -281,8 +297,8 @@ class TestDashboard:
 
     def test_get_dashboard(self, service):
         # Add some data
-        service.quick_apply("Dashboard Corp 1", "Job 1")
-        service.quick_apply("Dashboard Corp 2", "Job 2")
+        service.add_lead("Dashboard Corp 1", "Job 1")
+        service.add_lead("Dashboard Corp 2", "Job 2")
 
         contact = service.add_contact(name="Dashboard Contact")
         contact.next_followup_date = date.today()

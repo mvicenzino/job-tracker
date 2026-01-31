@@ -93,17 +93,25 @@ class JobHuntService:
         self.session.commit()
         return app
 
-    def quick_apply(self, company_name: str, job_title: str,
-                   job_url: str = None, source: str = None) -> Application:
+    def add_lead(self, company_name: str = None, job_title: str = None,
+                 job_url: str = None, source: str = None,
+                 company_id: int = None, referral_contact_id: int = None) -> Application:
         """
-        Quick workflow: Add company, job, and application in one go.
+        Add a new lead to the pipeline: creates company (if needed), job, and application.
+        If company_id is provided, uses that company directly instead of searching by name.
+        Default status is INTERESTED (no date_applied set).
         """
-        # Find or create company
-        companies = self.companies.search_by_name(company_name)
-        if companies:
-            company = companies[0]
+        if company_id:
+            company = self.companies.get_by_id(company_id)
+        elif company_name:
+            # Find or create company
+            companies = self.companies.search_by_name(company_name)
+            if companies:
+                company = companies[0]
+            else:
+                company = self.companies.create(name=company_name)
         else:
-            company = self.companies.create(name=company_name)
+            raise ValueError("Either company_name or company_id must be provided")
 
         # Create job
         job = self.jobs.create(
@@ -113,15 +121,27 @@ class JobHuntService:
             source=source
         )
 
-        # Create application
-        app = self.applications.create(
+        # Create application with INTERESTED status (no date_applied)
+        create_kwargs = dict(
             job_id=job.id,
-            status=ApplicationStatus.APPLIED,
-            date_applied=date.today()
+            status=ApplicationStatus.INTERESTED,
         )
+        if referral_contact_id:
+            create_kwargs['referral_contact_id'] = referral_contact_id
+        app = self.applications.create(**create_kwargs)
 
         self.session.commit()
         return app
+
+    def quick_apply(self, company_name: str = None, job_title: str = None,
+                   job_url: str = None, source: str = None,
+                   company_id: int = None, referral_contact_id: int = None) -> Application:
+        """Backward-compatible alias for add_lead."""
+        return self.add_lead(
+            company_name=company_name, job_title=job_title,
+            job_url=job_url, source=source,
+            company_id=company_id, referral_contact_id=referral_contact_id
+        )
 
     def update_application_status(self, app_id: int,
                                   status: ApplicationStatus) -> Optional[Application]:
@@ -219,7 +239,7 @@ class JobHuntService:
                           **kwargs) -> Event:
         """Schedule an interview for an application."""
         app = self.applications.get_by_id(application_id)
-        if app and app.status in [ApplicationStatus.APPLIED, ApplicationStatus.SCREENING]:
+        if app and app.status in [ApplicationStatus.INTERESTED, ApplicationStatus.PREPARING, ApplicationStatus.APPLIED, ApplicationStatus.SCREENING]:
             app.status = ApplicationStatus.INTERVIEWING
             if not app.date_response:
                 app.date_response = date.today()

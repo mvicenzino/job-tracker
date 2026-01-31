@@ -39,6 +39,7 @@
             <div class="card-footer">
                 <span class="job-count">{{ company.jobs|length }} jobs</span>
                 <span class="contact-count">{{ company.contacts|length }} contacts</span>
+                <a href="{{ url_for('applications.new_application', company_id=company.id, company_name=company.name) }}" class="btn btn-sm btn-primary">+ Add Lead</a>
             </div>
         </div>
         {% endfor %}

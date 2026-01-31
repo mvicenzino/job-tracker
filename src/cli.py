@@ -124,14 +124,14 @@ class CLI:
                 print(f"    {status}: {count}")
 
     def cmd_apply(self, args):
-        """Quick apply to a job."""
-        app = self.service.quick_apply(
+        """Add a new lead to the pipeline."""
+        app = self.service.add_lead(
             company_name=args.company,
             job_title=args.title,
             job_url=args.url,
             source=args.source
         )
-        print(f"\nApplication created! ID: {app.id}")
+        print(f"\nLead added! ID: {app.id}")
         self.print_application(app)
 
     def cmd_status(self, args):
@@ -382,7 +382,7 @@ def create_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("dashboard", aliases=["d"], help="Show dashboard overview")
 
     # Apply
-    apply_parser = subparsers.add_parser("apply", aliases=["a"], help="Quick apply to a job")
+    apply_parser = subparsers.add_parser("apply", aliases=["a"], help="Add a new lead to the pipeline")
     apply_parser.add_argument("company", help="Company name")
     apply_parser.add_argument("title", help="Job title")
     apply_parser.add_argument("--url", help="Job posting URL")

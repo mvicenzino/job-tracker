@@ -1,18 +1,33 @@
 {% extends "base.html" %}
 
-{% block title %}Quick Apply - Stride{% endblock %}
+{% block title %}Add Lead - Stride{% endblock %}
 
 {% block content %}
 <div class="form-page">
     <header class="page-header">
-        <h1>Quick Apply</h1>
-        <p class="subtitle">Track a new job application</p>
+        <h1>Add Lead</h1>
+        <p class="subtitle">Add a new lead to your pipeline</p>
     </header>
 
     <form method="post" class="form card">
+        {% if prefill and prefill.company_id %}
+        <input type="hidden" name="company_id" value="{{ prefill.company_id }}">
+        {% endif %}
+        {% if prefill and prefill.referral_contact_id %}
+        <input type="hidden" name="referral_contact_id" value="{{ prefill.referral_contact_id }}">
+        {% endif %}
+
+        {% if prefill and prefill.referral_name %}
+        <div class="referral-badge">
+            <span class="badge badge-info">Referral from {{ prefill.referral_name }}</span>
+        </div>
+        {% endif %}
+
         <div class="form-group">
             <label for="company">Company *</label>
-            <input type="text" id="company" name="company" required placeholder="e.g., Google, Stripe, Acme Corp">
+            <input type="text" id="company" name="company" required placeholder="e.g., Google, Stripe, Acme Corp"
+                   value="{{ prefill.company_name if prefill else '' }}"
+                   {% if prefill and prefill.company_id %}readonly{% endif %}>
         </div>
 
         <div class="form-group">
@@ -33,7 +48,7 @@
                 <option value="Indeed">Indeed</option>
                 <option value="Glassdoor">Glassdoor</option>
                 <option value="Company Website">Company Website</option>
-                <option value="Referral">Referral</option>
+                <option value="Referral" {% if prefill and prefill.referral_contact_id %}selected{% endif %}>Referral</option>
                 <option value="Recruiter">Recruiter</option>
                 <option value="Networking">Networking</option>
                 <option value="Other">Other</option>
@@ -42,7 +57,7 @@
 
         <div class="form-actions">
             <a href="{{ url_for('dashboard.pipeline') }}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">Create Application</button>
+            <button type="submit" class="btn btn-primary">Add Lead</button>
         </div>
     </form>
 </div>

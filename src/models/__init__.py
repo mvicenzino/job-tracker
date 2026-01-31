@@ -7,6 +7,7 @@ from .contact import Contact, ContactType
 from .event import Event, EventType
 from .note import Note
 from .tag import Tag, entity_tags
+from .feedback import Feedback
 
 __all__ = [
     'Base',
@@ -21,5 +22,6 @@ __all__ = [
     'EventType',
     'Note',
     'Tag',
-    'entity_tags'
+    'entity_tags',
+    'Feedback'
 ]

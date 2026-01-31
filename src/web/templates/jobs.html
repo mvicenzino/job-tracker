@@ -87,7 +87,7 @@
                 {% if job.job_url %}
                 <a href="{{ job.job_url }}" target="_blank" class="btn btn-sm btn-ghost">View Posting</a>
                 {% endif %}
-                <a href="{{ url_for('applications.new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Apply</a>
+                <a href="{{ url_for('applications.new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Add Lead</a>
             </div>
         </div>
         {% endfor %}

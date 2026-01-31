@@ -74,7 +74,8 @@
             {% endif %}
         </div>
         <div class="nav-actions">
-            <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Quick Apply</a>
+            <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Lead</a>
+            <a href="{{ url_for('feedback.feedback') }}" class="btn btn-ghost">Feedback</a>
         </div>
         {% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %}
         <div class="nav-user demo-nav-user">
