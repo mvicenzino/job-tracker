@@ -126,6 +126,7 @@ def create_app(db_path: str = None, database_url: str = None):
     from .routes.settings import bp as settings_bp
     from .routes.api import bp as api_bp
     from .routes.digest import bp as digest_bp
+    from .routes.reflections import bp as reflections_bp
     from .routes.feedback import bp as feedback_bp
 
     app.register_blueprint(public_bp)
@@ -139,6 +140,7 @@ def create_app(db_path: str = None, database_url: str = None):
     app.register_blueprint(settings_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(digest_bp)
+    app.register_blueprint(reflections_bp)
     app.register_blueprint(feedback_bp)
 
     return app

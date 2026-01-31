@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Weekly Reflection - Stride{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <header class="page-header">
+        <h1>Weekly Reflection</h1>
+        <p class="subtitle">How did your job search go this week?</p>
+    </header>
+
+    <form method="post" class="form card">
+        <div class="form-group">
+            <label>Energy Level</label>
+            <div class="energy-selector">
+                {% for i in range(1, 6) %}
+                <label class="energy-option">
+                    <input type="radio" name="energy_level" value="{{ i }}" {% if i == 3 %}checked{% endif %}>
+                    <span class="energy-label">
+                        {% if i == 1 %}1 - Drained{% elif i == 2 %}2 - Low{% elif i == 3 %}3 - OK{% elif i == 4 %}4 - Good{% else %}5 - Fired Up{% endif %}
+                    </span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Momentum</label>
+            <div class="momentum-selector">
+                <label class="momentum-option">
+                    <input type="radio" name="momentum" value="gaining">
+                    <span class="momentum-label">Gaining</span>
+                </label>
+                <label class="momentum-option">
+                    <input type="radio" name="momentum" value="steady" checked>
+                    <span class="momentum-label">Steady</span>
+                </label>
+                <label class="momentum-option">
+                    <input type="radio" name="momentum" value="losing">
+                    <span class="momentum-label">Losing</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="wins">Wins this week</label>
+            <textarea id="wins" name="wins" rows="3" placeholder="What went well? Any responses, interviews, or connections made?"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="challenges">Challenges</label>
+            <textarea id="challenges" name="challenges" rows="3" placeholder="What was hard? Rejections, ghosting, motivation struggles?"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="next_week_goals">Goals for next week</label>
+            <textarea id="next_week_goals" name="next_week_goals" rows="3" placeholder="What do you want to focus on next week?"></textarea>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('reflections.reflections') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Reflection</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

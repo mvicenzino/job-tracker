@@ -3421,6 +3421,19 @@ body.demo-active .navbar {
 /* Referral badge on form */
 .referral-badge { margin-bottom: 1rem; }
 
+/* Reflection form selectors */
+.energy-selector, .momentum-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.energy-option, .momentum-option { cursor: pointer; }
+.energy-option input, .momentum-option input { display: none; }
+.energy-label, .momentum-label {
+    display: inline-block; padding: 0.5rem 1rem; border-radius: 0.5rem;
+    border: 2px solid var(--border); font-size: 0.9rem; transition: all 0.15s;
+}
+.energy-option input:checked + .energy-label,
+.momentum-option input:checked + .momentum-label {
+    border-color: var(--primary); background: var(--primary); color: white;
+}
+
 @media print {
     .navbar,
     .hamburger,

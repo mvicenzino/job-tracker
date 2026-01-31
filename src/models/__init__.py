@@ -9,6 +9,7 @@ from .note import Note
 from .tag import Tag, entity_tags
 from .feedback import Feedback
 from .checklist import ChecklistItem
+from .reflection import WeeklyReflection
 
 __all__ = [
     'Base',
@@ -25,5 +26,6 @@ __all__ = [
     'Tag',
     'entity_tags',
     'Feedback',
-    'ChecklistItem'
+    'ChecklistItem',
+    'WeeklyReflection'
 ]
