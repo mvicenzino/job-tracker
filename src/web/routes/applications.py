@@ -119,6 +119,21 @@ def edit_application(app_id):
         session.close()
 
 
+@bp.route('/applications/checklist/<int:item_id>/toggle', methods=['POST'])
+@login_required
+def toggle_checklist(item_id):
+    """Toggle a checklist item's completed state."""
+    service, session = get_service()
+    try:
+        item = service.toggle_checklist_item(item_id)
+        if item:
+            return redirect(request.referrer or url_for('applications.application_detail', app_id=item.application_id))
+        flash('Checklist item not found', 'error')
+        return redirect(request.referrer or url_for('dashboard.pipeline'))
+    finally:
+        session.close()
+
+
 @bp.route('/applications/<int:app_id>/notes', methods=['POST'])
 @login_required
 def add_application_note(app_id):

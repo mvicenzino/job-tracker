@@ -8,6 +8,7 @@ from .event import Event, EventType
 from .note import Note
 from .tag import Tag, entity_tags
 from .feedback import Feedback
+from .checklist import ChecklistItem
 
 __all__ = [
     'Base',
@@ -23,5 +24,6 @@ __all__ = [
     'Note',
     'Tag',
     'entity_tags',
-    'Feedback'
+    'Feedback',
+    'ChecklistItem'
 ]

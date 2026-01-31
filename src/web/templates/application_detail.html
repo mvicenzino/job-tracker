@@ -82,6 +82,41 @@
             </div>
         </section>
 
+        <!-- Prep Checklist -->
+        {% if details.application.checklist_items %}
+        <section class="card">
+            <div class="card-header">
+                <h2>Prep Checklist</h2>
+                {% set total = details.application.checklist_items|length %}
+                {% set done = details.application.checklist_items|selectattr('completed')|list|length %}
+                <span class="badge {% if done == total %}badge-success{% else %}badge-info{% endif %}">{{ done }}/{{ total }}</span>
+            </div>
+            <div class="card-body">
+                <ul class="checklist">
+                    {% for item in details.application.checklist_items|sort(attribute='sort_order') %}
+                    <li class="checklist-item {% if item.completed %}completed{% endif %}">
+                        <form action="{{ url_for('applications.toggle_checklist', item_id=item.id) }}" method="post" class="inline-form">
+                            <button type="submit" class="checklist-toggle" title="Toggle">
+                                {% if item.completed %}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--success)">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                {% else %}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--text-secondary)">
+                                    <circle cx="12" cy="12" r="10"/>
+                                </svg>
+                                {% endif %}
+                            </button>
+                            <span class="checklist-label {% if item.completed %}line-through{% endif %}">{{ item.label }}</span>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% endif %}
+
         <!-- Job Info -->
         <section class="card">
             <div class="card-header">

@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from ..models import (
     Company, Job, Application, ApplicationStatus,
-    Contact, ContactType, Event, EventType, Note, Tag
+    Contact, ContactType, Event, EventType, Note, Tag,
+    ChecklistItem
 )
 from ..repositories import (
     CompanyRepository, JobRepository, ApplicationRepository,
@@ -143,12 +144,40 @@ class JobHuntService:
             company_id=company_id, referral_contact_id=referral_contact_id
         )
 
+    DEFAULT_PREP_CHECKLIST = [
+        "Research the company (mission, culture, recent news)",
+        "Tailor resume for this role",
+        "Write/customize cover letter",
+        "Prepare talking points for key requirements",
+        "Find connections at the company",
+    ]
+
     def update_application_status(self, app_id: int,
                                   status: ApplicationStatus) -> Optional[Application]:
-        """Update an application's status."""
+        """Update an application's status. Auto-creates prep checklist when moving to PREPARING."""
         app = self.applications.update_status(app_id, status)
+        if app and status == ApplicationStatus.PREPARING:
+            # Only create checklist if none exists yet
+            existing = self.session.query(ChecklistItem).filter_by(
+                application_id=app_id
+            ).count()
+            if existing == 0:
+                for i, label in enumerate(self.DEFAULT_PREP_CHECKLIST):
+                    self.session.add(ChecklistItem(
+                        application_id=app_id,
+                        label=label,
+                        sort_order=i
+                    ))
         self.session.commit()
         return app
+
+    def toggle_checklist_item(self, item_id: int) -> Optional[ChecklistItem]:
+        """Toggle a checklist item's completed state."""
+        item = self.session.query(ChecklistItem).get(item_id)
+        if item:
+            item.completed = not item.completed
+            self.session.commit()
+        return item
 
     def get_pipeline(self) -> Dict[str, List[Application]]:
         """Get applications organized by status (pipeline view)."""
