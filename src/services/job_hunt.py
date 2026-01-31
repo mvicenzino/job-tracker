@@ -96,7 +96,11 @@ class JobHuntService:
 
     def add_lead(self, company_name: str = None, job_title: str = None,
                  job_url: str = None, source: str = None,
-                 company_id: int = None, referral_contact_id: int = None) -> Application:
+                 company_id: int = None, referral_contact_id: int = None,
+                 description: str = None, requirements: str = None,
+                 location: str = None, remote_type: str = None,
+                 salary_min: int = None, salary_max: int = None,
+                 salary_currency: str = None) -> Application:
         """
         Add a new lead to the pipeline: creates company (if needed), job, and application.
         If company_id is provided, uses that company directly instead of searching by name.
@@ -114,13 +118,26 @@ class JobHuntService:
         else:
             raise ValueError("Either company_name or company_id must be provided")
 
-        # Create job
-        job = self.jobs.create(
+        # Create job — include optional fields when provided
+        job_kwargs = dict(
             company_id=company.id,
             title=job_title,
             job_url=job_url,
-            source=source
+            source=source,
         )
+        for key, val in [
+            ('description', description),
+            ('requirements', requirements),
+            ('location', location),
+            ('remote_type', remote_type),
+            ('salary_min', salary_min),
+            ('salary_max', salary_max),
+            ('salary_currency', salary_currency),
+        ]:
+            if val is not None:
+                job_kwargs[key] = val
+
+        job = self.jobs.create(**job_kwargs)
 
         # Create application with INTERESTED status (no date_applied)
         create_kwargs = dict(

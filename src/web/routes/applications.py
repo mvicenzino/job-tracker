@@ -29,13 +29,38 @@ def new_application():
         try:
             company_id = request.form.get('company_id', type=int)
             referral_contact_id = request.form.get('referral_contact_id', type=int)
+
+            # Collect optional job detail fields
+            job_extras = {}
+            if request.form.get('description'):
+                job_extras['description'] = request.form['description']
+            if request.form.get('requirements'):
+                job_extras['requirements'] = request.form['requirements']
+            if request.form.get('location'):
+                job_extras['location'] = request.form['location']
+            if request.form.get('remote_type'):
+                job_extras['remote_type'] = request.form['remote_type']
+            if request.form.get('salary_min'):
+                try:
+                    job_extras['salary_min'] = int(request.form['salary_min'])
+                except ValueError:
+                    pass
+            if request.form.get('salary_max'):
+                try:
+                    job_extras['salary_max'] = int(request.form['salary_max'])
+                except ValueError:
+                    pass
+            if request.form.get('salary_currency'):
+                job_extras['salary_currency'] = request.form['salary_currency']
+
             app = service.add_lead(
                 company_name=request.form['company'],
                 job_title=request.form['title'],
                 job_url=request.form.get('url'),
                 source=request.form.get('source'),
                 company_id=company_id,
-                referral_contact_id=referral_contact_id
+                referral_contact_id=referral_contact_id,
+                **job_extras
             )
             flash(f'Lead added for {app.job.title} at {app.job.company.name}!', 'success')
             return redirect(url_for('dashboard.pipeline'))

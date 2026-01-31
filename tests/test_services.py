@@ -136,6 +136,32 @@ class TestApplicationOperations:
         assert app.job.company.name == "Referral Corp"
         assert app.referral_contact_id == contact.id
 
+    def test_add_lead_with_job_details(self, service):
+        app = service.add_lead(
+            company_name="Detail Corp",
+            job_title="Full Stack Developer",
+            job_url="https://example.com/job/123",
+            source="LinkedIn",
+            description="Build full-stack web applications",
+            requirements="Python, React, PostgreSQL",
+            location="New York, NY",
+            remote_type="hybrid",
+            salary_min=130000,
+            salary_max=180000,
+            salary_currency="USD"
+        )
+
+        assert app.id is not None
+        assert app.status == ApplicationStatus.INTERESTED
+        assert app.job.title == "Full Stack Developer"
+        assert app.job.description == "Build full-stack web applications"
+        assert app.job.requirements == "Python, React, PostgreSQL"
+        assert app.job.location == "New York, NY"
+        assert app.job.remote_type == "hybrid"
+        assert app.job.salary_min == 130000
+        assert app.job.salary_max == 180000
+        assert app.job.salary_currency == "USD"
+
     def test_update_application_status(self, service):
         app = service.add_lead(company_name="Status Corp", job_title="Status Job")
 

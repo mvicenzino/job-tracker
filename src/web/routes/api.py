@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 
 from ..helpers import get_service, get_service_for_user, get_user_by_api_key
 from ...models import ApplicationStatus, ContactType
+from ...services.ai_parser import is_ai_parsing_available, parse_job_description
 
 bp = Blueprint('api', __name__)
 
@@ -286,3 +287,25 @@ def api_create_job():
         return response, 500
     finally:
         session.close()
+
+
+@bp.route('/api/parse-job-description', methods=['POST'])
+@login_required
+def api_parse_job_description():
+    """API: Parse a job description using AI."""
+    if not is_ai_parsing_available():
+        return jsonify({'success': False, 'error': 'AI parsing is not available'}), 503
+
+    data = request.get_json()
+    if not data or not data.get('text'):
+        return jsonify({'success': False, 'error': 'Text is required'}), 400
+
+    text = data['text'].strip()
+    if len(text) < 20:
+        return jsonify({'success': False, 'error': 'Text must be at least 20 characters'}), 400
+
+    try:
+        parsed = parse_job_description(text)
+        return jsonify({'success': True, 'data': parsed})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

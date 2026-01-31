@@ -9,6 +9,23 @@
         <p class="subtitle">Add a new lead to your pipeline</p>
     </header>
 
+    {% if ai_parsing_enabled %}
+    <div class="card" style="margin-bottom: 1.5rem; border: 1px dashed var(--border-color, #e2e8f0); padding: 1.25rem;">
+        <h3 style="margin: 0 0 0.75rem 0; font-size: 1rem;">Paste & Parse Job Description</h3>
+        <p style="margin: 0 0 0.75rem 0; font-size: 0.875rem; color: var(--text-secondary, #64748b);">
+            Paste a job description below and let AI extract the details for you.
+        </p>
+        <div class="form-group" style="margin-bottom: 0.75rem;">
+            <textarea id="ai-job-text" rows="6" placeholder="Paste the full job description here..."
+                      style="width: 100%; resize: vertical;"></textarea>
+        </div>
+        <button type="button" id="ai-parse-btn" class="btn btn-primary" onclick="parseJobDescription()">
+            Parse with AI
+        </button>
+        <span id="ai-parse-status" style="margin-left: 0.75rem; font-size: 0.875rem;"></span>
+    </div>
+    {% endif %}
+
     <form method="post" class="form card">
         {% if prefill and prefill.company_id %}
         <input type="hidden" name="company_id" value="{{ prefill.company_id }}">
@@ -55,10 +72,156 @@
             </select>
         </div>
 
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <div class="form-group" style="flex: 1; min-width: 200px;">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" placeholder="e.g., San Francisco, CA">
+            </div>
+            <div class="form-group" style="flex: 0 0 180px;">
+                <label for="remote_type">Work Type</label>
+                <select id="remote_type" name="remote_type">
+                    <option value="">Select type</option>
+                    <option value="remote">Remote</option>
+                    <option value="hybrid">Hybrid</option>
+                    <option value="onsite">Onsite</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <div class="form-group" style="flex: 1; min-width: 140px;">
+                <label for="salary_min">Salary Min</label>
+                <input type="number" id="salary_min" name="salary_min" placeholder="e.g., 120000">
+            </div>
+            <div class="form-group" style="flex: 1; min-width: 140px;">
+                <label for="salary_max">Salary Max</label>
+                <input type="number" id="salary_max" name="salary_max" placeholder="e.g., 180000">
+            </div>
+        </div>
+        <input type="hidden" id="salary_currency" name="salary_currency" value="USD">
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" placeholder="Brief summary of the role..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="requirements">Key Requirements</label>
+            <textarea id="requirements" name="requirements" rows="3" placeholder="Key qualifications and requirements..."></textarea>
+        </div>
+
         <div class="form-actions">
             <a href="{{ url_for('dashboard.pipeline') }}" class="btn btn-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">Add Lead</button>
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% if ai_parsing_enabled %}
+<script>
+function parseJobDescription() {
+    var textEl = document.getElementById('ai-job-text');
+    var btn = document.getElementById('ai-parse-btn');
+    var status = document.getElementById('ai-parse-status');
+    var text = textEl.value.trim();
+
+    if (text.length < 20) {
+        status.textContent = 'Please paste a longer job description.';
+        status.style.color = '#ef4444';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Parsing...';
+    status.textContent = '';
+    status.style.color = '';
+
+    fetch('/api/parse-job-description', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({text: text})
+    })
+    .then(function(resp) { return resp.json(); })
+    .then(function(result) {
+        if (result.success) {
+            fillFormFields(result.data);
+            status.textContent = 'Fields populated!';
+            status.style.color = '#22c55e';
+        } else {
+            status.textContent = result.error || 'Parsing failed.';
+            status.style.color = '#ef4444';
+        }
+    })
+    .catch(function(err) {
+        status.textContent = 'Network error: ' + err.message;
+        status.style.color = '#ef4444';
+    })
+    .finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Parse with AI';
+    });
+}
+
+function fillFormFields(data) {
+    // Only fill company if the field is not pre-filled (readonly)
+    var companyEl = document.getElementById('company');
+    if (data.company_name && !companyEl.readOnly && !companyEl.value) {
+        companyEl.value = data.company_name;
+    }
+
+    if (data.job_title) {
+        document.getElementById('title').value = data.job_title;
+    }
+    if (data.location) {
+        document.getElementById('location').value = data.location;
+    }
+    if (data.remote_type) {
+        var sel = document.getElementById('remote_type');
+        for (var i = 0; i < sel.options.length; i++) {
+            if (sel.options[i].value === data.remote_type) {
+                sel.selectedIndex = i;
+                break;
+            }
+        }
+    }
+    if (data.salary_min) {
+        document.getElementById('salary_min').value = data.salary_min;
+    }
+    if (data.salary_max) {
+        document.getElementById('salary_max').value = data.salary_max;
+    }
+    if (data.salary_currency) {
+        document.getElementById('salary_currency').value = data.salary_currency;
+    }
+    if (data.description) {
+        document.getElementById('description').value = data.description;
+    }
+    if (data.requirements) {
+        document.getElementById('requirements').value = data.requirements;
+    }
+    if (data.source) {
+        var srcSel = document.getElementById('source');
+        var matched = false;
+        for (var j = 0; j < srcSel.options.length; j++) {
+            if (srcSel.options[j].value.toLowerCase() === data.source.toLowerCase()) {
+                srcSel.selectedIndex = j;
+                matched = true;
+                break;
+            }
+        }
+        if (!matched && data.source) {
+            // Set to "Other" if source doesn't match predefined options
+            for (var k = 0; k < srcSel.options.length; k++) {
+                if (srcSel.options[k].value === 'Other') {
+                    srcSel.selectedIndex = k;
+                    break;
+                }
+            }
+        }
+    }
+}
+</script>
+{% endif %}
 {% endblock %}

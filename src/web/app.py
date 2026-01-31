@@ -28,6 +28,7 @@ def create_app(db_path: str = None, database_url: str = None):
     app.config['REMEMBER_COOKIE_SECURE'] = bool(is_production)
     app.config['REMEMBER_COOKIE_HTTPONLY'] = True
     app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB upload limit
+    app.config['AI_PARSING_ENABLED'] = bool(os.environ.get('ANTHROPIC_API_KEY'))
 
     # Database setup - prefer DATABASE_URL for production
     if database_url is None:
@@ -56,6 +57,10 @@ def create_app(db_path: str = None, database_url: str = None):
             response.headers['Pragma'] = 'no-cache'
             response.headers['Expires'] = '0'
         return response
+
+    @app.context_processor
+    def inject_ai_config():
+        return {'ai_parsing_enabled': app.config.get('AI_PARSING_ENABLED', False)}
 
     # Initialize Flask-Login
     login_manager = LoginManager()
