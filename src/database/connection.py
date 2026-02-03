@@ -1,6 +1,6 @@
 import os
 from contextlib import contextmanager
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.orm import sessionmaker, Session
 from ..models.base import Base
 
@@ -43,6 +43,24 @@ class DatabaseConnection:
     def create_tables(self):
         """Create all tables in the database."""
         Base.metadata.create_all(self.engine)
+        self._run_migrations()
+
+    def _run_migrations(self):
+        """Run simple schema migrations for new columns."""
+        inspector = inspect(self.engine)
+
+        # Check if users table exists and add new onboarding columns if missing
+        if 'users' in inspector.get_table_names():
+            columns = [col['name'] for col in inspector.get_columns('users')]
+
+            with self.engine.connect() as conn:
+                if 'onboarding_completed' not in columns:
+                    conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_completed BOOLEAN DEFAULT 0'))
+                    conn.commit()
+
+                if 'onboarding_dismissed' not in columns:
+                    conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_dismissed BOOLEAN DEFAULT 0'))
+                    conn.commit()
 
     def drop_tables(self):
         """Drop all tables in the database. Use with caution!"""

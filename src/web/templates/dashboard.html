@@ -4,10 +4,97 @@
 
 {% block content %}
 <div class="dashboard">
+    {% if onboarding.show %}
+    <!-- Onboarding Welcome & Checklist -->
+    <div class="onboarding-card">
+        <button type="button" class="onboarding-dismiss" id="dismiss-onboarding" title="Dismiss">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <div class="onboarding-header">
+            <div class="onboarding-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+            </div>
+            <div class="onboarding-intro">
+                <h2>Welcome to Stride!</h2>
+                <p>Let's get your job search organized. Complete these steps to get started.</p>
+            </div>
+        </div>
+        <div class="onboarding-progress">
+            <div class="onboarding-progress-bar">
+                <div class="onboarding-progress-fill" style="width: {{ (onboarding.progress / onboarding.total * 100)|int }}%"></div>
+            </div>
+            <span class="onboarding-progress-text">{{ onboarding.progress }} of {{ onboarding.total }} complete</span>
+        </div>
+        <div class="onboarding-steps">
+            <a href="{{ url_for('applications.new_application') }}" class="onboarding-step {% if onboarding.steps.first_application %}completed{% endif %}">
+                <span class="step-check">
+                    {% if onboarding.steps.first_application %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    {% else %}
+                    <span class="step-number">1</span>
+                    {% endif %}
+                </span>
+                <div class="step-content">
+                    <span class="step-title">Add your first lead</span>
+                    <span class="step-desc">Track a job you're interested in or have applied to</span>
+                </div>
+                <svg class="step-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            <a href="{{ url_for('contacts.new_contact') }}" class="onboarding-step {% if onboarding.steps.first_contact %}completed{% endif %}">
+                <span class="step-check">
+                    {% if onboarding.steps.first_contact %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    {% else %}
+                    <span class="step-number">2</span>
+                    {% endif %}
+                </span>
+                <div class="step-content">
+                    <span class="step-title">Add a contact</span>
+                    <span class="step-desc">Keep track of recruiters, hiring managers, and connections</span>
+                </div>
+                <svg class="step-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            <a href="{{ url_for('schedule.new_event') }}" class="onboarding-step {% if onboarding.steps.first_event %}completed{% endif %}">
+                <span class="step-check">
+                    {% if onboarding.steps.first_event %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    {% else %}
+                    <span class="step-number">3</span>
+                    {% endif %}
+                </span>
+                <div class="step-content">
+                    <span class="step-title">Schedule an event</span>
+                    <span class="step-desc">Add an interview, deadline, or reminder</span>
+                </div>
+                <svg class="step-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            <a href="{{ url_for('companies.new_company') }}" class="onboarding-step {% if onboarding.steps.first_company %}completed{% endif %}">
+                <span class="step-check">
+                    {% if onboarding.steps.first_company %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    {% else %}
+                    <span class="step-number">4</span>
+                    {% endif %}
+                </span>
+                <div class="step-content">
+                    <span class="step-title">Research a company</span>
+                    <span class="step-desc">Save notes about companies you're targeting</span>
+                </div>
+                <svg class="step-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
     <header class="page-header dashboard-header">
         <div class="greeting">
-            <h1>Welcome back</h1>
-            <p class="subtitle">Here's what's happening with your job search</p>
+            <h1>{% if onboarding.show %}Let's get started{% else %}Welcome back{% endif %}</h1>
+            <p class="subtitle">{% if onboarding.show %}Your job search command center{% else %}Here's what's happening with your job search{% endif %}</p>
         </div>
         <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Lead</a>
     </header>

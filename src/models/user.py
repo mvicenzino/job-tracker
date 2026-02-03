@@ -18,6 +18,8 @@ class User(Base, TimestampMixin, UserMixin):
     is_active = Column(Boolean, default=True, nullable=False)
     resume_text = Column(Text, nullable=True)
     resume_filename = Column(String(255), nullable=True)
+    onboarding_completed = Column(Boolean, default=False, nullable=False)
+    onboarding_dismissed = Column(Boolean, default=False, nullable=False)
 
     # Relationships
     companies = relationship("Company", back_populates="user", cascade="all, delete-orphan")

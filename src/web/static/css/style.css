@@ -178,22 +178,38 @@ a:hover {
     letter-spacing: 0;
 }
 
-.nav-menu {
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: auto;
-    height: 72px;
+/* Desktop nav center (main navigation links) */
+.nav-center {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
-    padding-right: var(--space-8);
-    z-index: 101;
-    pointer-events: none;
+    gap: var(--space-1);
+    margin-left: var(--space-6);
 }
 
-.nav-menu > * {
-    pointer-events: auto;
+.nav-link {
+    padding: var(--space-2) var(--space-3);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.nav-link:hover {
+    background: var(--color-bg-subtle);
+    color: var(--color-text);
+}
+
+.nav-link.active {
+    background: var(--color-primary);
+    color: white;
+}
+
+/* Mobile slide-out menu */
+.nav-menu {
+    display: none;
 }
 
 /* Hide mobile nav-actions on desktop */
@@ -317,23 +333,118 @@ a:hover {
     padding-right: var(--space-4);
 }
 
-.nav-right-link {
-    padding: var(--space-2) var(--space-3);
-    color: var(--color-text-secondary);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    text-decoration: none;
-    border-radius: var(--radius-sm);
-    transition: all var(--transition-fast);
+/* Profile dropdown */
+.nav-profile {
+    position: relative;
 }
 
-.nav-right-link:hover {
+.nav-profile-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: var(--space-2) var(--space-3);
+    background: none;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.nav-profile-toggle:hover {
     background: var(--color-bg-subtle);
+}
+
+.profile-name {
+    font-size: 0.875rem;
+    font-weight: 500;
     color: var(--color-text);
 }
 
-.nav-right-link.active {
+.profile-chevron {
+    color: var(--color-text-muted);
+    transition: transform var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.nav-profile.open .profile-chevron {
+    transform: rotate(180deg);
+}
+
+.nav-profile-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 200px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all var(--transition-fast);
+    z-index: 1000;
+}
+
+.nav-profile.open .nav-profile-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.profile-menu-header {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.profile-menu-email {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    word-break: break-all;
+}
+
+.nav-profile-menu a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+}
+
+.nav-profile-menu a:hover {
+    background: var(--color-bg-subtle);
+}
+
+.nav-profile-menu a.active {
     color: var(--color-primary);
+}
+
+.nav-profile-menu a svg {
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+}
+
+.nav-profile-menu a:hover svg {
+    color: var(--color-text);
+}
+
+.profile-menu-divider {
+    height: 1px;
+    background: var(--color-border-light);
+    margin: var(--space-2) 0;
+}
+
+.nav-profile-menu a.logout-link {
+    color: var(--color-error);
+}
+
+.nav-profile-menu a.logout-link svg {
+    color: var(--color-error);
 }
 
 /* === Nav Dropdown ("More" menu) === */
@@ -452,69 +563,6 @@ a:hover {
     display: none;
 }
 
-/* === Profile Dropdown === */
-.nav-profile-toggle {
-    width: 36px;
-    height: 36px;
-    border-radius: var(--radius-full);
-    background: var(--color-bg-subtle);
-    border: 1px solid var(--color-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    padding: 0;
-    font-family: inherit;
-}
-
-.nav-profile-toggle:hover {
-    background: var(--color-primary-light);
-    border-color: var(--color-primary);
-}
-
-.profile-icon {
-    width: 18px;
-    height: 18px;
-    color: var(--color-text-secondary);
-}
-
-.nav-profile-toggle:hover .profile-icon {
-    color: var(--color-primary);
-}
-
-.nav-profile-menu {
-    right: 0;
-    left: auto;
-    transform: none;
-    min-width: 220px;
-}
-
-.profile-menu-header {
-    padding: var(--space-3) var(--space-4);
-}
-
-.profile-menu-email {
-    font-size: 0.8125rem;
-    color: var(--color-text-secondary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: block;
-}
-
-.profile-menu-logout {
-    color: var(--color-danger) !important;
-}
-
-.profile-menu-logout:hover {
-    background: var(--color-danger-light) !important;
-}
-
-.profile-menu-signup {
-    color: var(--color-primary) !important;
-    font-weight: 600 !important;
-}
 
 /* Hide old nav-user on desktop (shown in profile dropdown instead) */
 .nav-mobile-only-block {
@@ -874,6 +922,224 @@ a:hover {
 
 .stat-card.highlight .stat-label {
     color: rgba(255, 255, 255, 0.8);
+}
+
+/* === Onboarding === */
+.onboarding-card {
+    position: relative;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    margin-bottom: var(--space-8);
+    color: white;
+    box-shadow: var(--shadow-lg), 0 4px 20px rgba(99, 102, 241, 0.3);
+}
+
+.onboarding-dismiss {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: var(--radius);
+    padding: var(--space-2);
+    cursor: pointer;
+    color: white;
+    opacity: 0.7;
+    transition: all var(--transition-fast);
+}
+
+.onboarding-dismiss:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.onboarding-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+}
+
+.onboarding-icon {
+    width: 56px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.onboarding-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: white;
+}
+
+.onboarding-intro h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+    color: white;
+}
+
+.onboarding-intro p {
+    opacity: 0.9;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.onboarding-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.onboarding-progress-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.onboarding-progress-fill {
+    height: 100%;
+    background: white;
+    border-radius: var(--radius-full);
+    transition: width 0.5s ease;
+}
+
+.onboarding-progress-text {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    white-space: nowrap;
+}
+
+.onboarding-steps {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+.onboarding-step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    text-decoration: none;
+    color: white;
+    transition: all var(--transition-fast);
+}
+
+.onboarding-step:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.onboarding-step.completed {
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0.7;
+}
+
+.onboarding-step.completed:hover {
+    opacity: 0.85;
+}
+
+.step-check {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.onboarding-step.completed .step-check {
+    background: var(--color-success);
+}
+
+.step-check svg {
+    width: 16px;
+    height: 16px;
+    stroke: white;
+}
+
+.step-number {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.step-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.step-title {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    margin-bottom: 2px;
+}
+
+.step-desc {
+    display: block;
+    font-size: 0.8125rem;
+    opacity: 0.8;
+    line-height: 1.4;
+}
+
+.step-arrow {
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
+    flex-shrink: 0;
+}
+
+.onboarding-step:hover .step-arrow {
+    opacity: 1;
+    transform: translateX(2px);
+}
+
+@media (max-width: 768px) {
+    .onboarding-card {
+        padding: var(--space-6);
+    }
+
+    .onboarding-header {
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .onboarding-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .onboarding-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .onboarding-intro h2 {
+        font-size: 1.25rem;
+    }
+
+    .onboarding-steps {
+        grid-template-columns: 1fr;
+    }
+
+    .step-desc {
+        display: none;
+    }
 }
 
 /* === Dashboard Grid === */
@@ -2818,6 +3084,10 @@ a:hover {
         pointer-events: none;
     }
 
+    .nav-menu {
+        display: block;
+    }
+
     .nav-menu.active {
         transform: translateX(0);
         -webkit-transform: translateX(0);
@@ -2865,8 +3135,9 @@ a:hover {
         font-size: 1.25rem;
     }
 
-    /* Hide desktop-only nav-right on mobile */
-    .nav-right {
+    /* Hide desktop-only elements on mobile */
+    .nav-right,
+    .nav-center {
         display: none;
     }
 

@@ -18,6 +18,9 @@
     <!-- Mobile overlay -->
     <div class="nav-overlay" id="nav-overlay"></div>
 
+    {% set network_active = request.endpoint and (request.endpoint.startswith('contacts.') or request.endpoint.startswith('companies.') or request.endpoint.startswith('jobs.')) %}
+    {% set insights_active = request.endpoint and (request.endpoint == 'compare.compare_offers' or 'reflections' in request.endpoint) %}
+
     <nav class="navbar">
         <div class="nav-left">
             <button type="button" class="hamburger" id="hamburger" aria-label="Toggle menu">
@@ -35,21 +38,89 @@
                 </a>
             </div>
         </div>
+
         {% if current_user.is_authenticated %}
+        <!-- Desktop nav links (inside navbar flow) -->
+        <div class="nav-center">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{{ url_for('dashboard.pipeline') }}" class="nav-link {% if request.endpoint == 'dashboard.pipeline' %}active{% endif %}">Pipeline</a>
+            <a href="{{ url_for('applications.applications') }}" class="nav-link {% if request.endpoint and request.endpoint.startswith('applications.') %}active{% endif %}">Applications</a>
+            <a href="{{ url_for('schedule.schedule') }}" class="nav-link {% if request.endpoint and request.endpoint.startswith('schedule.') %}active{% endif %}">Schedule</a>
+
+            <div class="nav-dropdown{% if network_active %} has-active-child{% endif %}">
+                <button type="button" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+                    Network <span class="nav-dropdown-chevron">▾</span>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="{{ url_for('contacts.contacts') }}" class="{% if request.endpoint and request.endpoint.startswith('contacts.') %}active{% endif %}">Contacts</a>
+                    <a href="{{ url_for('companies.companies') }}" class="{% if request.endpoint and request.endpoint.startswith('companies.') %}active{% endif %}">Companies</a>
+                    <a href="{{ url_for('jobs.jobs') }}" class="{% if request.endpoint and request.endpoint.startswith('jobs.') %}active{% endif %}">Jobs</a>
+                </div>
+            </div>
+
+            <div class="nav-dropdown{% if insights_active %} has-active-child{% endif %}">
+                <button type="button" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+                    Insights <span class="nav-dropdown-chevron">▾</span>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="{{ url_for('compare.compare_offers') }}" class="{% if request.endpoint == 'compare.compare_offers' %}active{% endif %}">Compare Offers</a>
+                    <a href="{{ url_for('reflections.reflections') }}" class="{% if request.endpoint and 'reflections' in request.endpoint %}active{% endif %}">Reflections</a>
+                </div>
+            </div>
+        </div>
+
         <div class="nav-right">
-            <a href="{{ url_for('settings.settings') }}" class="nav-right-link {% if request.endpoint == 'settings.settings' %}active{% endif %}">Settings</a>
-            {% if current_user.email == 'demo@stride-jobs.com' %}
-            <a href="{{ url_for('auth.logout') }}" class="nav-right-link">Exit Demo</a>
-            {% else %}
-            <a href="{{ url_for('auth.logout') }}" class="nav-right-link">Logout</a>
-            {% endif %}
+            <div class="nav-profile">
+                <button type="button" class="nav-profile-toggle" aria-haspopup="true" aria-expanded="false">
+                    <span class="profile-name">{{ current_user.email.split('@')[0] }}</span>
+                    <svg class="profile-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M2.5 4L5 6.5L7.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="nav-profile-menu">
+                    <div class="profile-menu-header">
+                        <span class="profile-menu-email">{{ current_user.email }}</span>
+                    </div>
+                    <a href="{{ url_for('settings.settings') }}" class="{% if request.endpoint == 'settings.settings' %}active{% endif %}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                        Settings
+                    </a>
+                    <a href="{{ url_for('feedback.feedback') }}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        Feedback
+                    </a>
+                    <div class="profile-menu-divider"></div>
+                    {% if current_user.email == 'demo@stride-jobs.com' %}
+                    <a href="{{ url_for('auth.logout') }}" class="logout-link">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Exit Demo
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('auth.logout') }}" class="logout-link">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Logout
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
         {% endif %}
     </nav>
 
-    {% set network_active = request.endpoint and (request.endpoint.startswith('contacts.') or request.endpoint.startswith('companies.') or request.endpoint.startswith('jobs.')) %}
-    {% set insights_active = request.endpoint and (request.endpoint == 'compare.compare_offers' or 'reflections' in request.endpoint) %}
-
+    <!-- Mobile slide-out menu -->
     <div class="nav-menu" id="nav-menu">
         <div class="nav-menu-header">
             <span class="menu-title">Menu</span>
