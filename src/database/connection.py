@@ -47,33 +47,51 @@ class DatabaseConnection:
 
     def _run_migrations(self):
         """Run simple schema migrations for new columns."""
-        inspector = inspect(self.engine)
+        try:
+            inspector = inspect(self.engine)
 
-        # Check if users table exists and add new columns if missing
-        if 'users' in inspector.get_table_names():
-            columns = [col['name'] for col in inspector.get_columns('users')]
+            # Check if users table exists and add new columns if missing
+            if 'users' in inspector.get_table_names():
+                columns = [col['name'] for col in inspector.get_columns('users')]
 
-            with self.engine.connect() as conn:
-                if 'onboarding_completed' not in columns:
-                    conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_completed BOOLEAN DEFAULT FALSE'))
-                    conn.commit()
+                with self.engine.connect() as conn:
+                    try:
+                        if 'onboarding_completed' not in columns:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_completed BOOLEAN DEFAULT FALSE'))
+                            conn.commit()
+                    except Exception:
+                        pass
 
-                if 'onboarding_dismissed' not in columns:
-                    conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_dismissed BOOLEAN DEFAULT FALSE'))
-                    conn.commit()
+                    try:
+                        if 'onboarding_dismissed' not in columns:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_dismissed BOOLEAN DEFAULT FALSE'))
+                            conn.commit()
+                    except Exception:
+                        pass
 
-                # Notification preferences
-                if 'email_digest_enabled' not in columns:
-                    conn.execute(text('ALTER TABLE users ADD COLUMN email_digest_enabled BOOLEAN DEFAULT FALSE'))
-                    conn.commit()
+                    # Notification preferences
+                    try:
+                        if 'email_digest_enabled' not in columns:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN email_digest_enabled BOOLEAN DEFAULT FALSE'))
+                            conn.commit()
+                    except Exception:
+                        pass
 
-                if 'email_digest_frequency' not in columns:
-                    conn.execute(text("ALTER TABLE users ADD COLUMN email_digest_frequency VARCHAR(20) DEFAULT 'weekly'"))
-                    conn.commit()
+                    try:
+                        if 'email_digest_frequency' not in columns:
+                            conn.execute(text("ALTER TABLE users ADD COLUMN email_digest_frequency VARCHAR(20) DEFAULT 'weekly'"))
+                            conn.commit()
+                    except Exception:
+                        pass
 
-                if 'browser_notifications_enabled' not in columns:
-                    conn.execute(text('ALTER TABLE users ADD COLUMN browser_notifications_enabled BOOLEAN DEFAULT TRUE'))
-                    conn.commit()
+                    try:
+                        if 'browser_notifications_enabled' not in columns:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN browser_notifications_enabled BOOLEAN DEFAULT TRUE'))
+                            conn.commit()
+                    except Exception:
+                        pass
+        except Exception:
+            pass  # Migration failures shouldn't crash the app
 
     def drop_tables(self):
         """Drop all tables in the database. Use with caution!"""
