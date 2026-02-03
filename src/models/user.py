@@ -18,8 +18,8 @@ class User(Base, TimestampMixin, UserMixin):
     is_active = Column(Boolean, default=True, nullable=False)
     resume_text = Column(Text, nullable=True)
     resume_filename = Column(String(255), nullable=True)
-    onboarding_completed = Column(Boolean, default=False, nullable=False)
-    onboarding_dismissed = Column(Boolean, default=False, nullable=False)
+    onboarding_completed = Column(Boolean, default=False, nullable=True)
+    onboarding_dismissed = Column(Boolean, default=False, nullable=True)
 
     # Notification preferences
     email_digest_enabled = Column(Boolean, default=False, nullable=True)

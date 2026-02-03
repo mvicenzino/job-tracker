@@ -46,52 +46,80 @@ class DatabaseConnection:
         self._run_migrations()
 
     def _run_migrations(self):
-        """Run simple schema migrations for new columns."""
+        """Run simple schema migrations for new columns and enum values."""
         try:
             inspector = inspect(self.engine)
+            is_postgres = 'postgresql' in str(self.engine.url)
+
+            # PostgreSQL enum migrations - add new values to existing enum types
+            if is_postgres:
+                with self.engine.connect() as conn:
+                    # Add ARCHIVED to applicationstatus enum if missing
+                    try:
+                        # Check if ARCHIVED already exists in the enum
+                        result = conn.execute(text("""
+                            SELECT EXISTS (
+                                SELECT 1 FROM pg_enum
+                                WHERE enumlabel = 'ARCHIVED'
+                                AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'applicationstatus')
+                            )
+                        """))
+                        exists = result.scalar()
+                        if not exists:
+                            conn.execute(text("ALTER TYPE applicationstatus ADD VALUE 'ARCHIVED'"))
+                            conn.commit()
+                            print("[Migration] Added ARCHIVED to applicationstatus enum")
+                    except Exception as e:
+                        print(f"[Migration] Failed to add ARCHIVED enum value: {e}")
 
             # Check if users table exists and add new columns if missing
             if 'users' in inspector.get_table_names():
                 columns = [col['name'] for col in inspector.get_columns('users')]
+                print(f"[Migration] Existing users columns: {columns}")
 
                 with self.engine.connect() as conn:
-                    try:
-                        if 'onboarding_completed' not in columns:
+                    if 'onboarding_completed' not in columns:
+                        try:
                             conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_completed BOOLEAN DEFAULT FALSE'))
                             conn.commit()
-                    except Exception:
-                        pass
+                            print("[Migration] Added onboarding_completed column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add onboarding_completed: {e}")
 
-                    try:
-                        if 'onboarding_dismissed' not in columns:
+                    if 'onboarding_dismissed' not in columns:
+                        try:
                             conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_dismissed BOOLEAN DEFAULT FALSE'))
                             conn.commit()
-                    except Exception:
-                        pass
+                            print("[Migration] Added onboarding_dismissed column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add onboarding_dismissed: {e}")
 
                     # Notification preferences
-                    try:
-                        if 'email_digest_enabled' not in columns:
+                    if 'email_digest_enabled' not in columns:
+                        try:
                             conn.execute(text('ALTER TABLE users ADD COLUMN email_digest_enabled BOOLEAN DEFAULT FALSE'))
                             conn.commit()
-                    except Exception:
-                        pass
+                            print("[Migration] Added email_digest_enabled column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add email_digest_enabled: {e}")
 
-                    try:
-                        if 'email_digest_frequency' not in columns:
+                    if 'email_digest_frequency' not in columns:
+                        try:
                             conn.execute(text("ALTER TABLE users ADD COLUMN email_digest_frequency VARCHAR(20) DEFAULT 'weekly'"))
                             conn.commit()
-                    except Exception:
-                        pass
+                            print("[Migration] Added email_digest_frequency column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add email_digest_frequency: {e}")
 
-                    try:
-                        if 'browser_notifications_enabled' not in columns:
+                    if 'browser_notifications_enabled' not in columns:
+                        try:
                             conn.execute(text('ALTER TABLE users ADD COLUMN browser_notifications_enabled BOOLEAN DEFAULT TRUE'))
                             conn.commit()
-                    except Exception:
-                        pass
-        except Exception:
-            pass  # Migration failures shouldn't crash the app
+                            print("[Migration] Added browser_notifications_enabled column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add browser_notifications_enabled: {e}")
+        except Exception as e:
+            print(f"[Migration] Migration check failed: {e}")
 
     def drop_tables(self):
         """Drop all tables in the database. Use with caution!"""

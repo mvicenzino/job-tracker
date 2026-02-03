@@ -333,3 +333,37 @@ def api_followups_due():
         })
     finally:
         session.close()
+
+
+@bp.route('/api/health')
+def api_health():
+    """API: Health check endpoint to verify app is running."""
+    from flask import current_app
+    from sqlalchemy import inspect, text
+
+    result = {
+        'status': 'ok',
+        'checks': {}
+    }
+
+    try:
+        db = current_app.extensions.get('db')
+        if db:
+            result['checks']['database'] = 'connected'
+
+            # Check users table columns
+            try:
+                inspector = inspect(db.engine)
+                if 'users' in inspector.get_table_names():
+                    columns = [col['name'] for col in inspector.get_columns('users')]
+                    result['checks']['users_columns'] = columns
+                else:
+                    result['checks']['users_table'] = 'missing'
+            except Exception as e:
+                result['checks']['schema_check'] = str(e)
+        else:
+            result['checks']['database'] = 'not configured'
+    except Exception as e:
+        result['checks']['database_error'] = str(e)
+
+    return jsonify(result)

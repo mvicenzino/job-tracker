@@ -18,8 +18,12 @@ def dashboard():
         pipeline = service.get_pipeline()
 
         # Calculate onboarding progress (with fallback for old DB schema)
-        onboarding_completed = getattr(current_user, 'onboarding_completed', False) or False
-        onboarding_dismissed = getattr(current_user, 'onboarding_dismissed', False) or False
+        try:
+            onboarding_completed = getattr(current_user, 'onboarding_completed', False) or False
+            onboarding_dismissed = getattr(current_user, 'onboarding_dismissed', False) or False
+        except Exception:
+            onboarding_completed = False
+            onboarding_dismissed = False
 
         onboarding = {
             'show': not onboarding_completed and not onboarding_dismissed,
@@ -36,16 +40,20 @@ def dashboard():
 
         # Auto-complete onboarding if all steps done
         if onboarding['progress'] == onboarding['total'] and not onboarding_completed:
-            db = current_app.extensions['db']
-            db_session = db.get_session()
             try:
-                user = db_session.query(User).get(current_user.id)
-                user.onboarding_completed = True
-                db_session.commit()
-                onboarding['completed'] = True
-                onboarding['show'] = False
-            finally:
-                db_session.close()
+                db = current_app.extensions['db']
+                db_session = db.get_session()
+                try:
+                    user = db_session.query(User).get(current_user.id)
+                    if user and hasattr(user, 'onboarding_completed'):
+                        user.onboarding_completed = True
+                        db_session.commit()
+                        onboarding['completed'] = True
+                        onboarding['show'] = False
+                finally:
+                    db_session.close()
+            except Exception:
+                pass  # Non-critical - don't crash if auto-complete fails
 
         return render_template('dashboard.html',
                              dashboard=data,

@@ -92,7 +92,17 @@ def create_app(db_path: str = None, database_url: str = None):
         """Load user by ID for Flask-Login."""
         session = db.get_session()
         try:
-            return session.query(User).get(int(user_id))
+            user = session.query(User).get(int(user_id))
+            if user:
+                # Eagerly load all attributes to avoid issues with detached session
+                session.expire_on_commit = False
+                # Access key attributes to ensure they're loaded
+                _ = user.id, user.email, user.is_active
+            return user
+        except Exception as e:
+            # Log error but don't crash - user will be redirected to login
+            print(f"Error loading user {user_id}: {e}")
+            return None
         finally:
             session.close()
 
