@@ -35,7 +35,7 @@ def dashboard():
         onboarding['total'] = len(onboarding['steps'])
 
         # Auto-complete onboarding if all steps done
-        if onboarding['progress'] == onboarding['total'] and not current_user.onboarding_completed:
+        if onboarding['progress'] == onboarding['total'] and not onboarding_completed:
             db = current_app.extensions['db']
             db_session = db.get_session()
             try:
