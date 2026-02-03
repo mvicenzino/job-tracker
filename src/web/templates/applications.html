@@ -68,8 +68,9 @@
         <p>No applications found matching your search</p>
         <a href="{{ url_for('applications.applications') }}" class="btn btn-secondary">Clear Filters</a>
         {% else %}
-        <p>No applications yet</p>
-        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">Create Your First Application</a>
+        <p class="empty-state-title">Track your job search journey</p>
+        <p class="empty-state-description">Keep all your applications in one place. See your pipeline at a glance and never lose track of where you stand with each company.</p>
+        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Your First Lead</a>
         {% endif %}
     </div>
     {% endif %}

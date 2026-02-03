@@ -102,8 +102,8 @@
                         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
                     </svg>
                 </div>
-                <p>{% if search %}No jobs found for "{{ search }}"{% elif flagged_only %}No saved jobs yet{% else %}No job listings yet{% endif %}</p>
-                <span class="empty-hint">{% if flagged_only %}Save jobs you're interested in to review later{% else %}Add jobs you find interesting to track them{% endif %}</span>
+                <p>{% if search %}No jobs found for "{{ search }}"{% elif flagged_only %}No saved jobs yet{% else %}Build your job wishlist{% endif %}</p>
+                <span class="empty-hint">{% if flagged_only %}Flag jobs you want to revisit later{% else %}Jobs are auto-created when you add applications. Use this page to browse and save interesting roles before applying.{% endif %}</span>
                 <div class="empty-actions">
                     <a href="{{ url_for('jobs.new_job') }}" class="btn btn-primary">+ Add Your First Job</a>
                 </div>

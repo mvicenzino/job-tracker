@@ -60,8 +60,8 @@
                         <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
                     </svg>
                 </div>
-                <p>{% if search %}No companies found for "{{ search }}"{% else %}No companies yet{% endif %}</p>
-                <span class="empty-hint">{% if search %}Try a different search term{% else %}Start tracking the companies you're interested in{% endif %}</span>
+                <p>{% if search %}No companies found for "{{ search }}"{% else %}Research your target companies{% endif %}</p>
+                <span class="empty-hint">{% if search %}Try a different search term{% else %}Keep notes on company culture, interview processes, and key contacts. Companies are auto-created when you add applications.{% endif %}</span>
                 <div class="empty-actions">
                     <a href="{{ url_for('companies.new_company') }}" class="btn btn-primary">+ Add Your First Company</a>
                 </div>

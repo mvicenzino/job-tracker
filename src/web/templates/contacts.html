@@ -126,8 +126,8 @@
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                     </svg>
                 </div>
-                <p>{% if search %}No contacts found for "{{ search }}"{% elif followup %}No contacts need follow-up{% else %}No contacts yet{% endif %}</p>
-                <span class="empty-hint">{% if search %}Try a different search term{% elif followup %}Great job staying in touch!{% else %}Build your professional network{% endif %}</span>
+                <p>{% if search %}No contacts found for "{{ search }}"{% elif followup %}No contacts need follow-up{% else %}Your network is your net worth{% endif %}</p>
+                <span class="empty-hint">{% if search %}Try a different search term{% elif followup %}Great job staying in touch!{% else %}70% of jobs are found through networking. Track recruiters, hiring managers, and referrals to stay organized.{% endif %}</span>
                 <div class="empty-actions">
                     <a href="{{ url_for('contacts.new_contact') }}" class="btn btn-primary">+ Add Your First Contact</a>
                 </div>
