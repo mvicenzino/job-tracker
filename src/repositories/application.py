@@ -120,3 +120,33 @@ class ApplicationRepository(BaseRepository[Application]):
         if self.user_id is not None:
             query = query.filter(Application.user_id == self.user_id)
         return query.order_by(desc(Application.updated_at)).all()
+
+    def search_with_company_info(
+        self,
+        search: Optional[str] = None,
+        status: Optional[ApplicationStatus] = None
+    ) -> List[tuple]:
+        """Search applications with company and job info.
+
+        Args:
+            search: Text to search in company name and job title
+            status: Filter by application status
+        """
+        query = self.session.query(Application, Job, Company).join(
+            Job, Application.job_id == Job.id
+        ).join(
+            Company, Job.company_id == Company.id
+        )
+        if self.user_id is not None:
+            query = query.filter(Application.user_id == self.user_id)
+
+        if search:
+            search_term = f"%{search}%"
+            query = query.filter(
+                (Company.name.ilike(search_term)) | (Job.title.ilike(search_term))
+            )
+
+        if status:
+            query = query.filter(Application.status == status)
+
+        return query.order_by(desc(Application.updated_at)).all()

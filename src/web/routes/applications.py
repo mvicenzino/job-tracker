@@ -11,11 +11,33 @@ bp = Blueprint('applications', __name__)
 @bp.route('/applications')
 @login_required
 def applications():
-    """List all applications."""
+    """List all applications with optional search and filter."""
     service, session = get_service()
     try:
-        apps = service.applications.get_with_company_info()
-        return render_template('applications.html', applications=apps)
+        search = request.args.get('search', '').strip()
+        status_str = request.args.get('status', '').strip()
+
+        # Parse status string to enum
+        status = None
+        if status_str:
+            try:
+                status = ApplicationStatus(status_str)
+            except ValueError:
+                pass
+
+        # Use search method if filters are active, otherwise get all
+        if search or status:
+            apps = service.applications.search_with_company_info(search=search, status=status)
+        else:
+            apps = service.applications.get_with_company_info()
+
+        return render_template(
+            'applications.html',
+            applications=apps,
+            search=search,
+            status=status_str,
+            ApplicationStatus=ApplicationStatus
+        )
     finally:
         session.close()
 

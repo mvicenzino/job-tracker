@@ -9,6 +9,26 @@
         <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Lead</a>
     </header>
 
+    <form class="filter-bar" method="GET" action="{{ url_for('applications.applications') }}">
+        <div class="search-form">
+            <input type="text" name="search" placeholder="Search by company or position..." value="{{ search or '' }}">
+            <select name="status" class="filter-select">
+                <option value="">All Statuses</option>
+                {% for s in ApplicationStatus %}
+                <option value="{{ s.value }}" {% if status == s.value %}selected{% endif %}>
+                    {{ s.value|replace('_', ' ')|title }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-buttons">
+            <button type="submit" class="btn btn-primary btn-sm">Search</button>
+            {% if search or status %}
+            <a href="{{ url_for('applications.applications') }}" class="btn btn-secondary btn-sm">Clear</a>
+            {% endif %}
+        </div>
+    </form>
+
     {% if applications %}
     <div class="table-container">
         <table class="data-table">
@@ -44,8 +64,13 @@
     </div>
     {% else %}
     <div class="empty-state-large">
+        {% if search or status %}
+        <p>No applications found matching your search</p>
+        <a href="{{ url_for('applications.applications') }}" class="btn btn-secondary">Clear Filters</a>
+        {% else %}
         <p>No applications yet</p>
         <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">Create Your First Application</a>
+        {% endif %}
     </div>
     {% endif %}
 </div>
