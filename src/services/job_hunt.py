@@ -334,6 +334,28 @@ class JobHuntService:
         stale_leads = self.applications.get_stale_leads(days_threshold=14)
         all_contacts = self.contacts.get_all()
 
+        # Calculate weekly trends
+        this_week_apps = self.applications.get_recent(days=7)
+        last_week_apps = self._get_applications_between_days(8, 14)
+        apps_this_week = len(this_week_apps)
+        apps_last_week = len(last_week_apps)
+        weekly_change = apps_this_week - apps_last_week
+
+        # Calculate interview rate (reached screening or beyond)
+        interview_statuses = ['screening', 'interviewing', 'final_round', 'offer', 'negotiating', 'accepted']
+        interviewed_count = sum(
+            app_stats['by_status'].get(status, 0) for status in interview_statuses
+        )
+        total_applied = app_stats['total']
+        interview_rate = round((interviewed_count / total_applied * 100)) if total_applied > 0 else 0
+
+        # Calculate response rate (any status change from applied)
+        response_statuses = interview_statuses + ['rejected']
+        response_count = sum(
+            app_stats['by_status'].get(status, 0) for status in response_statuses
+        )
+        response_rate = round((response_count / total_applied * 100)) if total_applied > 0 else 0
+
         return {
             'summary': {
                 'active_applications': len(active_apps),
@@ -344,6 +366,14 @@ class JobHuntService:
                 'apps_awaiting_response': len(stale_apps),
                 'stale_leads': len(stale_leads)
             },
+            'metrics': {
+                'apps_this_week': apps_this_week,
+                'weekly_change': weekly_change,
+                'interview_rate': interview_rate,
+                'interviewed_count': interviewed_count,
+                'response_rate': response_rate,
+                'response_count': response_count,
+            },
             'today': today_events,
             'upcoming': upcoming_events[:5],  # Next 5 events
             'needs_attention': {
@@ -353,6 +383,16 @@ class JobHuntService:
             },
             'stats': app_stats
         }
+
+    def _get_applications_between_days(self, start_days_ago: int, end_days_ago: int):
+        """Get applications created between start and end days ago."""
+        from datetime import datetime
+        start_date = date.today() - timedelta(days=end_days_ago)
+        end_date = date.today() - timedelta(days=start_days_ago)
+        return [
+            app for app in self.applications.get_all()
+            if app.date_applied and start_date <= app.date_applied <= end_date
+        ]
 
     # === Daily Digest ===
 
