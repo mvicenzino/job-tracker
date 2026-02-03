@@ -55,16 +55,16 @@ class DatabaseConnection:
 
             with self.engine.connect() as conn:
                 if 'onboarding_completed' not in columns:
-                    conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_completed BOOLEAN DEFAULT 0'))
+                    conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_completed BOOLEAN DEFAULT FALSE'))
                     conn.commit()
 
                 if 'onboarding_dismissed' not in columns:
-                    conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_dismissed BOOLEAN DEFAULT 0'))
+                    conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_dismissed BOOLEAN DEFAULT FALSE'))
                     conn.commit()
 
                 # Notification preferences
                 if 'email_digest_enabled' not in columns:
-                    conn.execute(text('ALTER TABLE users ADD COLUMN email_digest_enabled BOOLEAN DEFAULT 0'))
+                    conn.execute(text('ALTER TABLE users ADD COLUMN email_digest_enabled BOOLEAN DEFAULT FALSE'))
                     conn.commit()
 
                 if 'email_digest_frequency' not in columns:
@@ -72,7 +72,7 @@ class DatabaseConnection:
                     conn.commit()
 
                 if 'browser_notifications_enabled' not in columns:
-                    conn.execute(text('ALTER TABLE users ADD COLUMN browser_notifications_enabled BOOLEAN DEFAULT 1'))
+                    conn.execute(text('ALTER TABLE users ADD COLUMN browser_notifications_enabled BOOLEAN DEFAULT TRUE'))
                     conn.commit()
 
     def drop_tables(self):
