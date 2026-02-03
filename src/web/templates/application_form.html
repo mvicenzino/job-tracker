@@ -61,62 +61,61 @@
             <input type="text" id="title" name="title" required placeholder="e.g., Senior Software Engineer">
         </div>
 
-        <div class="form-group">
-            <label for="url">Job Posting URL</label>
-            <input type="url" id="url" name="url" placeholder="https://...">
-        </div>
+        <button type="button" class="details-toggle" onclick="toggleDetails()">
+            <svg class="toggle-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <span class="toggle-text">Add more details</span>
+        </button>
 
-        <div class="form-group">
-            <label for="source">Source</label>
-            <select id="source" name="source">
-                <option value="">Select where you found this job</option>
-                <option value="LinkedIn">LinkedIn</option>
-                <option value="Indeed">Indeed</option>
-                <option value="Glassdoor">Glassdoor</option>
-                <option value="Company Website">Company Website</option>
-                <option value="Referral" {% if prefill and prefill.referral_contact_id %}selected{% endif %}>Referral</option>
-                <option value="Recruiter">Recruiter</option>
-                <option value="Networking">Networking</option>
-                <option value="Other">Other</option>
-            </select>
-        </div>
-
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <div class="form-group" style="flex: 1; min-width: 200px;">
-                <label for="location">Location</label>
-                <input type="text" id="location" name="location" placeholder="e.g., San Francisco, CA">
+        <div class="details-section" id="detailsSection">
+            <div class="form-group">
+                <label for="url">Job Posting URL</label>
+                <input type="url" id="url" name="url" placeholder="https://...">
             </div>
-            <div class="form-group" style="flex: 0 0 180px;">
-                <label for="remote_type">Work Type</label>
-                <select id="remote_type" name="remote_type">
-                    <option value="">Select type</option>
-                    <option value="remote">Remote</option>
-                    <option value="hybrid">Hybrid</option>
-                    <option value="onsite">Onsite</option>
+
+            <div class="form-group">
+                <label for="source">Source</label>
+                <select id="source" name="source">
+                    <option value="">Select where you found this job</option>
+                    <option value="LinkedIn">LinkedIn</option>
+                    <option value="Indeed">Indeed</option>
+                    <option value="Glassdoor">Glassdoor</option>
+                    <option value="Company Website">Company Website</option>
+                    <option value="Referral" {% if prefill and prefill.referral_contact_id %}selected{% endif %}>Referral</option>
+                    <option value="Recruiter">Recruiter</option>
+                    <option value="Networking">Networking</option>
+                    <option value="Other">Other</option>
                 </select>
             </div>
-        </div>
 
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <div class="form-group" style="flex: 1; min-width: 140px;">
-                <label for="salary_min">Salary Min</label>
-                <input type="number" id="salary_min" name="salary_min" placeholder="e.g., 120000">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" name="location" placeholder="e.g., San Francisco, CA">
+                </div>
+                <div class="form-group" style="flex: 0 0 180px;">
+                    <label for="remote_type">Work Type</label>
+                    <select id="remote_type" name="remote_type">
+                        <option value="">Select type</option>
+                        <option value="remote">Remote</option>
+                        <option value="hybrid">Hybrid</option>
+                        <option value="onsite">Onsite</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group" style="flex: 1; min-width: 140px;">
-                <label for="salary_max">Salary Max</label>
-                <input type="number" id="salary_max" name="salary_max" placeholder="e.g., 180000">
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width: 140px;">
+                    <label for="salary_min">Salary Min</label>
+                    <input type="number" id="salary_min" name="salary_min" placeholder="e.g., 120000">
+                </div>
+                <div class="form-group" style="flex: 1; min-width: 140px;">
+                    <label for="salary_max">Salary Max</label>
+                    <input type="number" id="salary_max" name="salary_max" placeholder="e.g., 180000">
+                </div>
             </div>
-        </div>
-        <input type="hidden" id="salary_currency" name="salary_currency" value="USD">
-
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" name="description" rows="4" placeholder="Brief summary of the role..."></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="requirements">Key Requirements</label>
-            <textarea id="requirements" name="requirements" rows="3" placeholder="Key qualifications and requirements..."></textarea>
+            <input type="hidden" id="salary_currency" name="salary_currency" value="USD">
         </div>
 
         <div class="form-actions">
@@ -128,6 +127,14 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+function toggleDetails() {
+    var section = document.getElementById('detailsSection');
+    var toggle = document.querySelector('.details-toggle');
+    var isExpanded = section.classList.toggle('expanded');
+    toggle.classList.toggle('expanded', isExpanded);
+}
+</script>
 {% if ai_parsing_enabled %}
 <script>
 function parseJobDescription() {
@@ -174,6 +181,8 @@ function parseJobDescription() {
 }
 
 function fillFormFields(data) {
+    var hasDetails = false;
+
     // Only fill company if the field is not pre-filled (readonly)
     var companyEl = document.getElementById('company');
     if (data.company_name && !companyEl.readOnly && !companyEl.value) {
@@ -185,30 +194,28 @@ function fillFormFields(data) {
     }
     if (data.location) {
         document.getElementById('location').value = data.location;
+        hasDetails = true;
     }
     if (data.remote_type) {
         var sel = document.getElementById('remote_type');
         for (var i = 0; i < sel.options.length; i++) {
             if (sel.options[i].value === data.remote_type) {
                 sel.selectedIndex = i;
+                hasDetails = true;
                 break;
             }
         }
     }
     if (data.salary_min) {
         document.getElementById('salary_min').value = data.salary_min;
+        hasDetails = true;
     }
     if (data.salary_max) {
         document.getElementById('salary_max').value = data.salary_max;
+        hasDetails = true;
     }
     if (data.salary_currency) {
         document.getElementById('salary_currency').value = data.salary_currency;
-    }
-    if (data.description) {
-        document.getElementById('description').value = data.description;
-    }
-    if (data.requirements) {
-        document.getElementById('requirements').value = data.requirements;
     }
     if (data.source) {
         var srcSel = document.getElementById('source');
@@ -217,6 +224,7 @@ function fillFormFields(data) {
             if (srcSel.options[j].value.toLowerCase() === data.source.toLowerCase()) {
                 srcSel.selectedIndex = j;
                 matched = true;
+                hasDetails = true;
                 break;
             }
         }
@@ -225,10 +233,19 @@ function fillFormFields(data) {
             for (var k = 0; k < srcSel.options.length; k++) {
                 if (srcSel.options[k].value === 'Other') {
                     srcSel.selectedIndex = k;
+                    hasDetails = true;
                     break;
                 }
             }
         }
+    }
+
+    // Auto-expand details section if any detail fields were populated
+    if (hasDetails) {
+        var section = document.getElementById('detailsSection');
+        var toggle = document.querySelector('.details-toggle');
+        section.classList.add('expanded');
+        toggle.classList.add('expanded');
     }
 }
 </script>
