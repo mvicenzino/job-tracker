@@ -97,6 +97,42 @@ def create_app(db_path: str = None, database_url: str = None):
         }
         return colors.get(status, '#6b7280')
 
+    @app.template_filter('status_description')
+    def status_description(status):
+        descriptions = {
+            'interested': 'Saved for later - you want to apply',
+            'preparing': 'Working on resume, cover letter, or application',
+            'applied': 'Application submitted - waiting to hear back',
+            'screening': 'Recruiter call or phone screen scheduled/completed',
+            'interviewing': 'In the interview process',
+            'final_round': 'Final interviews with team or leadership',
+            'offer': 'Received an offer - reviewing terms',
+            'negotiating': 'Discussing salary, benefits, or start date',
+            'accepted': 'You accepted the offer!',
+            'rejected': 'Company declined to move forward',
+            'withdrawn': 'You decided not to continue',
+            'ghosted': 'No response after 2+ weeks'
+        }
+        return descriptions.get(status, '')
+
+    @app.template_filter('status_phase')
+    def status_phase(status):
+        phases = {
+            'interested': 'Exploring',
+            'preparing': 'Exploring',
+            'applied': 'Active',
+            'screening': 'Interviewing',
+            'interviewing': 'Interviewing',
+            'final_round': 'Interviewing',
+            'offer': 'Decision',
+            'negotiating': 'Decision',
+            'accepted': 'Closed',
+            'rejected': 'Closed',
+            'withdrawn': 'Closed',
+            'ghosted': 'Closed'
+        }
+        return phases.get(status, '')
+
     @app.template_filter('event_type_icon')
     def event_type_icon(event_type):
         icons = {

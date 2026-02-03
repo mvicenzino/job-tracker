@@ -426,7 +426,7 @@
                 {% if dashboard.stats.by_status %}
                     <ul class="stats-breakdown">
                         {% for status, count in dashboard.stats.by_status.items() %}
-                        <li class="stats-row">
+                        <li class="stats-row" title="{{ status|status_description }}">
                             <div class="stats-row-left">
                                 <span class="status-dot" style="background-color: {{ status|status_color }}"></span>
                                 <span class="status-name">{{ status|replace('_', ' ')|title }}</span>

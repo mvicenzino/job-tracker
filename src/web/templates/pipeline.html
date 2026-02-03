@@ -14,8 +14,11 @@
         {% for status in active_statuses %}
         <div class="pipeline-column" data-status="{{ status }}">
             <div class="column-header" style="border-top-color: {{ status|status_color }}">
-                <h3>{{ status|replace('_', ' ')|title }}</h3>
-                <span class="column-count">{{ pipeline.get(status, [])|length }}</span>
+                <div class="column-header-top">
+                    <h3>{{ status|replace('_', ' ')|title }}</h3>
+                    <span class="column-count">{{ pipeline.get(status, [])|length }}</span>
+                </div>
+                <p class="column-description">{{ status|status_description }}</p>
             </div>
             <div class="column-body">
                 {% for app in pipeline.get(status, []) %}
@@ -41,7 +44,7 @@
                                 {% if s.value != status %}
                                 <form action="{{ url_for('applications.update_status', app_id=app.id) }}" method="post">
                                     <input type="hidden" name="status" value="{{ s.value }}">
-                                    <button type="submit" class="dropdown-item">
+                                    <button type="submit" class="dropdown-item" title="{{ s.value|status_description }}">
                                         <span class="status-dot" style="background-color: {{ s.value|status_color }}"></span>
                                         {{ s.value|replace('_', ' ')|title }}
                                     </button>

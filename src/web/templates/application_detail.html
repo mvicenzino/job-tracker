@@ -27,9 +27,9 @@
                     <dt>Status</dt>
                     <dd>
                         <form action="{{ url_for('applications.update_status', app_id=details.application.id) }}" method="post" class="inline-form">
-                            <select name="status" onchange="this.form.submit()" class="status-select">
+                            <select name="status" onchange="this.form.submit()" class="status-select" title="Change application status">
                                 {% for s in ApplicationStatus %}
-                                <option value="{{ s.value }}" {% if s == details.application.status %}selected{% endif %}>
+                                <option value="{{ s.value }}" {% if s == details.application.status %}selected{% endif %} title="{{ s.value|status_description }}">
                                     {{ s.value|replace('_', ' ')|title }}
                                 </option>
                                 {% endfor %}

@@ -12,10 +12,10 @@
     <form class="filter-bar" method="GET" action="{{ url_for('applications.applications') }}">
         <div class="search-form">
             <input type="text" name="search" placeholder="Search by company or position..." value="{{ search or '' }}">
-            <select name="status" class="filter-select">
+            <select name="status" class="filter-select" title="Filter by application status">
                 <option value="">All Statuses</option>
                 {% for s in ApplicationStatus %}
-                <option value="{{ s.value }}" {% if status == s.value %}selected{% endif %}>
+                <option value="{{ s.value }}" {% if status == s.value %}selected{% endif %} title="{{ s.value|status_description }}">
                     {{ s.value|replace('_', ' ')|title }}
                 </option>
                 {% endfor %}
@@ -48,7 +48,7 @@
                     <td><strong>{{ company.name }}</strong></td>
                     <td>{{ job.title }}</td>
                     <td>
-                        <span class="status-badge" style="background-color: {{ app.status.value|status_color }}">
+                        <span class="status-badge" style="background-color: {{ app.status.value|status_color }}" title="{{ app.status.value|status_description }}">
                             {{ app.status.value|replace('_', ' ')|title }}
                         </span>
                     </td>
