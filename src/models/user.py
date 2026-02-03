@@ -22,9 +22,9 @@ class User(Base, TimestampMixin, UserMixin):
     onboarding_dismissed = Column(Boolean, default=False, nullable=False)
 
     # Notification preferences
-    email_digest_enabled = Column(Boolean, default=False, nullable=False)
-    email_digest_frequency = Column(String(20), default='weekly')  # 'daily' or 'weekly'
-    browser_notifications_enabled = Column(Boolean, default=True, nullable=False)
+    email_digest_enabled = Column(Boolean, default=False, nullable=True)
+    email_digest_frequency = Column(String(20), default='weekly', nullable=True)
+    browser_notifications_enabled = Column(Boolean, default=True, nullable=True)
 
     # Relationships
     companies = relationship("Company", back_populates="user", cascade="all, delete-orphan")

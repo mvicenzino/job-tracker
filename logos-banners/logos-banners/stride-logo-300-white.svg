@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="chevronGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&amp;display=swap');
+      .logo-text { font-family: 'Inter', sans-serif; font-size: 52px; font-weight: 700; fill: #6366f1; }
+    </style>
+  </defs>
+  
+  <!-- Background - pure white -->
+  <rect width="300" height="300" fill="#ffffff"/>
+  
+  <!-- Double chevron - centered and larger -->
+  <g transform="translate(150, 115)">
+    <path d="M-35 -40 L0 0 L-35 40" stroke="url(#chevronGrad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M0 -40 L35 0 L0 40" stroke="url(#chevronGrad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.55"/>
+  </g>
+  
+  <!-- "Stride" text below -->
+  <text x="150" y="215" text-anchor="middle" class="logo-text">Stride</text>
+  
+  <!-- Subtle bottom accent -->
+  <rect x="75" y="250" width="150" height="2" rx="1" fill="url(#chevronGrad)" opacity="0.4"/>
+</svg>

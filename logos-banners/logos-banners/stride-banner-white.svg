@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1584 288" width="1584" height="288">
+  <defs>
+    <linearGradient id="chevronGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="motionGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="40%" stop-color="#6366f1"/>
+      <stop offset="70%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="bottomLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="25%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="75%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+    <radialGradient id="glowBg" cx="5%" cy="50%" r="25%">
+      <stop offset="0%" stop-color="rgba(99, 102, 241, 0.06)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <linearGradient id="dividerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="50%" stop-color="rgba(99, 102, 241, 0.3)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap');
+      .tagline { font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 500; fill: #1a1a2e; }
+      .sub-tagline { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 400; fill: #64748b; }
+      .logo-text { font-family: 'Inter', sans-serif; font-size: 42px; font-weight: 700; fill: #6366f1; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1584" height="288" fill="#ffffff"/>
+  
+  <!-- Subtle glow behind logo -->
+  <ellipse cx="120" cy="144" rx="300" ry="200" fill="url(#glowBg)"/>
+  
+  <!-- Bottom accent line -->
+  <rect x="0" y="285" width="1584" height="3" fill="url(#bottomLine)" opacity="0.6"/>
+  
+  <!-- Logo: Double chevron -->
+  <g transform="translate(80, 108)">
+    <path d="M0 0 L18 24 L0 48" stroke="url(#chevronGrad)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M20 0 L38 24 L20 48" stroke="url(#chevronGrad)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.55"/>
+  </g>
+  
+  <!-- Logo text: Stride -->
+  <text x="152" y="152" class="logo-text">Stride</text>
+  
+  <!-- Divider -->
+  <rect x="320" y="114" width="1" height="60" fill="url(#dividerGrad)"/>
+  
+  <!-- Tagline -->
+  <text x="360" y="136" class="tagline">Navigating your next chapter</text>
+  <text x="360" y="162" class="sub-tagline">A newsletter for job seekers who build, not just apply</text>
+  
+  <!-- Motion lines -->
+  <g transform="translate(1250, 94)">
+    <rect x="0" y="0" width="60" height="2" rx="1" fill="url(#motionGrad)" opacity="0.2"/>
+    <rect x="-40" y="16" width="100" height="2" rx="1" fill="url(#motionGrad)" opacity="0.35"/>
+    <rect x="-90" y="32" width="150" height="2" rx="1" fill="url(#motionGrad)" opacity="0.5"/>
+    <rect x="-160" y="48" width="220" height="2" rx="1" fill="url(#motionGrad)" opacity="0.7"/>
+    <rect x="-90" y="64" width="150" height="2" rx="1" fill="url(#motionGrad)" opacity="0.5"/>
+    <rect x="-40" y="80" width="100" height="2" rx="1" fill="url(#motionGrad)" opacity="0.35"/>
+    <rect x="0" y="96" width="60" height="2" rx="1" fill="url(#motionGrad)" opacity="0.2"/>
+  </g>
+</svg>
