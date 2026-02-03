@@ -66,15 +66,18 @@ def create_app(db_path: str = None, database_url: str = None):
     def inject_followup_count():
         """Inject overdue followups count for nav badge."""
         from flask_login import current_user
-        if current_user.is_authenticated:
-            from ..repositories import ContactRepository
-            session = db.get_session()
-            try:
-                contacts_repo = ContactRepository(session, user_id=current_user.id)
-                overdue = contacts_repo.get_needing_followup()
-                return {'overdue_followups_count': len(overdue)}
-            finally:
-                session.close()
+        try:
+            if current_user.is_authenticated:
+                from ..repositories import ContactRepository
+                session = db.get_session()
+                try:
+                    contacts_repo = ContactRepository(session, user_id=current_user.id)
+                    overdue = contacts_repo.get_needing_followup()
+                    return {'overdue_followups_count': len(overdue)}
+                finally:
+                    session.close()
+        except Exception:
+            pass  # Fail silently - badge is non-critical
         return {'overdue_followups_count': 0}
 
     # Initialize Flask-Login
