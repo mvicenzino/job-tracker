@@ -31,7 +31,6 @@
             <div class="nav-brand">
                 <a href="{{ url_for('dashboard.dashboard') }}">
                     <img src="{{ url_for('static', filename='img/stride-logo-transparent.svg') }}" alt="Stride" class="brand-logo">
-                    <span class="brand-tagline">Stride into your next role</span>
                     {% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %}
                     <span class="demo-badge">DEMO</span>
                     {% endif %}

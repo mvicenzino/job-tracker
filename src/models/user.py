@@ -43,5 +43,20 @@ class User(Base, TimestampMixin, UserMixin):
         self.api_key = secrets.token_hex(32)
         return self.api_key
 
+    @property
+    def first_name(self) -> str:
+        """Extract first name from email for personalized greetings."""
+        if not self.email:
+            return ''
+        # Get the part before @ and split by common separators
+        local_part = self.email.split('@')[0]
+        # Split by dots, underscores, or hyphens and take the first part
+        for sep in ['.', '_', '-']:
+            if sep in local_part:
+                local_part = local_part.split(sep)[0]
+                break
+        # Capitalize and return
+        return local_part.capitalize()
+
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}')>"

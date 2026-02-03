@@ -164,7 +164,7 @@ a:hover {
 }
 
 .brand-logo {
-    height: 36px;
+    height: 42px;
     width: auto;
 }
 
@@ -3444,7 +3444,7 @@ a:hover {
 
     /* Mobile logo size */
     .brand-logo {
-        height: 28px;
+        height: 32px;
     }
 
     /* Hide More dropdown on mobile (items shown flat) */
@@ -4179,12 +4179,13 @@ textarea:focus-visible {
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
     color: white;
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: var(--radius-full);
-    margin-left: var(--space-2);
+    margin-left: var(--space-1);
     line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(249, 115, 22, 0.3);
 }
 
 body.demo-active .navbar {
