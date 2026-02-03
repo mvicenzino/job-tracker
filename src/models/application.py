@@ -19,6 +19,7 @@ class ApplicationStatus(enum.Enum):
     REJECTED = "rejected"               # Rejected by company
     WITHDRAWN = "withdrawn"             # You withdrew
     GHOSTED = "ghosted"                 # No response after reasonable time
+    ARCHIVED = "archived"               # Hidden from view, can be restored
 
 
 class Application(Base, TimestampMixin):

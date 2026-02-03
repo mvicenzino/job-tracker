@@ -100,7 +100,7 @@ class JobHuntService:
                  description: str = None, requirements: str = None,
                  location: str = None, remote_type: str = None,
                  salary_min: int = None, salary_max: int = None,
-                 salary_currency: str = None) -> Application:
+                 salary_currency: str = None, resume_version: str = None) -> Application:
         """
         Add a new lead to the pipeline: creates company (if needed), job, and application.
         If company_id is provided, uses that company directly instead of searching by name.
@@ -146,6 +146,8 @@ class JobHuntService:
         )
         if referral_contact_id:
             create_kwargs['referral_contact_id'] = referral_contact_id
+        if resume_version:
+            create_kwargs['resume_version'] = resume_version
         app = self.applications.create(**create_kwargs)
 
         self.session.commit()

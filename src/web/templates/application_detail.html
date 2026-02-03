@@ -314,6 +314,48 @@
                 {% endif %}
             </div>
         </section>
+
+        <!-- Danger Zone -->
+        <section class="card danger-zone">
+            <div class="card-header">
+                <h2>Manage Application</h2>
+            </div>
+            <div class="card-body">
+                {% if details.application.status.value == 'archived' %}
+                <div class="danger-zone-item">
+                    <div>
+                        <strong>Restore Application</strong>
+                        <p>Move this application back to your active pipeline.</p>
+                    </div>
+                    <form action="{{ url_for('applications.update_status', app_id=details.application.id) }}" method="post">
+                        <input type="hidden" name="status" value="interested">
+                        <button type="submit" class="btn btn-secondary">Restore</button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="danger-zone-item">
+                    <div>
+                        <strong>Archive Application</strong>
+                        <p>Hide from your pipeline. You can restore it anytime.</p>
+                    </div>
+                    <button type="button" class="btn btn-secondary"
+                            onclick="showConfirmModal('Archive Application', 'This will hide the application from your pipeline. You can restore it anytime from the archived applications view.', '{{ url_for('applications.archive_application', app_id=details.application.id) }}', 'Archive', 'btn-secondary')">
+                        Archive
+                    </button>
+                </div>
+                {% endif %}
+                <div class="danger-zone-item">
+                    <div>
+                        <strong>Delete Permanently</strong>
+                        <p>Remove this application and all its data forever. This cannot be undone.</p>
+                    </div>
+                    <button type="button" class="btn btn-danger"
+                            onclick="showConfirmModal('Delete Application', 'Are you sure you want to permanently delete this application? All notes, events, and history will be lost. This action cannot be undone.', '{{ url_for('applications.delete_application', app_id=details.application.id) }}', 'Delete Forever', 'btn-danger')">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 {% endblock %}

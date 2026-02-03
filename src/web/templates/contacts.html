@@ -104,9 +104,10 @@
                                 <input type="hidden" name="followup_days" value="14">
                                 <button type="submit" class="btn btn-sm btn-success" title="Log contact, set follow-up in 14 days">Contacted</button>
                             </form>
-                            <form action="{{ url_for('contacts.delete_contact', contact_id=contact.id) }}" method="post" class="inline-form" onsubmit="return confirm('Delete {{ contact.name }}?')">
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete contact">Delete</button>
-                            </form>
+                            <button type="button" class="btn btn-sm btn-danger" title="Delete contact"
+                                    onclick="showConfirmModal('Delete Contact', 'Are you sure you want to delete {{ contact.name }}? This action cannot be undone.', '{{ url_for('contacts.delete_contact', contact_id=contact.id) }}', 'Delete', 'btn-danger')">
+                                Delete
+                            </button>
                         </div>
                     </td>
                 </tr>

@@ -75,6 +75,8 @@ def new_application():
             if request.form.get('salary_currency'):
                 job_extras['salary_currency'] = request.form['salary_currency']
 
+            resume_version = request.form.get('resume_version', '').strip() or None
+
             app = service.add_lead(
                 company_name=request.form['company'],
                 job_title=request.form['title'],
@@ -82,6 +84,7 @@ def new_application():
                 source=request.form.get('source'),
                 company_id=company_id,
                 referral_contact_id=referral_contact_id,
+                resume_version=resume_version,
                 **job_extras
             )
             flash(f'Lead added for {app.job.title} at {app.job.company.name}!', 'success')
@@ -197,3 +200,40 @@ def add_application_note(app_id):
     finally:
         session.close()
     return redirect(url_for('applications.application_detail', app_id=app_id))
+
+
+@bp.route('/applications/<int:app_id>/archive', methods=['POST'])
+@login_required
+def archive_application(app_id):
+    """Archive an application (soft delete)."""
+    service, session = get_service()
+    try:
+        app = service.applications.get_by_id(app_id)
+        if app:
+            service.update_application_status(app_id, ApplicationStatus.ARCHIVED)
+            flash('Application archived. You can restore it anytime.', 'success')
+            return redirect(url_for('dashboard.pipeline'))
+        flash('Application not found', 'error')
+    finally:
+        session.close()
+    return redirect(url_for('applications.applications'))
+
+
+@bp.route('/applications/<int:app_id>/delete', methods=['POST'])
+@login_required
+def delete_application(app_id):
+    """Permanently delete an application."""
+    service, session = get_service()
+    try:
+        app = service.applications.get_by_id(app_id)
+        if app:
+            job_title = app.job.title
+            company_name = app.job.company.name
+            service.applications.delete(app_id)
+            session.commit()
+            flash(f'Application for {job_title} at {company_name} permanently deleted.', 'success')
+            return redirect(url_for('dashboard.pipeline'))
+        flash('Application not found', 'error')
+    finally:
+        session.close()
+    return redirect(url_for('applications.applications'))

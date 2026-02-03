@@ -46,10 +46,17 @@ class ApplicationRepository(BaseRepository[Application]):
             ApplicationStatus.REJECTED,
             ApplicationStatus.WITHDRAWN,
             ApplicationStatus.GHOSTED,
-            ApplicationStatus.ACCEPTED
+            ApplicationStatus.ACCEPTED,
+            ApplicationStatus.ARCHIVED
         ]
         return self._base_query().filter(
             Application.status.notin_(inactive_statuses)
+        ).order_by(desc(Application.updated_at)).all()
+
+    def get_archived(self) -> List[Application]:
+        """Get all archived applications."""
+        return self._base_query().filter(
+            Application.status == ApplicationStatus.ARCHIVED
         ).order_by(desc(Application.updated_at)).all()
 
     def get_by_job(self, job_id: int) -> List[Application]:

@@ -328,9 +328,40 @@
             <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
     </a>
+
+    <!-- Confirmation Modal -->
+    <div class="confirm-modal-overlay" id="confirmModal">
+        <div class="confirm-modal">
+            <h3 id="confirmModalTitle">Confirm Action</h3>
+            <p id="confirmModalMessage">Are you sure you want to continue?</p>
+            <div class="confirm-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+                <form id="confirmModalForm" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger" id="confirmModalButton">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
     {% endif %}
 
     <script src="{{ url_for('static', filename='js/main.js') }}?v=20260201"></script>
+    <script>
+    function showConfirmModal(title, message, actionUrl, buttonText, buttonClass) {
+        document.getElementById('confirmModalTitle').textContent = title;
+        document.getElementById('confirmModalMessage').textContent = message;
+        document.getElementById('confirmModalForm').action = actionUrl;
+        var btn = document.getElementById('confirmModalButton');
+        btn.textContent = buttonText || 'Confirm';
+        btn.className = 'btn ' + (buttonClass || 'btn-danger');
+        document.getElementById('confirmModal').classList.add('active');
+    }
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.remove('active');
+    }
+    document.getElementById('confirmModal').addEventListener('click', function(e) {
+        if (e.target === this) closeConfirmModal();
+    });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

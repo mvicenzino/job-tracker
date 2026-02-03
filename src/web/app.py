@@ -93,7 +93,8 @@ def create_app(db_path: str = None, database_url: str = None):
             'accepted': '#10b981',
             'rejected': '#ef4444',
             'withdrawn': '#9ca3af',
-            'ghosted': '#6b7280'
+            'ghosted': '#6b7280',
+            'archived': '#d1d5db'
         }
         return colors.get(status, '#6b7280')
 
@@ -111,7 +112,8 @@ def create_app(db_path: str = None, database_url: str = None):
             'accepted': 'You accepted the offer!',
             'rejected': 'Company declined to move forward',
             'withdrawn': 'You decided not to continue',
-            'ghosted': 'No response after 2+ weeks'
+            'ghosted': 'No response after 2+ weeks',
+            'archived': 'Hidden from view - can be restored anytime'
         }
         return descriptions.get(status, '')
 
@@ -129,7 +131,8 @@ def create_app(db_path: str = None, database_url: str = None):
             'accepted': 'Closed',
             'rejected': 'Closed',
             'withdrawn': 'Closed',
-            'ghosted': 'Closed'
+            'ghosted': 'Closed',
+            'archived': 'Archived'
         }
         return phases.get(status, '')
 
