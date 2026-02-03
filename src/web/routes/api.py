@@ -309,3 +309,27 @@ def api_parse_job_description():
         return jsonify({'success': True, 'data': parsed})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/followups/due')
+@login_required
+def api_followups_due():
+    """API: Get contacts with follow-ups due today or overdue."""
+    service, session = get_service()
+    try:
+        contacts = service.contacts.get_needing_followup()
+        return jsonify({
+            'success': True,
+            'count': len(contacts),
+            'contacts': [
+                {
+                    'id': c.id,
+                    'name': c.name,
+                    'company': c.company.name if c.company else None,
+                    'next_followup_date': c.next_followup_date.isoformat() if c.next_followup_date else None
+                }
+                for c in contacts[:10]  # Limit to 10 for notifications
+            ]
+        })
+    finally:
+        session.close()

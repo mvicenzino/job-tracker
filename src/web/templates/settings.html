@@ -120,6 +120,61 @@
             <a href="{{ url_for('settings.setup') }}" class="btn btn-primary">Go to Setup Guide</a>
         </div>
     </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Notifications</h2>
+        </div>
+        <div class="card-body">
+            <p class="text-secondary mb-4">
+                Stay on top of your follow-ups and never miss an opportunity to connect.
+            </p>
+
+            <div class="notification-setting">
+                <div class="notification-setting-info">
+                    <strong>Browser Notifications</strong>
+                    <p class="text-muted">Get notified when you have follow-ups due today</p>
+                </div>
+                <div class="notification-setting-control">
+                    <button type="button" class="btn btn-sm" id="browserNotifBtn" onclick="toggleBrowserNotifications()">
+                        Enable
+                    </button>
+                    <span id="browserNotifStatus" class="notification-status"></span>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('settings.save_notifications') }}" class="notification-form">
+                <div class="notification-setting">
+                    <div class="notification-setting-info">
+                        <strong>Email Digest</strong>
+                        <p class="text-muted">Receive a summary of follow-ups and action items</p>
+                    </div>
+                    <div class="notification-setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="email_digest_enabled" value="1"
+                                   {% if current_user.email_digest_enabled %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="notification-setting" id="digestFrequencyRow" style="{% if not current_user.email_digest_enabled %}opacity: 0.5;{% endif %}">
+                    <div class="notification-setting-info">
+                        <strong>Digest Frequency</strong>
+                        <p class="text-muted">How often to receive the email digest</p>
+                    </div>
+                    <div class="notification-setting-control">
+                        <select name="email_digest_frequency" class="frequency-select">
+                            <option value="daily" {% if current_user.email_digest_frequency == 'daily' %}selected{% endif %}>Daily</option>
+                            <option value="weekly" {% if current_user.email_digest_frequency == 'weekly' %}selected{% endif %}>Weekly (Mondays)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-4">Save Notification Settings</button>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -140,7 +195,60 @@ function copyApiKey() {
     alert('API key copied to clipboard!');
 }
 
+// Browser notifications
+function updateBrowserNotifUI() {
+    var btn = document.getElementById('browserNotifBtn');
+    var status = document.getElementById('browserNotifStatus');
+    if (!('Notification' in window)) {
+        btn.disabled = true;
+        btn.textContent = 'Not Supported';
+        status.textContent = 'Your browser does not support notifications';
+        status.className = 'notification-status status-error';
+    } else if (Notification.permission === 'granted') {
+        btn.textContent = 'Enabled';
+        btn.disabled = true;
+        btn.className = 'btn btn-sm btn-success';
+        status.textContent = 'Notifications are enabled';
+        status.className = 'notification-status status-success';
+    } else if (Notification.permission === 'denied') {
+        btn.textContent = 'Blocked';
+        btn.disabled = true;
+        status.textContent = 'Notifications blocked. Enable in browser settings.';
+        status.className = 'notification-status status-error';
+    } else {
+        btn.textContent = 'Enable';
+        btn.disabled = false;
+        btn.className = 'btn btn-sm btn-primary';
+        status.textContent = '';
+    }
+}
 
+function toggleBrowserNotifications() {
+    if (Notification.permission === 'default') {
+        Notification.requestPermission().then(function(permission) {
+            updateBrowserNotifUI();
+            if (permission === 'granted') {
+                new Notification('Stride Notifications Enabled', {
+                    body: 'You will now receive reminders for follow-ups.',
+                    icon: '/static/img/favicon.svg'
+                });
+            }
+        });
+    }
+}
+
+// Toggle digest frequency visibility
+document.addEventListener('DOMContentLoaded', function() {
+    updateBrowserNotifUI();
+
+    var digestCheckbox = document.querySelector('input[name="email_digest_enabled"]');
+    var freqRow = document.getElementById('digestFrequencyRow');
+    if (digestCheckbox && freqRow) {
+        digestCheckbox.addEventListener('change', function() {
+            freqRow.style.opacity = this.checked ? '1' : '0.5';
+        });
+    }
+});
 </script>
 
 <style>
@@ -278,6 +386,115 @@ function copyApiKey() {
 
 .btn-danger:hover {
     background: #dc2626;
+}
+
+/* Notification settings */
+.notification-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.notification-setting:last-of-type {
+    border-bottom: none;
+}
+
+.notification-setting-info {
+    flex: 1;
+}
+
+.notification-setting-info strong {
+    display: block;
+    margin-bottom: var(--space-1);
+}
+
+.notification-setting-info p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.notification-setting-control {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.notification-status {
+    font-size: 0.8rem;
+}
+
+.status-success {
+    color: var(--color-success);
+}
+
+.status-error {
+    color: var(--color-danger);
+}
+
+.frequency-select {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    background: var(--color-surface);
+}
+
+/* Toggle switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-border);
+    transition: var(--transition);
+    border-radius: 26px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: var(--transition);
+    border-radius: 50%;
+    box-shadow: var(--shadow-sm);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--color-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(22px);
+}
+
+.notification-form {
+    margin-top: var(--space-2);
+}
+
+.btn-success {
+    background: var(--color-success);
+    color: white;
 }
 </style>
 {% endblock %}

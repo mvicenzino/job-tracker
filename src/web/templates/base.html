@@ -49,10 +49,10 @@
 
             <div class="nav-dropdown{% if network_active %} has-active-child{% endif %}">
                 <button type="button" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-                    Network <span class="nav-dropdown-chevron">▾</span>
+                    Network{% if overdue_followups_count %} <span class="nav-badge">{{ overdue_followups_count }}</span>{% endif %} <span class="nav-dropdown-chevron">▾</span>
                 </button>
                 <div class="nav-dropdown-menu">
-                    <a href="{{ url_for('contacts.contacts') }}" class="{% if request.endpoint and request.endpoint.startswith('contacts.') %}active{% endif %}">Contacts</a>
+                    <a href="{{ url_for('contacts.contacts') }}" class="{% if request.endpoint and request.endpoint.startswith('contacts.') %}active{% endif %}">Contacts{% if overdue_followups_count %} <span class="nav-badge">{{ overdue_followups_count }}</span>{% endif %}</a>
                     <a href="{{ url_for('companies.companies') }}" class="{% if request.endpoint and request.endpoint.startswith('companies.') %}active{% endif %}">Companies</a>
                     <a href="{{ url_for('jobs.jobs') }}" class="{% if request.endpoint and request.endpoint.startswith('jobs.') %}active{% endif %}">Jobs</a>
                 </div>
@@ -183,7 +183,7 @@
             <!-- Mobile-only sections (hidden on desktop, visible in slide-out menu) -->
             <span class="nav-section-label">Network</span>
             <a href="{{ url_for('contacts.contacts') }}" class="nav-mobile-only {% if request.endpoint and request.endpoint.startswith('contacts.') %}active{% endif %}">
-                <span class="nav-icon">👥</span> Contacts
+                <span class="nav-icon">👥</span> Contacts{% if overdue_followups_count %} <span class="nav-badge">{{ overdue_followups_count }}</span>{% endif %}
             </a>
             <a href="{{ url_for('companies.companies') }}" class="nav-mobile-only {% if request.endpoint and request.endpoint.startswith('companies.') %}active{% endif %}">
                 <span class="nav-icon">🏢</span> Companies
@@ -361,6 +361,51 @@
     document.getElementById('confirmModal').addEventListener('click', function(e) {
         if (e.target === this) closeConfirmModal();
     });
+
+    // Browser notifications for follow-ups
+    (function() {
+        // Check if notifications are supported and we haven't shown today
+        if (!('Notification' in window)) return;
+
+        var lastNotified = localStorage.getItem('strideLastFollowupNotification');
+        var today = new Date().toDateString();
+        if (lastNotified === today) return;
+
+        // Only request permission if not yet decided
+        if (Notification.permission === 'default') {
+            // Don't auto-request, wait for user to enable in settings
+            return;
+        }
+
+        if (Notification.permission === 'granted') {
+            checkAndShowFollowupNotifications();
+        }
+
+        function checkAndShowFollowupNotifications() {
+            fetch('/api/followups/due')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success && data.count > 0) {
+                        var title = data.count === 1
+                            ? '1 contact needs follow-up'
+                            : data.count + ' contacts need follow-up';
+                        var body = data.contacts.slice(0, 3).map(function(c) {
+                            return c.name + (c.company ? ' at ' + c.company : '');
+                        }).join('\n');
+                        if (data.count > 3) {
+                            body += '\n+' + (data.count - 3) + ' more';
+                        }
+                        new Notification(title, {
+                            body: body,
+                            icon: '/static/img/favicon.svg',
+                            tag: 'stride-followup'
+                        });
+                        localStorage.setItem('strideLastFollowupNotification', today);
+                    }
+                })
+                .catch(function() { /* ignore errors */ });
+        }
+    })();
     </script>
     {% block scripts %}{% endblock %}
 </body>

@@ -62,6 +62,21 @@ def create_app(db_path: str = None, database_url: str = None):
     def inject_ai_config():
         return {'ai_parsing_enabled': app.config.get('AI_PARSING_ENABLED', False)}
 
+    @app.context_processor
+    def inject_followup_count():
+        """Inject overdue followups count for nav badge."""
+        from flask_login import current_user
+        if current_user.is_authenticated:
+            from ..repositories import ContactRepository
+            session = db.get_session()
+            try:
+                contacts_repo = ContactRepository(session, user_id=current_user.id)
+                overdue = contacts_repo.get_needing_followup()
+                return {'overdue_followups_count': len(overdue)}
+            finally:
+                session.close()
+        return {'overdue_followups_count': 0}
+
     # Initialize Flask-Login
     login_manager = LoginManager()
     login_manager.init_app(app)

@@ -138,3 +138,20 @@ def delete_resume():
     finally:
         session.close()
     return redirect(url_for('settings.settings'))
+
+
+@bp.route('/settings/notifications', methods=['POST'])
+@login_required
+def save_notifications():
+    """Save notification preferences."""
+    db = current_app.extensions['db']
+    session = db.get_session()
+    try:
+        user = session.query(User).get(current_user.id)
+        user.email_digest_enabled = bool(request.form.get('email_digest_enabled'))
+        user.email_digest_frequency = request.form.get('email_digest_frequency', 'weekly')
+        session.commit()
+        flash('Notification settings saved!', 'success')
+    finally:
+        session.close()
+    return redirect(url_for('settings.settings'))

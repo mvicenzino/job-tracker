@@ -49,7 +49,7 @@ class DatabaseConnection:
         """Run simple schema migrations for new columns."""
         inspector = inspect(self.engine)
 
-        # Check if users table exists and add new onboarding columns if missing
+        # Check if users table exists and add new columns if missing
         if 'users' in inspector.get_table_names():
             columns = [col['name'] for col in inspector.get_columns('users')]
 
@@ -60,6 +60,19 @@ class DatabaseConnection:
 
                 if 'onboarding_dismissed' not in columns:
                     conn.execute(text('ALTER TABLE users ADD COLUMN onboarding_dismissed BOOLEAN DEFAULT 0'))
+                    conn.commit()
+
+                # Notification preferences
+                if 'email_digest_enabled' not in columns:
+                    conn.execute(text('ALTER TABLE users ADD COLUMN email_digest_enabled BOOLEAN DEFAULT 0'))
+                    conn.commit()
+
+                if 'email_digest_frequency' not in columns:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN email_digest_frequency VARCHAR(20) DEFAULT 'weekly'"))
+                    conn.commit()
+
+                if 'browser_notifications_enabled' not in columns:
+                    conn.execute(text('ALTER TABLE users ADD COLUMN browser_notifications_enabled BOOLEAN DEFAULT 1'))
                     conn.commit()
 
     def drop_tables(self):
