@@ -1,6 +1,6 @@
-"""Schedule routes: list, new event, new interview, complete."""
-from datetime import datetime
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+"""Schedule routes: list, new event, new interview, complete, .ics export."""
+from datetime import datetime, timedelta
+from flask import Blueprint, render_template, request, redirect, url_for, flash, Response
 from flask_login import login_required
 
 from ..helpers import get_service
@@ -112,5 +112,80 @@ def new_interview():
         return render_template('interview_form.html',
                              applications=applications,
                              EventType=EventType)
+    finally:
+        session.close()
+
+
+def _ics_escape(text):
+    """Escape text for iCalendar format (RFC 5545)."""
+    if not text:
+        return ''
+    return text.replace('\\', '\\\\').replace(';', '\\;').replace(',', '\\,').replace('\n', '\\n')
+
+
+@bp.route('/events/<int:event_id>/export.ics')
+@login_required
+def export_ics(event_id):
+    """Export an event as an .ics (iCalendar) file."""
+    service, session = get_service()
+    try:
+        event = service.events.get_by_id(event_id)
+        if not event:
+            flash('Event not found.', 'error')
+            return redirect(url_for('schedule.schedule'))
+
+        dtstart = event.start_time.strftime('%Y%m%dT%H%M%S')
+        if event.end_time:
+            dtend = event.end_time.strftime('%Y%m%dT%H%M%S')
+        else:
+            dtend = (event.start_time + timedelta(hours=1)).strftime('%Y%m%dT%H%M%S')
+
+        dtstamp = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+
+        description_parts = []
+        if event.description:
+            description_parts.append(event.description)
+        if event.prep_notes:
+            description_parts.append(f"Prep: {event.prep_notes}")
+        if event.questions_to_ask:
+            description_parts.append(f"Questions: {event.questions_to_ask}")
+        description = '\\n'.join(description_parts)
+
+        location = event.location or event.meeting_link or ''
+
+        lines = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//Stride//Job Hunt Tracker//EN',
+            'CALSCALE:GREGORIAN',
+            'METHOD:PUBLISH',
+            'BEGIN:VEVENT',
+            f'UID:{event.id}@stride-jobs.vercel.app',
+            f'DTSTAMP:{dtstamp}',
+            f'DTSTART:{dtstart}',
+            f'DTEND:{dtend}',
+            f'SUMMARY:{_ics_escape(event.title)}',
+        ]
+        if description:
+            lines.append(f'DESCRIPTION:{_ics_escape(description)}')
+        if location:
+            lines.append(f'LOCATION:{_ics_escape(location)}')
+        if event.meeting_link:
+            lines.append(f'URL:{event.meeting_link}')
+        lines += [
+            'END:VEVENT',
+            'END:VCALENDAR',
+        ]
+
+        ics_content = '\r\n'.join(lines) + '\r\n'
+        safe_title = event.title.replace(' ', '_').replace('/', '-')[:50]
+
+        return Response(
+            ics_content,
+            mimetype='text/calendar',
+            headers={
+                'Content-Disposition': f'attachment; filename="{safe_title}.ics"'
+            }
+        )
     finally:
         session.close()

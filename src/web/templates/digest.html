@@ -65,6 +65,23 @@
                             <a href="{{ event.meeting_link }}" target="_blank" class="event-link">Join Meeting</a>
                             {% endif %}
                         </div>
+                        <div class="cal-sync-wrap">
+                            <span class="cal-sync-toggle" title="Add to calendar">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                <span class="cal-caret">&#9662;</span>
+                            </span>
+                            <div class="cal-sync-panel">
+                                <a href="{{ url_for('schedule.export_ics', event_id=event.id) }}">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    Download .ics
+                                </a>
+                                {% set _imp = "title=" ~ (event.title|urlencode) ~ "&start=" ~ event.start_time.strftime('%Y-%m-%dT%H:%M:%S') ~ "&end=" ~ (event.end_time or event.start_time).strftime('%Y-%m-%dT%H:%M:%S') ~ "&color=#6366f1&source=stride" %}{% if event.description %}{% set _imp = _imp ~ "&description=" ~ (event.description|urlencode) %}{% endif %}
+                                <a href="https://calendora.replit.app/?import={{ _imp|urlencode }}">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Open in Calendora
+                                </a>
+                            </div>
+                        </div>
                     </li>
                     {% endfor %}
                 </ul>
@@ -86,6 +103,23 @@
                         <div class="event-details">
                             <div class="event-date">{{ event.start_time.strftime('%a, %b %d at %-I:%M %p') }}</div>
                             <div class="event-title">{{ event.title }}</div>
+                        </div>
+                        <div class="cal-sync-wrap">
+                            <span class="cal-sync-toggle" title="Add to calendar">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                <span class="cal-caret">&#9662;</span>
+                            </span>
+                            <div class="cal-sync-panel">
+                                <a href="{{ url_for('schedule.export_ics', event_id=event.id) }}">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    Download .ics
+                                </a>
+                                {% set _imp = "title=" ~ (event.title|urlencode) ~ "&start=" ~ event.start_time.strftime('%Y-%m-%dT%H:%M:%S') ~ "&end=" ~ (event.end_time or event.start_time).strftime('%Y-%m-%dT%H:%M:%S') ~ "&color=#6366f1&source=stride" %}{% if event.description %}{% set _imp = _imp ~ "&description=" ~ (event.description|urlencode) %}{% endif %}
+                                <a href="https://calendora.replit.app/?import={{ _imp|urlencode }}">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Open in Calendora
+                                </a>
+                            </div>
                         </div>
                     </li>
                     {% endfor %}

@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize nav dropdowns
     initNavDropdowns();
 
+    // Initialize calendar sync dropdowns
+    initCalSyncDropdowns();
+
     // Auto-dismiss alerts after 5 seconds
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
@@ -40,6 +43,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize drag and drop for pipeline board
     initPipelineDragDrop();
 });
+
+// === Calendar Sync Dropdowns ===
+
+function initCalSyncDropdowns() {
+    document.addEventListener('click', function(e) {
+        var toggle = e.target.closest('.cal-sync-toggle');
+        var wrap = toggle ? toggle.closest('.cal-sync-wrap') : null;
+
+        // Close every open dropdown except the one being toggled
+        document.querySelectorAll('.cal-sync-wrap.open').forEach(function(el) {
+            if (el !== wrap) el.classList.remove('open');
+        });
+
+        // If we clicked a toggle, flip its state
+        if (wrap) {
+            wrap.classList.toggle('open');
+        }
+    });
+}
 
 // === Mobile Menu ===
 
