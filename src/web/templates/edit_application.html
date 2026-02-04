@@ -30,18 +30,25 @@
             <input type="text" id="resume_version" name="resume_version"
                    value="{{ app.resume_version or '' }}"
                    list="resume_versions_list"
-                   placeholder="e.g., v2-technical, general-2024">
+                   placeholder="Select or type custom...">
             <datalist id="resume_versions_list">
-                {% for version in resume_versions %}
-                <option value="{{ version }}">
-                {% endfor %}
-                {% if not resume_versions %}
                 <option value="General">
                 <option value="Technical">
                 <option value="Leadership">
                 <option value="Tailored">
+                {% for version in resume_versions %}
+                {% if version not in ['General', 'Technical', 'Leadership', 'Tailored'] %}
+                <option value="{{ version }}">
                 {% endif %}
+                {% endfor %}
             </datalist>
+            <div class="resume-quick-picks">
+                <span class="quick-pick-label">Quick pick:</span>
+                <button type="button" class="quick-pick-btn" onclick="document.getElementById('resume_version').value='General'">General</button>
+                <button type="button" class="quick-pick-btn" onclick="document.getElementById('resume_version').value='Technical'">Technical</button>
+                <button type="button" class="quick-pick-btn" onclick="document.getElementById('resume_version').value='Leadership'">Leadership</button>
+                <button type="button" class="quick-pick-btn" onclick="document.getElementById('resume_version').value='Tailored'">Tailored</button>
+            </div>
         </div>
 
         <div class="form-group">

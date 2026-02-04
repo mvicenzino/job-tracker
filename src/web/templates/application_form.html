@@ -119,19 +119,25 @@
 
             <div class="form-group">
                 <label for="resume_version">Resume Version</label>
-                <input type="text" id="resume_version" name="resume_version" list="resume_versions_list" placeholder="e.g., v2-technical, backend-2024">
+                <input type="text" id="resume_version" name="resume_version" list="resume_versions_list" placeholder="Select or type custom...">
                 <datalist id="resume_versions_list">
-                    {% for version in resume_versions %}
-                    <option value="{{ version }}">
-                    {% endfor %}
-                    {% if not resume_versions %}
                     <option value="General">
                     <option value="Technical">
                     <option value="Leadership">
                     <option value="Tailored">
+                    {% for version in resume_versions %}
+                    {% if version not in ['General', 'Technical', 'Leadership', 'Tailored'] %}
+                    <option value="{{ version }}">
                     {% endif %}
+                    {% endfor %}
                 </datalist>
-                <span class="form-hint">Track which resume version you use — select previous or type new</span>
+                <div class="resume-quick-picks">
+                    <span class="quick-pick-label">Quick pick:</span>
+                    <button type="button" class="quick-pick-btn" onclick="document.getElementById('resume_version').value='General'">General</button>
+                    <button type="button" class="quick-pick-btn" onclick="document.getElementById('resume_version').value='Technical'">Technical</button>
+                    <button type="button" class="quick-pick-btn" onclick="document.getElementById('resume_version').value='Leadership'">Leadership</button>
+                    <button type="button" class="quick-pick-btn" onclick="document.getElementById('resume_version').value='Tailored'">Tailored</button>
+                </div>
             </div>
         </div>
 
