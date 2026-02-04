@@ -197,9 +197,11 @@ a:hover {
     font-weight: 500;
     transition: all var(--transition-fast);
     white-space: nowrap;
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     height: 36px;
+    line-height: 1;
 }
 
 .nav-link:hover {
@@ -469,11 +471,13 @@ a:hover {
     font-weight: 500;
     cursor: pointer;
     transition: all var(--transition-fast);
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-1);
     font-family: inherit;
     height: 36px;
+    line-height: 1;
 }
 
 .nav-dropdown-toggle:hover {
@@ -482,8 +486,11 @@ a:hover {
 }
 
 .nav-dropdown-chevron {
-    font-size: 0.75rem;
+    font-size: 0.625rem;
     transition: transform var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    margin-left: 2px;
 }
 
 .nav-dropdown.open .nav-dropdown-chevron {
