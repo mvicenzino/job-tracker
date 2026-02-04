@@ -25,14 +25,18 @@ def dashboard():
             onboarding_completed = False
             onboarding_dismissed = False
 
+        # Check if user has uploaded a resume
+        has_resume = bool(getattr(current_user, 'resume_text', None) or getattr(current_user, 'resume_filename', None))
+
         onboarding = {
             'show': not onboarding_completed and not onboarding_dismissed,
             'completed': onboarding_completed,
             'steps': {
-                'first_company': data['summary']['total_applications'] > 0 or len(service.companies.get_all()) > 0,
+                'resume_uploaded': has_resume,
                 'first_application': data['summary']['total_applications'] > 0,
                 'first_contact': data['summary']['total_contacts'] > 0,
                 'first_event': data['summary']['events_today'] > 0 or len(data.get('upcoming', [])) > 0,
+                'first_company': data['summary']['total_applications'] > 0 or len(service.companies.get_all()) > 0,
             }
         }
         onboarding['progress'] = sum(onboarding['steps'].values())

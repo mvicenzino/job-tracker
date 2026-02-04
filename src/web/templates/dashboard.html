@@ -31,12 +31,26 @@
             <span class="onboarding-progress-text">{{ onboarding.progress }} of {{ onboarding.total }} complete</span>
         </div>
         <div class="onboarding-steps">
+            <a href="{{ url_for('settings.settings') }}#resume" class="onboarding-step {% if onboarding.steps.resume_uploaded %}completed{% endif %}">
+                <span class="step-check">
+                    {% if onboarding.steps.resume_uploaded %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    {% else %}
+                    <span class="step-number">1</span>
+                    {% endif %}
+                </span>
+                <div class="step-content">
+                    <span class="step-title">Upload your resume</span>
+                    <span class="step-desc">Add your resume to track which version you use for each application</span>
+                </div>
+                <svg class="step-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
             <a href="{{ url_for('applications.new_application') }}" class="onboarding-step {% if onboarding.steps.first_application %}completed{% endif %}">
                 <span class="step-check">
                     {% if onboarding.steps.first_application %}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                     {% else %}
-                    <span class="step-number">1</span>
+                    <span class="step-number">2</span>
                     {% endif %}
                 </span>
                 <div class="step-content">
@@ -50,7 +64,7 @@
                     {% if onboarding.steps.first_contact %}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                     {% else %}
-                    <span class="step-number">2</span>
+                    <span class="step-number">3</span>
                     {% endif %}
                 </span>
                 <div class="step-content">
@@ -64,7 +78,7 @@
                     {% if onboarding.steps.first_event %}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                     {% else %}
-                    <span class="step-number">3</span>
+                    <span class="step-number">4</span>
                     {% endif %}
                 </span>
                 <div class="step-content">
@@ -78,7 +92,7 @@
                     {% if onboarding.steps.first_company %}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                     {% else %}
-                    <span class="step-number">4</span>
+                    <span class="step-number">5</span>
                     {% endif %}
                 </span>
                 <div class="step-content">
