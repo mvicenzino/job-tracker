@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, redirect, url_for, current_app
 from flask_login import current_user, login_user
 
 from ...services import JobHuntService
-from ...models import ApplicationStatus, EventType, ContactType, User, ChecklistItem
+from ...models import ApplicationStatus, EventType, ContactType, User, ChecklistItem, ResumeVersion
 
 bp = Blueprint('public', __name__)
 
@@ -66,6 +66,7 @@ def demo():
             session.execute(text(f"DELETE FROM jobs WHERE company_id IN (SELECT id FROM companies WHERE user_id = {demo_user.id})"))
             session.execute(text(f"DELETE FROM contacts WHERE user_id = {demo_user.id}"))
             session.execute(text(f"DELETE FROM companies WHERE user_id = {demo_user.id}"))
+            session.execute(text(f"DELETE FROM resume_versions WHERE user_id = {demo_user.id}"))
             session.commit()
 
             # Refresh service after clearing data
@@ -95,19 +96,178 @@ def demo():
                 company = service.add_company(**data)
                 companies.append(company)
 
-            # Create jobs with realistic titles and compensation
+            # Create jobs with realistic titles, compensation, and descriptions
             jobs_data = [
                 # Active opportunities - various stages
-                {'company': companies[0], 'title': 'Senior Software Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 200000, 'salary_max': 280000, 'source': 'Referral'},
-                {'company': companies[1], 'title': 'Staff Engineer, Platform', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 220000, 'salary_max': 300000, 'source': 'LinkedIn'},
-                {'company': companies[2], 'title': 'Senior Frontend Engineer', 'location': 'Remote', 'remote_type': 'remote', 'salary_min': 180000, 'salary_max': 250000, 'source': 'Company Website'},
-                {'company': companies[3], 'title': 'Software Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 170000, 'salary_max': 230000, 'source': 'LinkedIn'},
-                {'company': companies[4], 'title': 'Founding Engineer', 'location': 'San Francisco, CA', 'remote_type': 'onsite', 'salary_min': 180000, 'salary_max': 240000, 'source': 'Referral'},
-                {'company': companies[5], 'title': 'Senior Backend Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 190000, 'salary_max': 260000, 'source': 'Recruiter'},
-                {'company': companies[6], 'title': 'Research Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 250000, 'salary_max': 350000, 'source': 'Company Website'},
-                {'company': companies[7], 'title': 'Staff Data Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 230000, 'salary_max': 320000, 'source': 'LinkedIn'},
-                {'company': companies[8], 'title': 'Full Stack Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 175000, 'salary_max': 240000, 'source': 'AngelList'},
-                {'company': companies[9], 'title': 'Senior Software Engineer', 'location': 'New York, NY', 'remote_type': 'hybrid', 'salary_min': 200000, 'salary_max': 270000, 'source': 'Referral'},
+                {'company': companies[0], 'title': 'Senior Software Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 200000, 'salary_max': 280000, 'source': 'Referral',
+                 'description': '''We're looking for a Senior Software Engineer to join our Payments team. You'll work on building and scaling our payment infrastructure that processes billions of dollars annually.
+
+You will:
+- Design, build, and maintain APIs, services, and systems across Stripe's payments stack
+- Debug production issues across services and multiple levels of the stack
+- Work with engineers across the company to build new features at scale
+- Improve engineering standards, tooling, and processes
+
+Requirements:
+- 5+ years of software engineering experience
+- Strong proficiency in at least one programming language (we use Ruby, Go, and Java)
+- Experience with distributed systems and microservices architecture
+- Excellent problem-solving and debugging skills
+- Experience with databases (PostgreSQL, Redis) and message queues
+- Strong communication skills and ability to work cross-functionally
+
+Nice to have:
+- Experience with payment systems or financial technology
+- Experience with Kubernetes and cloud infrastructure (AWS/GCP)
+- Familiarity with PCI compliance requirements'''},
+
+                {'company': companies[1], 'title': 'Staff Engineer, Platform', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 220000, 'salary_max': 300000, 'source': 'LinkedIn',
+                 'description': '''Notion is looking for a Staff Engineer to lead our Platform team. You'll architect and build the foundational systems that power Notion for millions of users.
+
+Responsibilities:
+- Lead technical design and architecture for platform infrastructure
+- Mentor and grow a team of engineers
+- Drive technical decisions that impact the entire engineering organization
+- Collaborate with product teams to enable new features and capabilities
+- Optimize performance and reliability at scale
+
+Requirements:
+- 8+ years of software engineering experience with 3+ years in a senior/staff role
+- Deep experience with TypeScript/JavaScript and Node.js
+- Strong background in distributed systems and database design
+- Experience leading technical projects across multiple teams
+- Excellent written and verbal communication skills
+
+Technologies we use: TypeScript, React, Node.js, PostgreSQL, Redis, AWS'''},
+
+                {'company': companies[2], 'title': 'Senior Frontend Engineer', 'location': 'Remote', 'remote_type': 'remote', 'salary_min': 180000, 'salary_max': 250000, 'source': 'Company Website',
+                 'description': '''Join Figma as a Senior Frontend Engineer and help us build the future of design tools. You'll work on our web-based editor used by millions of designers worldwide.
+
+What you'll do:
+- Build new features for our collaborative design tool
+- Optimize performance for complex canvas rendering
+- Work closely with designers and product managers
+- Contribute to our design system and component library
+
+Requirements:
+- 5+ years of frontend development experience
+- Expert-level JavaScript/TypeScript skills
+- Experience with React and modern frontend tooling
+- Understanding of browser rendering and performance optimization
+- Experience with WebGL or Canvas APIs is a plus
+- Strong eye for design and attention to detail'''},
+
+                {'company': companies[3], 'title': 'Software Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 170000, 'salary_max': 230000, 'source': 'LinkedIn',
+                 'description': '''Vercel is hiring Software Engineers to work on our frontend cloud platform. Help us make the web faster for everyone.
+
+You will:
+- Build and improve our deployment and hosting infrastructure
+- Work on developer tools and CLI
+- Contribute to Next.js and our open source projects
+- Optimize edge computing and CDN systems
+
+Requirements:
+- 3+ years of software engineering experience
+- Strong JavaScript/TypeScript skills
+- Experience with React and Next.js
+- Understanding of web performance and CDN architecture
+- Passion for developer experience and open source'''},
+
+                {'company': companies[4], 'title': 'Founding Engineer', 'location': 'San Francisco, CA', 'remote_type': 'onsite', 'salary_min': 180000, 'salary_max': 240000, 'source': 'Referral',
+                 'description': '''Linear is looking for a Founding Engineer to help build the future of issue tracking. Join our small, high-impact team.
+
+What you'll do:
+- Own entire features from design to implementation
+- Shape the technical direction of the product
+- Work directly with founders and early customers
+- Build a product that developers love
+
+Requirements:
+- 4+ years of software engineering experience
+- Full-stack development skills (React, Node.js, PostgreSQL)
+- Strong product sense and attention to detail
+- Ability to move fast and ship quality code
+- Startup experience preferred'''},
+
+                {'company': companies[5], 'title': 'Senior Backend Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 190000, 'salary_max': 260000, 'source': 'Recruiter',
+                 'description': '''Rippling is hiring Senior Backend Engineers to build our unified HR platform.
+
+Responsibilities:
+- Design and build scalable backend services
+- Work on integrations with payroll, benefits, and HR systems
+- Improve system reliability and performance
+- Mentor junior engineers
+
+Requirements:
+- 5+ years of backend engineering experience
+- Strong Python or Go skills
+- Experience with PostgreSQL and distributed systems
+- Understanding of API design and microservices
+- Experience with AWS infrastructure'''},
+
+                {'company': companies[6], 'title': 'Research Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 250000, 'salary_max': 350000, 'source': 'Company Website',
+                 'description': '''Anthropic is seeking Research Engineers to work on AI safety and capabilities research. Help us build AI systems that are safe, beneficial, and understandable.
+
+What you'll do:
+- Implement and iterate on ML experiments
+- Build infrastructure for training large language models
+- Collaborate with researchers on novel AI techniques
+- Contribute to our understanding of AI alignment
+
+Requirements:
+- MS/PhD in CS, ML, or related field (or equivalent experience)
+- Strong programming skills in Python
+- Experience with PyTorch or JAX
+- Understanding of modern ML architectures (transformers, etc.)
+- Experience training large models is a plus
+- Interest in AI safety and alignment research'''},
+
+                {'company': companies[7], 'title': 'Staff Data Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 230000, 'salary_max': 320000, 'source': 'LinkedIn',
+                 'description': '''Databricks is hiring a Staff Data Engineer to build our data platform. Work on cutting-edge data and ML infrastructure.
+
+You will:
+- Design and build data pipelines at massive scale
+- Work on Apache Spark and Delta Lake
+- Optimize query performance and data processing
+- Lead technical projects and mentor engineers
+
+Requirements:
+- 7+ years of data engineering experience
+- Expert-level SQL and Python skills
+- Deep experience with Spark and distributed computing
+- Experience with cloud data platforms (AWS, Azure, GCP)
+- Strong understanding of data modeling and warehousing'''},
+
+                {'company': companies[8], 'title': 'Full Stack Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 175000, 'salary_max': 240000, 'source': 'AngelList',
+                 'description': '''Retool is looking for Full Stack Engineers to help us build internal tools faster.
+
+What you'll do:
+- Build features for our low-code platform
+- Work across the stack from React frontend to Node.js backend
+- Improve our component library and integrations
+- Help customers build better internal tools
+
+Requirements:
+- 3+ years of full-stack experience
+- Strong React and TypeScript skills
+- Node.js and PostgreSQL experience
+- Interest in developer tools and productivity'''},
+
+                {'company': companies[9], 'title': 'Senior Software Engineer', 'location': 'New York, NY', 'remote_type': 'hybrid', 'salary_min': 200000, 'salary_max': 270000, 'source': 'Referral',
+                 'description': '''Ramp is hiring Senior Software Engineers to build the future of corporate spend management.
+
+You will:
+- Build features for our corporate card and expense platform
+- Work on real-time transaction processing
+- Improve our accounting integrations
+- Scale systems handling billions in transactions
+
+Requirements:
+- 5+ years of software engineering experience
+- Strong Python or Go skills
+- Experience with PostgreSQL and Redis
+- Understanding of financial systems is a plus'''},
+
                 # Saved for later / researching
                 {'company': companies[10], 'title': 'Staff Engineer, Payments', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 240000, 'salary_max': 330000, 'source': 'LinkedIn'},
                 {'company': companies[11], 'title': 'Senior Software Engineer', 'location': 'Remote', 'remote_type': 'remote', 'salary_min': 180000, 'salary_max': 250000, 'source': 'Company Website'},
@@ -225,6 +385,152 @@ def demo():
 
             for data in events_data:
                 service.schedule_event(**data)
+
+            # Create sample resume versions for AI analysis demo
+            resume_general = ResumeVersion(
+                user_id=demo_user.id,
+                name='General',
+                content='''ALEX CHEN
+Senior Software Engineer | San Francisco, CA
+alex.chen@email.com | linkedin.com/in/alexchen | github.com/alexchen
+
+SUMMARY
+Senior Software Engineer with 7+ years of experience building scalable web applications and distributed systems. Passionate about clean code, developer experience, and mentoring teams. Strong background in full-stack development with expertise in React, Node.js, and cloud infrastructure.
+
+EXPERIENCE
+
+Senior Software Engineer | TechCorp Inc. | 2021 - Present
+- Led development of real-time analytics platform processing 10M+ events daily
+- Architected microservices migration reducing deployment time by 60%
+- Mentored team of 5 junior engineers, improving team velocity by 40%
+- Implemented CI/CD pipelines using GitHub Actions and Kubernetes
+- Technologies: TypeScript, React, Node.js, PostgreSQL, Redis, AWS
+
+Software Engineer | StartupXYZ | 2019 - 2021
+- Built customer-facing dashboard serving 50K+ daily active users
+- Designed RESTful APIs and GraphQL services
+- Reduced page load time by 45% through performance optimization
+- Collaborated with product team to ship features on tight deadlines
+- Technologies: JavaScript, React, Python, Django, PostgreSQL
+
+Software Engineer | WebAgency | 2017 - 2019
+- Developed responsive web applications for Fortune 500 clients
+- Created reusable component libraries used across 10+ projects
+- Participated in code reviews and established coding standards
+- Technologies: JavaScript, React, Vue.js, Node.js, MongoDB
+
+EDUCATION
+B.S. Computer Science | UC Berkeley | 2017
+
+SKILLS
+Languages: TypeScript, JavaScript, Python, Go, SQL
+Frontend: React, Next.js, Vue.js, HTML/CSS, Tailwind
+Backend: Node.js, Express, Django, FastAPI, GraphQL
+Databases: PostgreSQL, MongoDB, Redis, DynamoDB
+Cloud/DevOps: AWS, GCP, Docker, Kubernetes, Terraform
+Tools: Git, GitHub Actions, Jest, Cypress'''
+            )
+            session.add(resume_general)
+
+            resume_technical = ResumeVersion(
+                user_id=demo_user.id,
+                name='Technical',
+                content='''ALEX CHEN
+Senior Software Engineer | Distributed Systems & Platform Engineering
+San Francisco, CA | alex.chen@email.com | github.com/alexchen
+
+TECHNICAL SUMMARY
+Senior engineer specializing in distributed systems, platform infrastructure, and developer tooling. 7+ years building high-throughput systems processing millions of requests. Deep expertise in system design, performance optimization, and technical leadership.
+
+TECHNICAL EXPERIENCE
+
+Senior Software Engineer | TechCorp Inc. | 2021 - Present
+Platform & Infrastructure Focus:
+- Designed event-driven architecture handling 10M+ daily events with 99.99% uptime
+- Built distributed task queue system using Redis and Bull, reducing job latency by 70%
+- Implemented database sharding strategy for PostgreSQL, scaling to 100M+ records
+- Created internal developer platform reducing service deployment time from days to hours
+- Established observability stack (Prometheus, Grafana, Jaeger) for 50+ microservices
+
+Technical Leadership:
+- Led architecture review board for company-wide technical decisions
+- Authored technical RFCs adopted across engineering organization
+- Mentored 5 engineers through promotion to senior level
+
+Software Engineer | StartupXYZ | 2019 - 2021
+- Optimized GraphQL resolvers reducing API response time by 60%
+- Implemented caching layer with Redis reducing database load by 40%
+- Built real-time notification system using WebSockets and Redis Pub/Sub
+- Designed idempotent API patterns for payment processing reliability
+
+TECHNICAL SKILLS
+Systems: Distributed systems, microservices, event-driven architecture, CQRS
+Languages: TypeScript, Go, Python, Rust (learning), SQL
+Infrastructure: Kubernetes, Docker, Terraform, AWS (EC2, ECS, Lambda, RDS, SQS)
+Databases: PostgreSQL (advanced), Redis, MongoDB, Elasticsearch, DynamoDB
+Observability: Prometheus, Grafana, Jaeger, DataDog, PagerDuty
+Performance: Profiling, load testing, query optimization, caching strategies
+
+OPEN SOURCE
+- Contributor to Node.js ecosystem (Bull, TypeORM)
+- Maintainer of redis-toolkit (2K+ GitHub stars)
+- Speaker at NodeConf 2023: "Scaling Real-time Systems"
+
+EDUCATION
+B.S. Computer Science | UC Berkeley | 2017
+Focus: Distributed Systems, Database Systems'''
+            )
+            session.add(resume_technical)
+
+            resume_leadership = ResumeVersion(
+                user_id=demo_user.id,
+                name='Leadership',
+                content='''ALEX CHEN
+Engineering Leader | Building High-Performance Teams
+San Francisco, CA | alex.chen@email.com | linkedin.com/in/alexchen
+
+LEADERSHIP PROFILE
+Engineering leader with 7+ years of experience, including 3+ years leading teams. Track record of building and scaling engineering teams, driving technical strategy, and delivering complex projects. Passionate about creating environments where engineers do their best work.
+
+LEADERSHIP EXPERIENCE
+
+Senior Software Engineer & Tech Lead | TechCorp Inc. | 2021 - Present
+
+Team Leadership:
+- Led team of 8 engineers delivering company's highest-revenue product line
+- Implemented agile processes improving sprint velocity by 45%
+- Reduced engineer turnover from 25% to 5% through mentorship and growth planning
+- Established technical interview process, hiring 12 engineers in 18 months
+- Created engineering career ladder adopted company-wide
+
+Strategic Impact:
+- Partnered with product leadership to define 2-year technical roadmap
+- Led platform modernization initiative saving $500K annually in infrastructure costs
+- Drove adoption of TypeScript across organization (20+ services migrated)
+- Established engineering metrics and OKR framework for 50-person engineering org
+
+Cross-functional Collaboration:
+- Regular presenter to executive leadership on technical strategy
+- Collaborated with Sales and Customer Success on enterprise feature requirements
+- Worked with Security team on SOC 2 compliance initiatives
+
+Software Engineer | StartupXYZ | 2019 - 2021
+- Mentored 3 junior engineers, 2 promoted to mid-level within 18 months
+- Led technical discussions and architecture decisions for 5-person team
+- Facilitated sprint planning and retrospectives
+
+LEADERSHIP PHILOSOPHY
+I believe in servant leadership, creating clarity through documentation, and building psychologically safe teams where engineers can take risks and learn from failures.
+
+SKILLS
+Leadership: Team building, mentorship, hiring, performance management, strategic planning
+Technical: Full-stack development, system design, architecture, technical writing
+Process: Agile/Scrum, OKRs, technical roadmapping, incident management
+
+EDUCATION
+B.S. Computer Science | UC Berkeley | 2017'''
+            )
+            session.add(resume_leadership)
 
             session.commit()
 
