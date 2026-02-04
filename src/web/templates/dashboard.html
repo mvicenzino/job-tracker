@@ -467,6 +467,74 @@
             </div>
         </section>
 
+        <!-- Weekly Reflection Widget -->
+        <section class="card reflection-widget">
+            <div class="card-header">
+                <h2>Weekly Reflection</h2>
+                <a href="{{ url_for('reflections.reflections') }}" class="card-link">View All →</a>
+            </div>
+            <div class="card-body">
+                {% if reflection.has_current_week %}
+                    <div class="reflection-done">
+                        <div class="reflection-done-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <div class="reflection-done-content">
+                            <p class="reflection-done-title">This week's reflection complete!</p>
+                            <div class="reflection-summary">
+                                <span class="reflection-energy">
+                                    Energy:
+                                    {% for i in range(reflection.current_week.energy_level or 3) %}●{% endfor %}{% for i in range(5 - (reflection.current_week.energy_level or 3)) %}<span class="dim">●</span>{% endfor %}
+                                </span>
+                                <span class="reflection-momentum badge badge-{% if reflection.current_week.momentum == 'gaining' %}success{% elif reflection.current_week.momentum == 'losing' %}warning{% else %}info{% endif %}">
+                                    {{ reflection.current_week.momentum|title if reflection.current_week.momentum else 'Steady' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if reflection.streak > 1 %}
+                    <div class="reflection-streak">
+                        🔥 {{ reflection.streak }} week streak!
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="reflection-prompt">
+                        <div class="reflection-prompt-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 20h9"/>
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                            </svg>
+                        </div>
+                        <div class="reflection-prompt-content">
+                            <p class="reflection-prompt-title">How's your week going?</p>
+                            <p class="reflection-prompt-hint">Take 2 minutes to reflect on your progress</p>
+                        </div>
+                    </div>
+                    {% if reflection.streak > 0 %}
+                    <div class="reflection-streak-warning">
+                        ⚡ Don't break your {{ reflection.streak }} week streak!
+                    </div>
+                    {% endif %}
+                    <a href="{{ url_for('reflections.new_reflection') }}" class="btn btn-primary btn-block">Write This Week's Reflection</a>
+                {% endif %}
+
+                {% if reflection.mood_trend and reflection.mood_trend|length > 1 %}
+                <div class="mood-trend">
+                    <span class="mood-trend-label">Recent mood:</span>
+                    <div class="mood-dots">
+                        {% for m in reflection.mood_trend %}
+                        <span class="mood-dot {% if m.energy >= 4 %}high{% elif m.energy >= 3 %}mid{% else %}low{% endif %}" title="{{ m.week }}: Energy {{ m.energy }}/5">
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
         <!-- Quick Stats -->
         <section class="card">
             <div class="card-header">

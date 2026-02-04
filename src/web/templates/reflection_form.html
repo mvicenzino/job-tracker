@@ -5,19 +5,64 @@
 {% block content %}
 <div class="form-page">
     <header class="page-header">
-        <h1>Weekly Reflection</h1>
-        <p class="subtitle">How did your job search go this week?</p>
+        <div class="header-content">
+            <a href="{{ url_for('reflections.reflections') }}" class="back-link">← Back to Reflections</a>
+            <h1>Weekly Reflection</h1>
+            <p class="subtitle">Take a moment to reflect on your job search journey this week</p>
+        </div>
     </header>
 
-    <form method="post" class="form card">
+    <form method="post" class="form card reflection-form">
+        <div class="reflection-intro">
+            <p>Regular reflection helps you recognize patterns, celebrate wins, and stay motivated. Be honest with yourself - this is for you.</p>
+        </div>
+
         <div class="form-group">
-            <label>Energy Level</label>
-            <div class="energy-selector">
+            <label>How's your energy this week?</label>
+            <div class="energy-selector-visual">
                 {% for i in range(1, 6) %}
-                <label class="energy-option">
+                <label class="energy-option-visual">
                     <input type="radio" name="energy_level" value="{{ i }}" {% if i == 3 %}checked{% endif %}>
+                    <span class="energy-face">
+                        {% if i == 1 %}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M16 16s-1.5-2-4-2-4 2-4 2"/>
+                            <line x1="9" y1="9" x2="9.01" y2="9"/>
+                            <line x1="15" y1="9" x2="15.01" y2="9"/>
+                        </svg>
+                        {% elif i == 2 %}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="8" y1="15" x2="16" y2="15"/>
+                            <line x1="9" y1="9" x2="9.01" y2="9"/>
+                            <line x1="15" y1="9" x2="15.01" y2="9"/>
+                        </svg>
+                        {% elif i == 3 %}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                            <line x1="9" y1="9" x2="9.01" y2="9"/>
+                            <line x1="15" y1="9" x2="15.01" y2="9"/>
+                        </svg>
+                        {% elif i == 4 %}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                            <line x1="9" y1="9" x2="9.01" y2="9"/>
+                            <line x1="15" y1="9" x2="15.01" y2="9"/>
+                        </svg>
+                        {% else %}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                            <line x1="9" y1="9" x2="9.01" y2="9"/>
+                            <line x1="15" y1="9" x2="15.01" y2="9"/>
+                        </svg>
+                        {% endif %}
+                    </span>
                     <span class="energy-label">
-                        {% if i == 1 %}1 - Drained{% elif i == 2 %}2 - Low{% elif i == 3 %}3 - OK{% elif i == 4 %}4 - Good{% else %}5 - Fired Up{% endif %}
+                        {% if i == 1 %}Drained{% elif i == 2 %}Low{% elif i == 3 %}OK{% elif i == 4 %}Good{% else %}Fired Up{% endif %}
                     </span>
                 </label>
                 {% endfor %}
@@ -25,36 +70,72 @@
         </div>
 
         <div class="form-group">
-            <label>Momentum</label>
-            <div class="momentum-selector">
-                <label class="momentum-option">
-                    <input type="radio" name="momentum" value="gaining">
-                    <span class="momentum-label">Gaining</span>
-                </label>
-                <label class="momentum-option">
-                    <input type="radio" name="momentum" value="steady" checked>
-                    <span class="momentum-label">Steady</span>
-                </label>
-                <label class="momentum-option">
+            <label>Overall momentum</label>
+            <div class="momentum-selector-visual">
+                <label class="momentum-option-visual losing">
                     <input type="radio" name="momentum" value="losing">
-                    <span class="momentum-label">Losing</span>
+                    <span class="momentum-icon">↘</span>
+                    <span class="momentum-label">Losing Steam</span>
+                    <span class="momentum-desc">Feeling discouraged or stuck</span>
+                </label>
+                <label class="momentum-option-visual steady">
+                    <input type="radio" name="momentum" value="steady" checked>
+                    <span class="momentum-icon">→</span>
+                    <span class="momentum-label">Steady</span>
+                    <span class="momentum-desc">Maintaining the pace</span>
+                </label>
+                <label class="momentum-option-visual gaining">
+                    <input type="radio" name="momentum" value="gaining">
+                    <span class="momentum-icon">↗</span>
+                    <span class="momentum-label">Gaining</span>
+                    <span class="momentum-desc">Building positive momentum</span>
                 </label>
             </div>
         </div>
 
         <div class="form-group">
-            <label for="wins">Wins this week</label>
-            <textarea id="wins" name="wins" rows="3" placeholder="What went well? Any responses, interviews, or connections made?"></textarea>
+            <label for="wins">
+                <span class="label-icon wins">✓</span>
+                What went well this week?
+            </label>
+            <div class="guided-prompts">
+                <button type="button" class="prompt-chip" onclick="appendPrompt('wins', 'Got a response from ')">Response received</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('wins', 'Had a great interview with ')">Great interview</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('wins', 'Made a new connection: ')">New connection</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('wins', 'Applied to ')">Applications sent</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('wins', 'Learned about ')">Learned something</button>
+            </div>
+            <textarea id="wins" name="wins" rows="3" placeholder="Celebrate your wins, big or small. Got a callback? Made a connection? Finished an application?"></textarea>
         </div>
 
         <div class="form-group">
-            <label for="challenges">Challenges</label>
-            <textarea id="challenges" name="challenges" rows="3" placeholder="What was hard? Rejections, ghosting, motivation struggles?"></textarea>
+            <label for="challenges">
+                <span class="label-icon challenges">!</span>
+                What was challenging?
+            </label>
+            <div class="guided-prompts">
+                <button type="button" class="prompt-chip" onclick="appendPrompt('challenges', 'Got rejected from ')">Rejection</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('challenges', 'Haven\\'t heard back from ')">No response</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('challenges', 'Struggled with motivation because ')">Motivation dip</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('challenges', 'Interview didn\\'t go well: ')">Tough interview</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('challenges', 'Feeling overwhelmed by ')">Overwhelmed</button>
+            </div>
+            <textarea id="challenges" name="challenges" rows="3" placeholder="Be honest about the hard parts. Rejections? Ghosting? Imposter syndrome? Writing it down helps process it."></textarea>
         </div>
 
         <div class="form-group">
-            <label for="next_week_goals">Goals for next week</label>
-            <textarea id="next_week_goals" name="next_week_goals" rows="3" placeholder="What do you want to focus on next week?"></textarea>
+            <label for="next_week_goals">
+                <span class="label-icon goals">→</span>
+                What will you focus on next week?
+            </label>
+            <div class="guided-prompts">
+                <button type="button" class="prompt-chip" onclick="appendPrompt('next_week_goals', 'Apply to X more jobs')">Apply more</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('next_week_goals', 'Follow up with ')">Follow up</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('next_week_goals', 'Prepare for interview at ')">Interview prep</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('next_week_goals', 'Reach out to ')">Network</button>
+                <button type="button" class="prompt-chip" onclick="appendPrompt('next_week_goals', 'Update my ')">Update materials</button>
+            </div>
+            <textarea id="next_week_goals" name="next_week_goals" rows="3" placeholder="Set 1-3 concrete goals. What's the most important thing to accomplish?"></textarea>
         </div>
 
         <div class="form-actions">
@@ -63,4 +144,218 @@
         </div>
     </form>
 </div>
+
+<style>
+.reflection-form {
+    max-width: 700px;
+}
+
+.reflection-intro {
+    background: var(--color-bg-subtle);
+    padding: var(--space-4);
+    border-radius: var(--radius);
+    margin-bottom: var(--space-5);
+}
+
+.reflection-intro p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+}
+
+/* Energy Selector Visual */
+.energy-selector-visual {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.energy-option-visual {
+    flex: 1;
+    min-width: 70px;
+    cursor: pointer;
+}
+
+.energy-option-visual input {
+    position: absolute;
+    opacity: 0;
+}
+
+.energy-option-visual .energy-face {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: all 0.2s;
+    background: var(--color-bg);
+}
+
+.energy-option-visual .energy-face svg {
+    width: 32px;
+    height: 32px;
+    color: var(--color-text-secondary);
+    transition: all 0.2s;
+}
+
+.energy-option-visual .energy-label {
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    margin-top: var(--space-1);
+    color: var(--color-text-secondary);
+}
+
+.energy-option-visual input:checked + .energy-face {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+.energy-option-visual input:checked + .energy-face svg {
+    color: var(--color-primary);
+}
+
+.energy-option-visual:nth-child(1) input:checked + .energy-face { border-color: #ef4444; background: #fef2f2; }
+.energy-option-visual:nth-child(1) input:checked + .energy-face svg { color: #ef4444; }
+.energy-option-visual:nth-child(2) input:checked + .energy-face { border-color: #f59e0b; background: #fffbeb; }
+.energy-option-visual:nth-child(2) input:checked + .energy-face svg { color: #f59e0b; }
+.energy-option-visual:nth-child(4) input:checked + .energy-face { border-color: #22c55e; background: #f0fdf4; }
+.energy-option-visual:nth-child(4) input:checked + .energy-face svg { color: #22c55e; }
+.energy-option-visual:nth-child(5) input:checked + .energy-face { border-color: #10b981; background: #ecfdf5; }
+.energy-option-visual:nth-child(5) input:checked + .energy-face svg { color: #10b981; }
+
+/* Momentum Selector Visual */
+.momentum-selector-visual {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+}
+
+.momentum-option-visual {
+    cursor: pointer;
+    padding: var(--space-4);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    transition: all 0.2s;
+    background: var(--color-bg);
+}
+
+.momentum-option-visual input {
+    position: absolute;
+    opacity: 0;
+}
+
+.momentum-option-visual .momentum-icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: var(--space-2);
+}
+
+.momentum-option-visual .momentum-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+}
+
+.momentum-option-visual .momentum-desc {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+}
+
+.momentum-option-visual:has(input:checked) {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+.momentum-option-visual.losing:has(input:checked) {
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.momentum-option-visual.gaining:has(input:checked) {
+    border-color: #22c55e;
+    background: #f0fdf4;
+}
+
+/* Label icons */
+.label-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    margin-right: var(--space-2);
+    font-weight: 700;
+}
+
+.label-icon.wins {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.label-icon.challenges {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.label-icon.goals {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+/* Guided prompts */
+.guided-prompts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.prompt-chip {
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.prompt-chip:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+@media (max-width: 640px) {
+    .momentum-selector-visual {
+        grid-template-columns: 1fr;
+    }
+
+    .energy-option-visual {
+        min-width: 55px;
+    }
+}
+</style>
+
+<script>
+function appendPrompt(fieldId, text) {
+    var field = document.getElementById(fieldId);
+    if (field.value && !field.value.endsWith(' ') && !field.value.endsWith('\n')) {
+        field.value += '\n';
+    }
+    field.value += text;
+    field.focus();
+    // Place cursor at end
+    field.setSelectionRange(field.value.length, field.value.length);
+}
+</script>
 {% endblock %}

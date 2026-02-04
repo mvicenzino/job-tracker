@@ -1,11 +1,95 @@
 """Dashboard routes: dashboard, pipeline."""
+from datetime import date, timedelta
 from flask import Blueprint, render_template, request, jsonify, current_app
 from flask_login import login_required, current_user
+from sqlalchemy import desc
 
 from ..helpers import get_service
-from ...models import ApplicationStatus, User
+from ...models import ApplicationStatus, User, WeeklyReflection
 
 bp = Blueprint('dashboard', __name__)
+
+
+def _monday_of_week(d=None):
+    """Get the Monday of the current week."""
+    if d is None:
+        d = date.today()
+    return d - timedelta(days=d.weekday())
+
+
+def _get_reflection_data(session):
+    """Get reflection data for dashboard widget."""
+    try:
+        this_monday = _monday_of_week()
+
+        # Get recent reflections (last 8 weeks)
+        reflections = session.query(WeeklyReflection).filter_by(
+            user_id=current_user.id
+        ).order_by(desc(WeeklyReflection.week_of)).limit(8).all()
+
+        # Check if current week has a reflection
+        current_week = next((r for r in reflections if r.week_of == this_monday), None)
+        has_current_week = current_week is not None
+
+        # Calculate streak (consecutive weeks with reflections)
+        streak = 0
+        check_date = this_monday
+        for r in reflections:
+            if r.week_of == check_date:
+                streak += 1
+                check_date -= timedelta(days=7)
+            elif r.week_of < check_date:
+                break
+
+        # If no reflection this week yet, check if last week continues streak
+        if not has_current_week and reflections:
+            last_monday = this_monday - timedelta(days=7)
+            streak = 0
+            check_date = last_monday
+            for r in reflections:
+                if r.week_of == check_date:
+                    streak += 1
+                    check_date -= timedelta(days=7)
+                elif r.week_of < check_date:
+                    break
+
+        # Get mood trend (energy levels over last 4 weeks)
+        mood_trend = []
+        for r in reflections[:4]:
+            mood_trend.append({
+                'week': r.week_of.strftime('%b %d'),
+                'energy': r.energy_level or 3,
+                'momentum': r.momentum or 'steady'
+            })
+        mood_trend.reverse()  # Oldest first
+
+        # Calculate average energy
+        energies = [r.energy_level for r in reflections if r.energy_level]
+        avg_energy = sum(energies) / len(energies) if energies else 0
+
+        # Get last reflection for context
+        last_reflection = reflections[0] if reflections else None
+
+        return {
+            'has_current_week': has_current_week,
+            'current_week': current_week,
+            'streak': streak,
+            'mood_trend': mood_trend,
+            'avg_energy': round(avg_energy, 1),
+            'total_reflections': len(reflections),
+            'last_reflection': last_reflection
+        }
+    except Exception as e:
+        print(f"Error getting reflection data: {e}")
+        return {
+            'has_current_week': False,
+            'current_week': None,
+            'streak': 0,
+            'mood_trend': [],
+            'avg_energy': 0,
+            'total_reflections': 0,
+            'last_reflection': None
+        }
 
 
 @bp.route('/dashboard')
@@ -59,10 +143,14 @@ def dashboard():
             except Exception:
                 pass  # Non-critical - don't crash if auto-complete fails
 
+        # Fetch reflection data for dashboard widget
+        reflection_data = _get_reflection_data(session)
+
         return render_template('dashboard.html',
                              dashboard=data,
                              pipeline=pipeline,
                              onboarding=onboarding,
+                             reflection=reflection_data,
                              ApplicationStatus=ApplicationStatus)
     finally:
         session.close()
