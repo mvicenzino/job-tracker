@@ -8,6 +8,8 @@
     --landing-accent-soft: #eef2ff;
     --landing-border: #e5e5e5;
     --landing-card-bg: #ffffff;
+    --landing-orange: #F97316;
+    --landing-orange-hover: #EA580C;
     --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -200,7 +202,7 @@
 }
 
 .btn-primary {
-    background: var(--landing-text);
+    background: var(--landing-orange);
     color: white;
     border: none;
     border-radius: 8px;
@@ -213,7 +215,7 @@
 }
 
 .btn-primary:hover {
-    background: #1a1a1a;
+    background: var(--landing-orange-hover);
     transform: translateY(-1px);
 }
 
