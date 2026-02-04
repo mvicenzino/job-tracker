@@ -118,6 +118,19 @@ class DatabaseConnection:
                             print("[Migration] Added browser_notifications_enabled column")
                         except Exception as e:
                             print(f"[Migration] Failed to add browser_notifications_enabled: {e}")
+
+            # Check if applications table needs resume_version_id column
+            if 'applications' in inspector.get_table_names():
+                app_columns = [col['name'] for col in inspector.get_columns('applications')]
+                if 'resume_version_id' not in app_columns:
+                    with self.engine.connect() as conn:
+                        try:
+                            conn.execute(text('ALTER TABLE applications ADD COLUMN resume_version_id INTEGER'))
+                            conn.commit()
+                            print("[Migration] Added resume_version_id column to applications")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add resume_version_id: {e}")
+
         except Exception as e:
             print(f"[Migration] Migration check failed: {e}")
 
