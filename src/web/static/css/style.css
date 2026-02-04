@@ -96,6 +96,8 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: -0.01em;
+    display: flex;
+    flex-direction: column;
 }
 
 /* === Typography === */
@@ -608,6 +610,7 @@ a:hover {
     max-width: 1400px;
     margin: 0 auto;
     padding: var(--space-8);
+    flex: 1;
 }
 
 /* === Buttons === */
