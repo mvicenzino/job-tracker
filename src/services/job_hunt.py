@@ -6,11 +6,12 @@ from sqlalchemy.orm import Session
 from ..models import (
     Company, Job, Application, ApplicationStatus,
     Contact, ContactType, Event, EventType, Note, Tag,
-    ChecklistItem
+    ChecklistItem, ResumeVersion
 )
 from ..repositories import (
     CompanyRepository, JobRepository, ApplicationRepository,
-    ContactRepository, EventRepository, NoteRepository, TagRepository
+    ContactRepository, EventRepository, NoteRepository, TagRepository,
+    ResumeVersionRepository
 )
 
 
@@ -30,6 +31,7 @@ class JobHuntService:
         self.events = EventRepository(session, user_id=user_id)
         self.notes = NoteRepository(session)
         self.tags = TagRepository(session)
+        self.resume_versions = ResumeVersionRepository(session, user_id=user_id)
 
     # === Company Operations ===
 

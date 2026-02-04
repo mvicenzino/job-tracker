@@ -6,6 +6,7 @@ from .contact import ContactRepository
 from .event import EventRepository
 from .note import NoteRepository
 from .tag import TagRepository
+from .resume_version import ResumeVersionRepository
 
 __all__ = [
     'BaseRepository',
@@ -15,5 +16,6 @@ __all__ = [
     'ContactRepository',
     'EventRepository',
     'NoteRepository',
-    'TagRepository'
+    'TagRepository',
+    'ResumeVersionRepository'
 ]

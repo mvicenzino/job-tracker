@@ -10,6 +10,7 @@ from .tag import Tag, entity_tags
 from .feedback import Feedback
 from .checklist import ChecklistItem
 from .reflection import WeeklyReflection
+from .resume_version import ResumeVersion
 
 __all__ = [
     'Base',
@@ -27,5 +28,6 @@ __all__ = [
     'entity_tags',
     'Feedback',
     'ChecklistItem',
-    'WeeklyReflection'
+    'WeeklyReflection',
+    'ResumeVersion'
 ]

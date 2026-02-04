@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if version else 'New' }} Resume Version - Stride{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <header class="page-header">
+        <div class="header-content">
+            <a href="{{ url_for('resumes.resumes') }}" class="back-link">← Back to Resumes</a>
+            <h1>{{ 'Edit' if version else 'New' }} Resume Version</h1>
+            <p class="subtitle">{{ 'Update this resume version' if version else 'Create a new version of your resume for specific opportunities' }}</p>
+        </div>
+    </header>
+
+    <form method="post" class="form card">
+        <div class="form-group">
+            <label for="name">Version Name *</label>
+            <input type="text" id="name" name="name" required
+                   value="{{ version.name if version else name if name else '' }}"
+                   placeholder="e.g., General, Technical, Leadership, Backend-focused">
+            <span class="form-hint">A short name to identify this version</span>
+        </div>
+
+        <div class="form-group">
+            <label for="content">Resume Content</label>
+            <textarea id="content" name="content" rows="20"
+                      placeholder="Paste your resume text here...">{{ version.content if version else content if content else '' }}</textarea>
+            <span class="form-hint">Paste the full text of this resume version</span>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('resumes.resumes') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">{{ 'Save Changes' if version else 'Create Version' }}</button>
+        </div>
+    </form>
+</div>
+
+<style>
+#content {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 400px;
+}
+</style>
+{% endblock %}

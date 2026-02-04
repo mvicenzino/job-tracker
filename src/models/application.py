@@ -37,7 +37,8 @@ class Application(Base, TimestampMixin):
     date_closed = Column(Date)    # When application process ended
 
     # Application details
-    resume_version = Column(String(100))  # Which resume version you used
+    resume_version = Column(String(100))  # Which resume version you used (text, for backwards compat)
+    resume_version_id = Column(Integer, ForeignKey('resume_versions.id'), nullable=True)  # Link to saved resume
     cover_letter = Column(Text)
     referral_contact_id = Column(Integer, ForeignKey('contacts.id'))
 
@@ -55,6 +56,8 @@ class Application(Base, TimestampMixin):
     user = relationship("User", backref="applications")
     job = relationship("Job", back_populates="applications")
     referral_contact = relationship("Contact", foreign_keys=[referral_contact_id])
+    resume_version_ref = relationship("ResumeVersion", back_populates="applications",
+                                      foreign_keys=[resume_version_id])
     events = relationship("Event", back_populates="application", cascade="all, delete-orphan")
     notes = relationship("Note", back_populates="application", cascade="all, delete-orphan",
                         foreign_keys="Note.application_id")

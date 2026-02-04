@@ -201,6 +201,7 @@ def create_app(db_path: str = None, database_url: str = None):
     from .routes.digest import bp as digest_bp
     from .routes.reflections import bp as reflections_bp
     from .routes.feedback import bp as feedback_bp
+    from .routes.resumes import bp as resumes_bp
 
     app.register_blueprint(public_bp)
     app.register_blueprint(auth_bp)
@@ -216,6 +217,7 @@ def create_app(db_path: str = None, database_url: str = None):
     app.register_blueprint(digest_bp)
     app.register_blueprint(reflections_bp)
     app.register_blueprint(feedback_bp)
+    app.register_blueprint(resumes_bp)
 
     return app
 

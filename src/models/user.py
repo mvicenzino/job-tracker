@@ -29,6 +29,7 @@ class User(Base, TimestampMixin, UserMixin):
     # Relationships
     companies = relationship("Company", back_populates="user", cascade="all, delete-orphan")
     contacts = relationship("Contact", back_populates="user", cascade="all, delete-orphan")
+    resume_versions = relationship("ResumeVersion", back_populates="user", cascade="all, delete-orphan")
 
     def set_password(self, password: str) -> None:
         """Hash and set the user's password."""
