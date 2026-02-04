@@ -81,6 +81,14 @@
     padding: 0.625rem 1.25rem;
 }
 
+.landing-nav-links .btn-primary {
+    color: white;
+}
+
+.landing-nav-links .btn-primary:hover {
+    color: white;
+}
+
 .landing-menu-toggle {
     display: none;
     flex-direction: column;
