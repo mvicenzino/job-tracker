@@ -87,6 +87,15 @@
                         </svg>
                         Settings
                     </a>
+                    <a href="{{ url_for('resumes.resumes') }}" class="{% if request.endpoint and request.endpoint.startswith('resumes.') %}active{% endif %}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                        Resumes
+                    </a>
                     <a href="{{ url_for('feedback.feedback') }}">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -213,7 +222,7 @@
         <div class="nav-user nav-mobile-only-block">
             <span class="user-email">{{ current_user.email }}</span>
             <a href="{{ url_for('settings.settings') }}" class="btn btn-ghost btn-sm">Settings</a>
-            <a href="{{ url_for('settings.settings') }}#resume" class="btn btn-ghost btn-sm">Resume</a>
+            <a href="{{ url_for('resumes.resumes') }}" class="btn btn-ghost btn-sm">Resumes</a>
             <a href="{{ url_for('feedback.feedback') }}" class="btn btn-ghost btn-sm">Feedback</a>
             <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-sm">Logout</a>
         </div>
