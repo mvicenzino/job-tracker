@@ -891,7 +891,7 @@ a:hover {
 .stat-card.highlight {
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
     color: white;
-    border: none;
+    border: 1px solid transparent;
 }
 
 .stat-card.highlight::before {
