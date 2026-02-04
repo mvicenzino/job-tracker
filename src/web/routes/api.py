@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 
 from ..helpers import get_service, get_service_for_user, get_user_by_api_key
 from ...models import ApplicationStatus, ContactType
-from ...services.ai_parser import is_ai_parsing_available, parse_job_description
+from ...services.ai_parser import is_ai_parsing_available, parse_job_description, analyze_resume_job_fit
 
 bp = Blueprint('api', __name__)
 
@@ -309,6 +309,75 @@ def api_parse_job_description():
         return jsonify({'success': True, 'data': parsed})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/analyze-resume-fit', methods=['POST'])
+@login_required
+def api_analyze_resume_fit():
+    """API: Analyze how well a resume matches a job description."""
+    if not is_ai_parsing_available():
+        return jsonify({'success': False, 'error': 'AI analysis is not available. Please set ANTHROPIC_API_KEY.'}), 503
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Request body required'}), 400
+
+    service, session = get_service()
+    try:
+        # Get job info
+        job_id = data.get('job_id')
+        app_id = data.get('application_id')
+
+        job = None
+        if app_id:
+            app = service.applications.get_by_id(app_id)
+            if app:
+                job = app.job
+        elif job_id:
+            job = service.jobs.get_by_id(job_id)
+
+        if not job:
+            return jsonify({'success': False, 'error': 'Job not found'}), 404
+
+        # Get job description
+        job_description = job.description or ''
+        if job.requirements:
+            job_description += '\n\nRequirements:\n' + job.requirements
+
+        if len(job_description.strip()) < 50:
+            return jsonify({'success': False, 'error': 'Job description is too short for analysis. Please add more details to the job posting.'}), 400
+
+        # Get resume content
+        resume_text = None
+        resume_version_id = data.get('resume_version_id')
+
+        if resume_version_id:
+            resume_version = service.resume_versions.get_by_id(resume_version_id)
+            if resume_version:
+                resume_text = resume_version.content
+        else:
+            # Try to get most recent resume version
+            versions = service.resume_versions.get_all(limit=1)
+            if versions:
+                resume_text = versions[0].content
+
+        if not resume_text or len(resume_text.strip()) < 100:
+            return jsonify({'success': False, 'error': 'No resume found or resume content is too short. Please add a resume version first.'}), 400
+
+        # Run AI analysis
+        result = analyze_resume_job_fit(
+            resume_text=resume_text,
+            job_description=job_description,
+            job_title=job.title,
+            company_name=job.company.name if job.company else None
+        )
+
+        return jsonify({'success': True, 'analysis': result})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        session.close()
 
 
 @bp.route('/api/followups/due')

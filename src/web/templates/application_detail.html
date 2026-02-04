@@ -170,6 +170,54 @@
             </div>
         </section>
 
+        <!-- Resume Fit Analysis -->
+        {% if ai_parsing_enabled %}
+        <section class="card resume-fit-card">
+            <div class="card-header">
+                <h2>Resume Fit Analysis</h2>
+                <span class="badge badge-info">AI-Powered</span>
+            </div>
+            <div class="card-body">
+                <div id="resumeFitPrompt" class="resume-fit-prompt">
+                    <p>See how well your resume matches this job's requirements and get suggestions to improve your fit.</p>
+                    <div class="resume-fit-controls">
+                        <select id="resumeVersionSelect" class="resume-version-select">
+                            {% for version in resume_versions %}
+                            <option value="{{ version.id }}">{{ version.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="button" class="btn btn-primary" onclick="analyzeResumeFit()">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            Analyze Fit
+                        </button>
+                    </div>
+                    {% if not resume_versions %}
+                    <p class="resume-fit-warning">
+                        <a href="{{ url_for('resumes.new_resume') }}">Add a resume</a> first to use this feature.
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div id="resumeFitLoading" class="resume-fit-loading" style="display:none;">
+                    <div class="loading-spinner"></div>
+                    <p>Analyzing your resume against this job...</p>
+                </div>
+
+                <div id="resumeFitResults" class="resume-fit-results" style="display:none;">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+
+                <div id="resumeFitError" class="resume-fit-error" style="display:none;">
+                    <p id="resumeFitErrorMessage"></p>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="resetResumeFit()">Try Again</button>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
         <!-- Company Info -->
         <section class="card">
             <div class="card-header">
@@ -358,4 +406,343 @@
         </section>
     </div>
 </div>
+
+{% if ai_parsing_enabled %}
+<style>
+.resume-fit-card .badge {
+    font-size: 0.7rem;
+}
+
+.resume-fit-prompt p {
+    margin: 0 0 var(--space-4);
+    color: var(--color-text-secondary);
+}
+
+.resume-fit-controls {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.resume-version-select {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    min-width: 150px;
+}
+
+.resume-fit-warning {
+    margin-top: var(--space-3);
+    font-size: 0.875rem;
+    color: var(--color-warning);
+}
+
+.resume-fit-loading {
+    text-align: center;
+    padding: var(--space-6);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto var(--space-3);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.resume-fit-loading p {
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.resume-fit-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius);
+    padding: var(--space-4);
+    text-align: center;
+}
+
+.resume-fit-error p {
+    color: #dc2626;
+    margin: 0 0 var(--space-3);
+}
+
+/* Results Styles */
+.resume-fit-results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.fit-score-section {
+    text-align: center;
+    padding: var(--space-4);
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-lg);
+}
+
+.fit-score {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: var(--space-2);
+}
+
+.fit-score.high { color: #16a34a; }
+.fit-score.medium { color: #2563eb; }
+.fit-score.low { color: #f59e0b; }
+.fit-score.poor { color: #dc2626; }
+
+.fit-score-label {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+}
+
+.fit-summary {
+    font-size: 0.9375rem;
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+.fit-section {
+    border-top: 1px solid var(--color-border-light);
+    padding-top: var(--space-4);
+}
+
+.fit-section h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.fit-section h4 .icon {
+    font-size: 1rem;
+}
+
+.fit-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.fit-pill {
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.fit-pill.match {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.fit-pill.gap {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.fit-pill.keyword {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.suggestions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.suggestion-item {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+}
+
+.suggestion-priority {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.suggestion-priority.high {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.suggestion-priority.medium {
+    background: #fffbeb;
+    color: #d97706;
+}
+
+.suggestion-priority.low {
+    background: #f0fdf4;
+    color: #16a34a;
+}
+
+.suggestion-text {
+    flex: 1;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.fit-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border-light);
+}
+</style>
+
+<script>
+var applicationId = {{ details.application.id }};
+
+function analyzeResumeFit() {
+    var select = document.getElementById('resumeVersionSelect');
+    var resumeVersionId = select ? select.value : null;
+
+    if (!resumeVersionId) {
+        alert('Please select a resume version');
+        return;
+    }
+
+    // Show loading state
+    document.getElementById('resumeFitPrompt').style.display = 'none';
+    document.getElementById('resumeFitLoading').style.display = 'block';
+    document.getElementById('resumeFitResults').style.display = 'none';
+    document.getElementById('resumeFitError').style.display = 'none';
+
+    fetch('/api/analyze-resume-fit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            application_id: applicationId,
+            resume_version_id: resumeVersionId
+        })
+    })
+    .then(function(resp) { return resp.json(); })
+    .then(function(data) {
+        document.getElementById('resumeFitLoading').style.display = 'none';
+
+        if (data.success) {
+            renderResults(data.analysis);
+            document.getElementById('resumeFitResults').style.display = 'flex';
+        } else {
+            document.getElementById('resumeFitErrorMessage').textContent = data.error || 'Analysis failed';
+            document.getElementById('resumeFitError').style.display = 'block';
+        }
+    })
+    .catch(function(err) {
+        document.getElementById('resumeFitLoading').style.display = 'none';
+        document.getElementById('resumeFitErrorMessage').textContent = 'Network error: ' + err.message;
+        document.getElementById('resumeFitError').style.display = 'block';
+    });
+}
+
+function resetResumeFit() {
+    document.getElementById('resumeFitPrompt').style.display = 'block';
+    document.getElementById('resumeFitLoading').style.display = 'none';
+    document.getElementById('resumeFitResults').style.display = 'none';
+    document.getElementById('resumeFitError').style.display = 'none';
+}
+
+function renderResults(analysis) {
+    var score = analysis.match_score || 0;
+    var scoreClass = score >= 80 ? 'high' : score >= 60 ? 'medium' : score >= 40 ? 'low' : 'poor';
+    var scoreLabel = score >= 80 ? 'Strong Match' : score >= 60 ? 'Good Fit' : score >= 40 ? 'Some Gaps' : 'Needs Work';
+
+    var html = '<div class="fit-score-section">' +
+        '<div class="fit-score ' + scoreClass + '">' + score + '%</div>' +
+        '<div class="fit-score-label">' + scoreLabel + '</div>' +
+        '<p class="fit-summary">' + (analysis.summary || '') + '</p>' +
+    '</div>';
+
+    // Matching Skills
+    if (analysis.matching_skills && analysis.matching_skills.length) {
+        html += '<div class="fit-section">' +
+            '<h4><span class="icon">✓</span> Matching Skills</h4>' +
+            '<div class="fit-pills">';
+        analysis.matching_skills.forEach(function(skill) {
+            html += '<span class="fit-pill match">' + escapeHtml(skill) + '</span>';
+        });
+        html += '</div></div>';
+    }
+
+    // Missing Skills
+    if (analysis.missing_skills && analysis.missing_skills.length) {
+        html += '<div class="fit-section">' +
+            '<h4><span class="icon">!</span> Gaps to Address</h4>' +
+            '<div class="fit-pills">';
+        analysis.missing_skills.forEach(function(skill) {
+            html += '<span class="fit-pill gap">' + escapeHtml(skill) + '</span>';
+        });
+        html += '</div></div>';
+    }
+
+    // Keywords to Add
+    if (analysis.keywords_to_add && analysis.keywords_to_add.length) {
+        html += '<div class="fit-section">' +
+            '<h4><span class="icon">+</span> Keywords to Consider</h4>' +
+            '<div class="fit-pills">';
+        analysis.keywords_to_add.forEach(function(kw) {
+            html += '<span class="fit-pill keyword">' + escapeHtml(kw) + '</span>';
+        });
+        html += '</div></div>';
+    }
+
+    // Suggestions
+    if (analysis.suggestions && analysis.suggestions.length) {
+        html += '<div class="fit-section">' +
+            '<h4><span class="icon">→</span> Suggestions</h4>' +
+            '<ul class="suggestions-list">';
+        analysis.suggestions.forEach(function(s, i) {
+            var priority = s.priority || 'medium';
+            var priorityNum = priority === 'high' ? '!' : priority === 'medium' ? '•' : '○';
+            html += '<li class="suggestion-item">' +
+                '<span class="suggestion-priority ' + priority + '">' + priorityNum + '</span>' +
+                '<span class="suggestion-text">' + escapeHtml(s.suggestion) + '</span>' +
+            '</li>';
+        });
+        html += '</ul></div>';
+    }
+
+    // Actions
+    html += '<div class="fit-actions">' +
+        '<button type="button" class="btn btn-secondary" onclick="resetResumeFit()">Analyze Different Resume</button>' +
+        '<a href="{{ url_for('resumes.resumes') }}" class="btn btn-primary">Edit Resumes</a>' +
+    '</div>';
+
+    document.getElementById('resumeFitResults').innerHTML = html;
+}
+
+function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+{% endif %}
 {% endblock %}

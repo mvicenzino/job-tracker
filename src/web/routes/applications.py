@@ -118,8 +118,13 @@ def application_detail(app_id):
         if not details:
             flash('Application not found', 'error')
             return redirect(url_for('applications.applications'))
+
+        # Get resume versions for AI analysis feature
+        resume_versions = service.resume_versions.get_all() if hasattr(service, 'resume_versions') else []
+
         return render_template('application_detail.html',
                              details=details,
+                             resume_versions=resume_versions,
                              ApplicationStatus=ApplicationStatus,
                              EventType=EventType)
     finally:
