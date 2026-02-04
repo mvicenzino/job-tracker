@@ -853,6 +853,7 @@ a:hover {
     text-decoration: none;
     color: inherit;
     display: block;
+    height: 100%;
 }
 
 .stat-card {
@@ -868,6 +869,7 @@ a:hover {
     position: relative;
     overflow: hidden;
     cursor: pointer;
+    height: 100%;
 }
 
 .stat-card::before {
