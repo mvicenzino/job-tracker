@@ -1,10 +1,40 @@
 """Resume version management routes."""
+import io
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 
 from ..helpers import get_service
 
 bp = Blueprint('resumes', __name__)
+
+
+def extract_text_from_pdf(file_stream):
+    """Extract text from a PDF file."""
+    try:
+        from PyPDF2 import PdfReader
+        reader = PdfReader(file_stream)
+        text_parts = []
+        for page in reader.pages:
+            text = page.extract_text()
+            if text:
+                text_parts.append(text)
+        return '\n\n'.join(text_parts)
+    except Exception as e:
+        raise ValueError(f"Could not read PDF: {str(e)}")
+
+
+def extract_text_from_docx(file_stream):
+    """Extract text from a Word document."""
+    try:
+        from docx import Document
+        doc = Document(file_stream)
+        text_parts = []
+        for para in doc.paragraphs:
+            if para.text.strip():
+                text_parts.append(para.text)
+        return '\n\n'.join(text_parts)
+    except Exception as e:
+        raise ValueError(f"Could not read Word document: {str(e)}")
 
 
 @bp.route('/resumes')
@@ -34,10 +64,41 @@ def new_resume():
         try:
             name = request.form.get('name', '').strip()
             content = request.form.get('content', '').strip()
+            filename = None
+
+            # Handle file upload
+            uploaded_file = request.files.get('file')
+            if uploaded_file and uploaded_file.filename:
+                filename = uploaded_file.filename
+                file_ext = filename.lower().split('.')[-1] if '.' in filename else ''
+
+                try:
+                    file_stream = io.BytesIO(uploaded_file.read())
+                    if file_ext == 'pdf':
+                        extracted = extract_text_from_pdf(file_stream)
+                    elif file_ext in ('docx', 'doc'):
+                        extracted = extract_text_from_docx(file_stream)
+                    else:
+                        flash('Unsupported file type. Please upload a PDF or Word document.', 'error')
+                        return render_template('resume_form.html', name=name, content=content)
+
+                    # Use extracted text if no content was pasted
+                    if not content and extracted:
+                        content = extracted
+                    elif extracted:
+                        # File was uploaded but content also provided - use content
+                        pass
+                except ValueError as e:
+                    flash(str(e), 'error')
+                    return render_template('resume_form.html', name=name, content=content)
 
             if not name:
                 flash('Please provide a name for this resume version.', 'error')
-                return render_template('resume_form.html')
+                return render_template('resume_form.html', content=content)
+
+            if not content:
+                flash('Please upload a file or paste your resume content.', 'error')
+                return render_template('resume_form.html', name=name)
 
             # Check if name already exists
             existing = service.resume_versions.get_by_name(name)
@@ -45,7 +106,7 @@ def new_resume():
                 flash(f'A resume version named "{name}" already exists.', 'error')
                 return render_template('resume_form.html', name=name, content=content)
 
-            version = service.resume_versions.create(name=name, content=content)
+            version = service.resume_versions.create(name=name, content=content, filename=filename)
             session.commit()
             flash(f'Resume version "{name}" created!', 'success')
             return redirect(url_for('resumes.resumes'))
@@ -69,6 +130,30 @@ def edit_resume(version_id):
         if request.method == 'POST':
             name = request.form.get('name', '').strip()
             content = request.form.get('content', '').strip()
+            filename = version.filename  # Keep existing filename by default
+
+            # Handle file upload
+            uploaded_file = request.files.get('file')
+            if uploaded_file and uploaded_file.filename:
+                filename = uploaded_file.filename
+                file_ext = filename.lower().split('.')[-1] if '.' in filename else ''
+
+                try:
+                    file_stream = io.BytesIO(uploaded_file.read())
+                    if file_ext == 'pdf':
+                        extracted = extract_text_from_pdf(file_stream)
+                    elif file_ext in ('docx', 'doc'):
+                        extracted = extract_text_from_docx(file_stream)
+                    else:
+                        flash('Unsupported file type. Please upload a PDF or Word document.', 'error')
+                        return render_template('resume_form.html', version=version)
+
+                    # Replace content with extracted text
+                    if extracted:
+                        content = extracted
+                except ValueError as e:
+                    flash(str(e), 'error')
+                    return render_template('resume_form.html', version=version)
 
             if not name:
                 flash('Please provide a name for this resume version.', 'error')
@@ -80,7 +165,7 @@ def edit_resume(version_id):
                 flash(f'A resume version named "{name}" already exists.', 'error')
                 return render_template('resume_form.html', version=version)
 
-            service.resume_versions.update(version_id, name=name, content=content)
+            service.resume_versions.update(version_id, name=name, content=content, filename=filename)
             session.commit()
             flash(f'Resume version "{name}" updated!', 'success')
             return redirect(url_for('resumes.resumes'))
