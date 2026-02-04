@@ -119,8 +119,19 @@
 
             <div class="form-group">
                 <label for="resume_version">Resume Version</label>
-                <input type="text" id="resume_version" name="resume_version" placeholder="e.g., v2-technical, backend-2024">
-                <span class="form-hint">Track which resume version you use for this application</span>
+                <input type="text" id="resume_version" name="resume_version" list="resume_versions_list" placeholder="e.g., v2-technical, backend-2024">
+                <datalist id="resume_versions_list">
+                    {% for version in resume_versions %}
+                    <option value="{{ version }}">
+                    {% endfor %}
+                    {% if not resume_versions %}
+                    <option value="General">
+                    <option value="Technical">
+                    <option value="Leadership">
+                    <option value="Tailored">
+                    {% endif %}
+                </datalist>
+                <span class="form-hint">Track which resume version you use — select previous or type new</span>
             </div>
         </div>
 

@@ -30,6 +30,11 @@
                     {% elif app.created_at %}
                     <div class="card-date">Added {{ app.created_at.strftime('%b %d') }}</div>
                     {% endif %}
+                    {% if app.resume_version %}
+                    <div class="card-resume-version">
+                        <span class="resume-badge">{{ app.resume_version }}</span>
+                    </div>
+                    {% endif %}
                     {% if app.excitement_level %}
                     <div class="card-excitement">
                         {% for i in range(app.excitement_level) %}⭐{% endfor %}

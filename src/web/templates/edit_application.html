@@ -29,7 +29,19 @@
             <label for="resume_version">Resume Version Used</label>
             <input type="text" id="resume_version" name="resume_version"
                    value="{{ app.resume_version or '' }}"
+                   list="resume_versions_list"
                    placeholder="e.g., v2-technical, general-2024">
+            <datalist id="resume_versions_list">
+                {% for version in resume_versions %}
+                <option value="{{ version }}">
+                {% endfor %}
+                {% if not resume_versions %}
+                <option value="General">
+                <option value="Technical">
+                <option value="Leadership">
+                <option value="Tailored">
+                {% endif %}
+            </datalist>
         </div>
 
         <div class="form-group">

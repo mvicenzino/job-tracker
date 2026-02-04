@@ -157,3 +157,15 @@ class ApplicationRepository(BaseRepository[Application]):
             query = query.filter(Application.status == status)
 
         return query.order_by(desc(Application.updated_at)).all()
+
+    def get_resume_versions(self) -> List[str]:
+        """Get all distinct resume versions used by this user."""
+        from sqlalchemy import distinct
+        query = self.session.query(distinct(Application.resume_version)).filter(
+            Application.resume_version.isnot(None),
+            Application.resume_version != ''
+        )
+        if self.user_id is not None:
+            query = query.filter(Application.user_id == self.user_id)
+        results = query.order_by(Application.resume_version).all()
+        return [r[0] for r in results if r[0]]

@@ -1786,6 +1786,22 @@ a:hover {
     letter-spacing: 1px;
 }
 
+.pipeline-card .card-resume-version {
+    margin-top: var(--space-2);
+}
+
+.resume-badge {
+    display: inline-block;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
 .pipeline-card .card-actions {
     display: flex;
     gap: var(--space-2);

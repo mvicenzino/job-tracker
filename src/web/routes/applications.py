@@ -99,7 +99,13 @@ def new_application():
         'referral_contact_id': request.args.get('referral_contact_id', ''),
         'referral_name': request.args.get('referral_name', ''),
     }
-    return render_template('application_form.html', prefill=prefill)
+    # Get previously used resume versions for autocomplete
+    service, session = get_service()
+    try:
+        resume_versions = service.applications.get_resume_versions()
+    finally:
+        session.close()
+    return render_template('application_form.html', prefill=prefill, resume_versions=resume_versions)
 
 
 @bp.route('/applications/<int:app_id>')
@@ -162,9 +168,11 @@ def edit_application(app_id):
             flash('Application updated!', 'success')
             return redirect(url_for('applications.application_detail', app_id=app_id))
 
+        resume_versions = service.applications.get_resume_versions()
         return render_template('edit_application.html',
                              app=app_obj,
-                             ApplicationStatus=ApplicationStatus)
+                             ApplicationStatus=ApplicationStatus,
+                             resume_versions=resume_versions)
     finally:
         session.close()
 
