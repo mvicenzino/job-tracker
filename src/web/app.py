@@ -186,6 +186,24 @@ def create_app(db_path: str = None, database_url: str = None):
         }
         return icons.get(event_type, '📌')
 
+    @app.context_processor
+    def inject_notification_count():
+        """Inject unread notification count for nav badge."""
+        from flask_login import current_user
+        try:
+            if current_user.is_authenticated:
+                from ..repositories.notification import NotificationRepository
+                session = db.get_session()
+                try:
+                    notif_repo = NotificationRepository(session)
+                    unread = notif_repo.get_unread_count(current_user.id)
+                    return {'unread_notifications_count': unread}
+                finally:
+                    session.close()
+        except Exception:
+            pass  # Fail silently - badge is non-critical
+        return {'unread_notifications_count': 0}
+
     # Register blueprints
     from .routes.public import bp as public_bp
     from .routes.auth import bp as auth_bp
@@ -202,6 +220,7 @@ def create_app(db_path: str = None, database_url: str = None):
     from .routes.reflections import bp as reflections_bp
     from .routes.feedback import bp as feedback_bp
     from .routes.resumes import bp as resumes_bp
+    from .routes.notifications import bp as notifications_bp
 
     app.register_blueprint(public_bp)
     app.register_blueprint(auth_bp)
@@ -218,6 +237,7 @@ def create_app(db_path: str = None, database_url: str = None):
     app.register_blueprint(reflections_bp)
     app.register_blueprint(feedback_bp)
     app.register_blueprint(resumes_bp)
+    app.register_blueprint(notifications_bp)
 
     return app
 

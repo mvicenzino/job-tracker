@@ -430,6 +430,47 @@ a:hover {
     padding-right: var(--space-4);
 }
 
+/* Notification Bell */
+.nav-notification-bell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.nav-notification-bell:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.nav-notification-bell.active {
+    color: var(--accent-color);
+}
+
+.notification-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: var(--danger-color, #ef4444);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
 /* Profile dropdown */
 .nav-profile {
     position: relative;

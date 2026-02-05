@@ -319,6 +319,23 @@ def api_create_job():
             source=data.get('source', 'LinkedIn'),
             is_flagged=data.get('is_flagged', False)
         )
+        
+        # Create notification for the new job
+        try:
+            from ...repositories.notification import NotificationRepository
+            notif_repo = NotificationRepository(session)
+            notif_repo.create(
+                user_id=user.id,
+                notification_type='job_added',
+                title=f"New job added: {job.title}",
+                message=f"{job.company.name} • {data.get('location', 'Location TBD')}",
+                link_url=f"/jobs",
+                job_id=job.id
+            )
+        except Exception as notif_error:
+            # Don't fail the job creation if notification fails
+            print(f"Failed to create notification: {notif_error}")
+        
         response = jsonify({
             'success': True,
             'job': {

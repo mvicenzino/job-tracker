@@ -11,6 +11,7 @@ from .feedback import Feedback
 from .checklist import ChecklistItem
 from .reflection import WeeklyReflection
 from .resume_version import ResumeVersion
+from .notification import Notification
 
 __all__ = [
     'Base',
@@ -29,5 +30,6 @@ __all__ = [
     'Feedback',
     'ChecklistItem',
     'WeeklyReflection',
-    'ResumeVersion'
+    'ResumeVersion',
+    'Notification'
 ]
