@@ -9,6 +9,21 @@ from ...services.ai_parser import is_ai_parsing_available, parse_job_description
 bp = Blueprint('api', __name__)
 
 
+@bp.route('/api/debug/ai-status')
+def api_debug_ai_status():
+    """Debug endpoint to check AI configuration."""
+    import os
+    from flask import current_app
+    api_key = os.environ.get('ANTHROPIC_API_KEY', '')
+    return jsonify({
+        'ai_parsing_available': is_ai_parsing_available(),
+        'config_ai_enabled': current_app.config.get('AI_PARSING_ENABLED', False),
+        'env_var_set': bool(api_key),
+        'env_var_length': len(api_key) if api_key else 0,
+        'env_var_prefix': api_key[:10] + '...' if len(api_key) > 10 else 'not set'
+    })
+
+
 @bp.route('/api/applications/<int:app_id>/status', methods=['PATCH'])
 @login_required
 def api_update_status(app_id):
