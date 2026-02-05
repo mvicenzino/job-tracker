@@ -6,8 +6,22 @@
 <div class="pipeline-page">
     <header class="page-header">
         <h1>Application Pipeline</h1>
-        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Lead</a>
+        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary btn-desktop-only">+ Add Lead</a>
     </header>
+
+    <!-- Mobile Status Tabs -->
+    <div class="mobile-pipeline-tabs" id="pipelineTabs">
+        {% set active_statuses = ['interested', 'preparing', 'applied', 'screening', 'interviewing', 'final_round', 'offer', 'negotiating'] %}
+        {% for status in active_statuses %}
+        <button type="button" 
+                class="pipeline-tab {% if loop.first %}active{% endif %}" 
+                data-status="{{ status }}"
+                style="--tab-color: {{ status|status_color }}">
+            <span class="tab-count">{{ pipeline.get(status, [])|length }}</span>
+            <span class="tab-name">{{ status|replace('_', ' ')|title }}</span>
+        </button>
+        {% endfor %}
+    </div>
 
     <div class="pipeline-board">
         {% set active_statuses = ['interested', 'preparing', 'applied', 'screening', 'interviewing', 'final_round', 'offer', 'negotiating'] %}
@@ -99,4 +113,47 @@
     </section>
     {% endif %}
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    var tabs = document.querySelectorAll('.pipeline-tab');
+    var columns = document.querySelectorAll('.pipeline-column');
+    
+    function switchTab(status) {
+        // Update active tab
+        tabs.forEach(function(tab) {
+            if (tab.dataset.status === status) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+        
+        // Update visible column (mobile only - CSS handles showing/hiding)
+        columns.forEach(function(col) {
+            if (col.dataset.status === status) {
+                col.classList.add('mobile-visible');
+            } else {
+                col.classList.remove('mobile-visible');
+            }
+        });
+    }
+    
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            switchTab(this.dataset.status);
+            // Scroll tab into view
+            this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        });
+    });
+    
+    // Initialize first column as visible on mobile
+    if (columns.length > 0) {
+        columns[0].classList.add('mobile-visible');
+    }
+})();
+</script>
 {% endblock %}
