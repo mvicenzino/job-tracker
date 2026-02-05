@@ -41,34 +41,82 @@ def api_update_application(app_id):
         session.close()
 
 
-@bp.route('/api/jobs/<int:job_id>', methods=['PATCH'])
-@login_required
+@bp.route('/api/jobs/<int:job_id>', methods=['PATCH', 'OPTIONS'])
 def api_update_job(job_id):
     """API: Update job fields."""
-    service, session = get_service()
+    # Handle CORS preflight
+    if request.method == 'OPTIONS':
+        response = jsonify({'status': 'ok'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'PATCH, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
+        return response
+
+    # Check for API key authentication
+    api_key = request.headers.get('X-API-Key')
+    user = get_user_by_api_key(api_key) if api_key else None
+
+    # Fall back to session auth
+    if not user and current_user.is_authenticated:
+        user = current_user
+
+    if not user:
+        response = jsonify({'success': False, 'error': 'Authentication required'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 401
+
+    service, session = get_service_for_user(user.id)
     try:
         data = request.get_json()
         job = service.jobs.update(job_id, **data)
         session.commit()
         if job:
-            return jsonify({'success': True})
-        return jsonify({'success': False, 'error': 'Not found'}), 404
+            response = jsonify({'success': True})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
+        response = jsonify({'success': False, 'error': 'Not found'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 404
     finally:
         session.close()
 
 
-@bp.route('/api/companies/<int:company_id>', methods=['PATCH'])
-@login_required
+@bp.route('/api/companies/<int:company_id>', methods=['PATCH', 'OPTIONS'])
 def api_update_company(company_id):
     """API: Update company fields."""
-    service, session = get_service()
+    # Handle CORS preflight
+    if request.method == 'OPTIONS':
+        response = jsonify({'status': 'ok'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'PATCH, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
+        return response
+
+    # Check for API key authentication
+    api_key = request.headers.get('X-API-Key')
+    user = get_user_by_api_key(api_key) if api_key else None
+
+    # Fall back to session auth
+    if not user and current_user.is_authenticated:
+        user = current_user
+
+    if not user:
+        response = jsonify({'success': False, 'error': 'Authentication required'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 401
+
+    service, session = get_service_for_user(user.id)
     try:
         data = request.get_json()
         company = service.companies.update(company_id, **data)
         session.commit()
         if company:
-            return jsonify({'success': True})
-        return jsonify({'success': False, 'error': 'Not found'}), 404
+            response = jsonify({'success': True})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
+        response = jsonify({'success': False, 'error': 'Not found'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 404
     finally:
         session.close()
 
