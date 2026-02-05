@@ -973,7 +973,7 @@
     }
 
     .landing-menu-toggle {
-        display: flex;
+        display: none;
     }
 
     .hero {
