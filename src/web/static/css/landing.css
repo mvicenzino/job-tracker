@@ -1340,6 +1340,11 @@
     opacity: 0.8;
 }
 
+.mock-logo-img {
+    height: 28px;
+    width: auto;
+}
+
 .mock-nav-items {
     display: flex;
     gap: 1.5rem;
