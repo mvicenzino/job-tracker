@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260205f">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260205g">
     {% block head %}{% endblock %}
 </head>
 <body{% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %} class="demo-active"{% endif %}>
@@ -403,13 +403,25 @@
                 <span class="more-menu-icon">💼</span>
                 <span>Jobs</span>
             </a>
+            <a href="{{ url_for('resumes.resumes') }}" class="more-menu-item">
+                <span class="more-menu-icon">📋</span>
+                <span>Resumes</span>
+            </a>
             <a href="{{ url_for('reflections.reflections') }}" class="more-menu-item">
                 <span class="more-menu-icon">📝</span>
                 <span>Reflections</span>
             </a>
+            <a href="{{ url_for('compare.compare_offers') }}" class="more-menu-item">
+                <span class="more-menu-icon">⚖️</span>
+                <span>Compare</span>
+            </a>
             <a href="{{ url_for('settings.settings') }}" class="more-menu-item">
                 <span class="more-menu-icon">⚙️</span>
                 <span>Settings</span>
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="more-menu-item more-menu-logout">
+                <span class="more-menu-icon">🚪</span>
+                <span>Logout</span>
             </a>
         </div>
     </div>
