@@ -5024,14 +5024,50 @@ body.demo-active .navbar {
    MOBILE UX POLISH - Comprehensive Optimization
    =========================================== */
 @media (max-width: 768px) {
-    /* --- Base & Typography --- */
+    /* --- Prevent Zoom/Pinch Issues --- */
     html {
         font-size: 16px;
         -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        touch-action: pan-x pan-y;
+        overflow-x: hidden;
     }
 
     body {
         line-height: 1.5;
+        overflow-x: hidden;
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+    }
+
+    /* Prevent horizontal scroll */
+    .container,
+    main,
+    .pipeline-page,
+    .dashboard {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+
+    /* Lock bottom tab bar position regardless of zoom */
+    .bottom-tab-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        transform: translateZ(0); /* Force GPU layer */
+        -webkit-transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    /* Lock more menu position */
+    .more-menu,
+    .more-menu-overlay {
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
     }
 
     /* --- Page Headers --- */
