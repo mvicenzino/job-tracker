@@ -1483,14 +1483,155 @@
 }
 
 .card-2 {
-    bottom: 15%;
+    bottom: 35%;
     right: -5%;
     animation-delay: 2s;
+}
+
+.card-3 {
+    bottom: 10%;
+    right: 5%;
+    animation-delay: 3.5s;
 }
 
 @keyframes float-card {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-15px); }
+}
+
+/* Greeting text styles */
+.mock-greeting .greeting-text {
+    width: auto;
+    height: auto;
+    background: none;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--landing-text);
+    margin-bottom: 0.25rem;
+}
+
+.mock-greeting .greeting-sub {
+    width: auto;
+    height: auto;
+    background: none;
+    font-size: 0.8125rem;
+    color: #64748b;
+}
+
+/* Mock Job Cards */
+.mock-job-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.mock-job-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.mock-job-card:hover {
+    border-color: #c7d2fe;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+}
+
+.job-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.job-company-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.job-company-logo.stripe {
+    background: linear-gradient(135deg, #635bff 0%, #8b5cf6 100%);
+}
+
+.job-company-logo.notion {
+    background: linear-gradient(135deg, #0a0a0a 0%, #2d2d2d 100%);
+}
+
+.job-company-logo.figma {
+    background: linear-gradient(135deg, #f24e1e 0%, #a259ff 100%);
+}
+
+.job-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.job-card-info .job-title {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--landing-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-card-info .job-company {
+    display: block;
+    font-size: 0.6875rem;
+    color: #64748b;
+}
+
+.ai-match-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.ai-match-badge.high {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #059669;
+}
+
+.ai-match-badge.medium {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #d97706;
+}
+
+.ai-match-badge.low {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #dc2626;
+}
+
+/* Featured Feature Card */
+.feature-card.featured {
+    position: relative;
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    border: 2px solid #c4b5fd;
+}
+
+.feature-badge {
+    position: absolute;
+    top: -10px;
+    right: 16px;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    color: white;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 0.25rem 0.625rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 /* Mobile Responsive */

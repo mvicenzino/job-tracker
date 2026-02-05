@@ -102,8 +102,8 @@
                     </div>
                     <div class="mock-dashboard">
                         <div class="mock-greeting">
-                            <div class="greeting-text"></div>
-                            <div class="greeting-sub"></div>
+                            <div class="greeting-text">Good morning, Sarah</div>
+                            <div class="greeting-sub">You have 2 interviews this week</div>
                         </div>
                         <div class="mock-stats">
                             <div class="mock-stat">
@@ -119,31 +119,56 @@
                                 <span class="stat-label">Offers</span>
                             </div>
                         </div>
-                        <div class="mock-pipeline">
-                            <div class="pipeline-bar">
-                                <div class="bar-segment applied" style="width: 40%"></div>
-                                <div class="bar-segment screening" style="width: 25%"></div>
-                                <div class="bar-segment interview" style="width: 20%"></div>
-                                <div class="bar-segment offer" style="width: 15%"></div>
+                        <div class="mock-job-cards">
+                            <div class="mock-job-card">
+                                <div class="job-card-header">
+                                    <div class="job-company-logo stripe">S</div>
+                                    <div class="job-card-info">
+                                        <span class="job-title">Senior Product Manager</span>
+                                        <span class="job-company">Stripe</span>
+                                    </div>
+                                    <div class="ai-match-badge high">92%</div>
+                                </div>
                             </div>
-                            <div class="pipeline-labels">
-                                <span>Applied</span>
-                                <span>Screening</span>
-                                <span>Interview</span>
-                                <span>Offer</span>
+                            <div class="mock-job-card">
+                                <div class="job-card-header">
+                                    <div class="job-company-logo notion">N</div>
+                                    <div class="job-card-info">
+                                        <span class="job-title">Product Lead</span>
+                                        <span class="job-company">Notion</span>
+                                    </div>
+                                    <div class="ai-match-badge medium">78%</div>
+                                </div>
+                            </div>
+                            <div class="mock-job-card">
+                                <div class="job-card-header">
+                                    <div class="job-company-logo figma">F</div>
+                                    <div class="job-card-info">
+                                        <span class="job-title">Staff Designer</span>
+                                        <span class="job-company">Figma</span>
+                                    </div>
+                                    <div class="ai-match-badge high">88%</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="floating-card card-1">
-                <div class="card-icon">📅</div>
+                <div class="card-icon">🤖</div>
                 <div class="card-text">
-                    <strong>Interview Tomorrow</strong>
-                    <span>Google • 10:00 AM</span>
+                    <strong>Resume Analyzed</strong>
+                    <span>92% match • 2 suggestions</span>
                 </div>
             </div>
             <div class="floating-card card-2">
+                <div class="card-icon">✨</div>
+                <div class="card-text">
+                    <strong>Cover Letter Ready</strong>
+                    <span>AI-tailored for Stripe</span>
+                </div>
+            </div>
+            <div class="floating-card card-3">
                 <div class="card-icon">🎉</div>
                 <div class="card-text">
                     <strong>Offer Received!</strong>
@@ -237,16 +262,17 @@
                     <h3>Progress Dashboard</h3>
                     <p>Get insights into your job search with stats on applications, response rates, and pipeline health.</p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon" style="--icon-color: #ef4444; --icon-bg: #fee2e2;">
+                <div class="feature-card featured">
+                    <div class="feature-badge">AI-Powered</div>
+                    <div class="feature-icon" style="--icon-color: #8b5cf6; --icon-bg: #f3e8ff;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
                         </svg>
                     </div>
-                    <h3>Smart Reminders</h3>
-                    <p>Get alerts for stale applications and overdue follow-ups. Never let opportunities slip away.</p>
+                    <h3>AI Resume Analysis</h3>
+                    <p>Get instant match scores for each job. See skill gaps, keyword suggestions, and generate tailored cover letters in one click.</p>
                 </div>
             </div>
         </div>
