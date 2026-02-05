@@ -1422,6 +1422,21 @@
     font-weight: 500;
 }
 
+.mock-stat .stat-trend {
+    display: block;
+    font-size: 0.625rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+}
+
+.mock-stat .stat-trend.up {
+    color: #10b981;
+}
+
+.mock-stat .stat-trend.hot {
+    color: #f59e0b;
+}
+
 .mock-pipeline {
     background: #f8fafc;
     padding: 1rem;
