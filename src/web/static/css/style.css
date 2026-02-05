@@ -4656,3 +4656,216 @@ body.demo-active .navbar {
         border: 1px solid #ddd;
     }
 }
+
+/* ===========================================
+   MOBILE BOTTOM TAB BAR
+   =========================================== */
+
+.bottom-tab-bar {
+    display: none; /* Hidden on desktop */
+}
+
+@media (max-width: 768px) {
+    /* Show bottom tab bar on mobile */
+    .bottom-tab-bar {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid var(--color-border-light);
+        z-index: 1000;
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    /* Hide the old FAB when we have bottom tabs */
+    .mobile-fab {
+        display: none !important;
+    }
+
+    /* Add padding to body so content isn't hidden behind tab bar */
+    body {
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0));
+    }
+
+    /* Hide footer on mobile - tab bar replaces it for nav */
+    .app-footer {
+        padding-bottom: calc(80px + env(safe-area-inset-bottom, 0));
+    }
+
+    .tab-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: var(--color-text-tertiary);
+        font-size: 0.625rem;
+        font-weight: 500;
+        gap: 4px;
+        padding: 8px 12px;
+        border-radius: var(--radius);
+        transition: all 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
+        background: none;
+        border: none;
+        cursor: pointer;
+        min-width: 56px;
+    }
+
+    .tab-item:active {
+        transform: scale(0.95);
+    }
+
+    .tab-item.active {
+        color: var(--color-primary);
+    }
+
+    .tab-item.active .tab-icon {
+        stroke: var(--color-primary);
+    }
+
+    .tab-icon {
+        width: 24px;
+        height: 24px;
+        stroke: var(--color-text-tertiary);
+        transition: stroke 0.15s ease;
+    }
+
+    .tab-label {
+        line-height: 1;
+        letter-spacing: -0.01em;
+    }
+
+    /* Special styling for the Add button */
+    .tab-item-add {
+        position: relative;
+    }
+
+    .tab-add-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        background: var(--color-primary);
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        margin-top: -20px;
+        transition: all 0.15s ease;
+    }
+
+    .tab-add-button svg {
+        width: 24px;
+        height: 24px;
+        stroke: white;
+    }
+
+    .tab-item-add:active .tab-add-button {
+        transform: scale(0.95);
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    }
+
+    .tab-item-add .tab-label {
+        margin-top: 4px;
+        color: var(--color-primary);
+        font-weight: 600;
+    }
+
+    /* More Menu */
+    .more-menu-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1001;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .more-menu-overlay.active {
+        display: block;
+        opacity: 1;
+    }
+
+    .more-menu {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--color-surface);
+        border-radius: 20px 20px 0 0;
+        z-index: 1002;
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .more-menu.active {
+        display: block;
+        transform: translateY(0);
+    }
+
+    .more-menu-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-4) var(--space-5);
+        border-bottom: 1px solid var(--color-border-light);
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .more-menu-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--color-text-tertiary);
+        cursor: pointer;
+        padding: var(--space-2);
+        line-height: 1;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .more-menu-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-2);
+        padding: var(--space-4);
+    }
+
+    .more-menu-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-4);
+        border-radius: var(--radius-lg);
+        text-decoration: none;
+        color: var(--color-text);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        transition: background 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .more-menu-item:active {
+        background: var(--color-bg-subtle);
+    }
+
+    .more-menu-icon {
+        font-size: 1.75rem;
+        line-height: 1;
+    }
+}
