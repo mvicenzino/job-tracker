@@ -5022,8 +5022,18 @@ body.demo-active .navbar {
 
 /* ===========================================
    MOBILE UX POLISH - Comprehensive Optimization
+   iPhone 15 Pro Optimized (393pt width, Dynamic Island)
    =========================================== */
 @media (max-width: 768px) {
+    /* --- Safe Area Variables --- */
+    :root {
+        --safe-top: env(safe-area-inset-top, 0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-left: env(safe-area-inset-left, 0px);
+        --safe-right: env(safe-area-inset-right, 0px);
+        --tab-bar-height: 64px;
+    }
+
     /* --- Prevent Zoom/Pinch Issues --- */
     html {
         font-size: 16px;
@@ -5039,7 +5049,11 @@ body.demo-active .navbar {
         position: relative;
         width: 100%;
         min-height: 100vh;
-        min-height: -webkit-fill-available;
+        min-height: 100dvh; /* Dynamic viewport height for iOS */
+        padding-top: var(--safe-top);
+        padding-left: var(--safe-left);
+        padding-right: var(--safe-right);
+        padding-bottom: calc(var(--tab-bar-height) + var(--safe-bottom));
     }
 
     /* Prevent horizontal scroll */
@@ -5051,12 +5065,31 @@ body.demo-active .navbar {
         overflow-x: hidden;
     }
 
+    /* --- Navbar: Account for Dynamic Island --- */
+    .navbar {
+        padding-top: var(--safe-top);
+        height: calc(64px + var(--safe-top));
+        padding-left: calc(var(--space-4) + var(--safe-left));
+        padding-right: calc(var(--space-4) + var(--safe-right));
+    }
+
+    /* --- Container: Full width with safe padding --- */
+    .container {
+        padding-left: calc(var(--space-4) + var(--safe-left));
+        padding-right: calc(var(--space-4) + var(--safe-right));
+        padding-bottom: var(--space-4);
+    }
+
     /* Lock bottom tab bar position regardless of zoom */
     .bottom-tab-bar {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
+        height: calc(var(--tab-bar-height) + var(--safe-bottom));
+        padding-bottom: var(--safe-bottom);
+        padding-left: var(--safe-left);
+        padding-right: var(--safe-right);
         transform: translateZ(0); /* Force GPU layer */
         -webkit-transform: translateZ(0);
         backface-visibility: hidden;
@@ -5064,7 +5097,14 @@ body.demo-active .navbar {
     }
 
     /* Lock more menu position */
-    .more-menu,
+    .more-menu {
+        padding-bottom: calc(var(--space-4) + var(--safe-bottom));
+        padding-left: var(--safe-left);
+        padding-right: var(--safe-right);
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+    
     .more-menu-overlay {
         transform: translateZ(0);
         -webkit-transform: translateZ(0);
@@ -5469,5 +5509,120 @@ body.demo-active .navbar {
 
     .footer-brand {
         align-items: center;
+    }
+
+    /* --- iPhone 15 Pro+ Specific (393pt+ width) --- */
+    @supports (padding: max(0px)) {
+        body {
+            padding-top: max(var(--safe-top), 0px);
+            padding-bottom: max(calc(var(--tab-bar-height) + var(--safe-bottom)), var(--tab-bar-height));
+        }
+        
+        .navbar {
+            padding-top: max(var(--safe-top), 0px);
+            height: max(calc(64px + var(--safe-top)), 64px);
+        }
+        
+        .bottom-tab-bar {
+            height: max(calc(var(--tab-bar-height) + var(--safe-bottom)), var(--tab-bar-height));
+            padding-bottom: max(var(--safe-bottom), 0px);
+        }
+    }
+}
+
+/* --- iPhone 15 Pro / Pro Max Optimizations (390pt+) --- */
+@media (min-width: 390px) and (max-width: 768px) {
+    /* Slightly larger text for bigger screens */
+    .stat-card .stat-value {
+        font-size: 1.75rem;
+    }
+
+    .stat-card .stat-label {
+        font-size: 0.8125rem;
+    }
+
+    /* More spacious cards */
+    .stat-card {
+        padding: var(--space-5);
+    }
+
+    .card-body {
+        padding: var(--space-5);
+    }
+
+    /* Larger pipeline tabs */
+    .pipeline-tab {
+        min-width: 80px;
+        padding: var(--space-3) var(--space-5);
+    }
+
+    .pipeline-tab .tab-count {
+        font-size: 1.5rem;
+    }
+
+    /* More breathing room in page headers */
+    .page-header {
+        padding: var(--space-5) 0;
+    }
+
+    .page-header h1 {
+        font-size: 1.625rem;
+    }
+
+    /* Better tab bar sizing */
+    .tab-item {
+        min-width: 64px;
+    }
+
+    .tab-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+    .tab-add-button {
+        width: 52px;
+        height: 52px;
+    }
+
+    .tab-add-button svg {
+        width: 26px;
+        height: 26px;
+    }
+
+    /* More menu grid */
+    .more-menu-grid {
+        gap: var(--space-3);
+        padding: var(--space-5);
+    }
+
+    .more-menu-item {
+        padding: var(--space-5);
+    }
+
+    .more-menu-icon {
+        font-size: 2rem;
+    }
+}
+
+/* --- iPhone 15 Pro Max (430pt) --- */
+@media (min-width: 428px) and (max-width: 768px) {
+    .stat-card .stat-value {
+        font-size: 2rem;
+    }
+
+    .dashboard-header .greeting h1 {
+        font-size: 1.5rem;
+    }
+
+    .pipeline-tab {
+        min-width: 88px;
+    }
+
+    .pipeline-card {
+        padding: var(--space-5);
+    }
+
+    .pipeline-card .card-title {
+        font-size: 1.125rem;
     }
 }
