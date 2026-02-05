@@ -4865,8 +4865,18 @@ body.demo-active .navbar {
     }
 
     .more-menu-icon {
-        font-size: 1.75rem;
-        line-height: 1;
+        width: 28px;
+        height: 28px;
+        stroke: var(--color-text-secondary);
+        flex-shrink: 0;
+    }
+
+    .more-menu-item:active .more-menu-icon {
+        stroke: var(--color-primary);
+    }
+
+    .more-menu-logout .more-menu-icon {
+        stroke: var(--color-danger, #dc2626);
     }
 
     /* ===========================================
