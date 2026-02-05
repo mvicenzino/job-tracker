@@ -119,6 +119,77 @@ Provide your analysis as JSON."""
     return data
 
 
+COVER_LETTER_PROMPT = """You are an expert career coach and professional writer. Write a compelling, personalized cover letter for the candidate.
+
+Guidelines:
+- Keep it concise (250-350 words)
+- Open with a strong hook that shows genuine interest in the role
+- Highlight 2-3 specific experiences/skills from the resume that directly match the job requirements
+- Use concrete examples and metrics where possible
+- Show knowledge of the company (if provided)
+- Close with enthusiasm and a clear call to action
+- Maintain a professional but personable tone
+- Do NOT use generic phrases like "I am writing to express my interest" or "I believe I would be a great fit"
+- Do NOT start with "Dear Hiring Manager" - just start with the body
+
+Return ONLY the cover letter text, no additional formatting or explanation."""
+
+
+def generate_cover_letter(resume_text: str, job_description: str, job_title: str = None, company_name: str = None) -> str:
+    """Generate a tailored cover letter based on resume and job description.
+
+    Args:
+        resume_text: The candidate's resume content
+        job_description: The job posting description/requirements
+        job_title: Optional job title for context
+        company_name: Optional company name for context
+
+    Returns:
+        A string containing the generated cover letter
+
+    Raises:
+        RuntimeError: If the API call fails
+    """
+    import anthropic
+
+    # Build context
+    context_parts = []
+    if job_title:
+        context_parts.append(f"Job Title: {job_title}")
+    if company_name:
+        context_parts.append(f"Company: {company_name}")
+    context = "\n".join(context_parts) if context_parts else ""
+
+    # Truncate inputs to stay within limits
+    resume_text = resume_text[:6000] if resume_text else ""
+    job_description = job_description[:6000] if job_description else ""
+
+    user_message = f"""Write a cover letter for this candidate applying to this job:
+
+{context}
+
+=== JOB DESCRIPTION ===
+{job_description}
+
+=== CANDIDATE RESUME ===
+{resume_text}
+
+Write a compelling cover letter that highlights the candidate's most relevant qualifications."""
+
+    client = anthropic.Anthropic()
+    message = client.messages.create(
+        model="claude-3-5-haiku-20241022",
+        max_tokens=1024,
+        temperature=0.7,  # Slightly creative for better writing
+        system=COVER_LETTER_PROMPT,
+        messages=[
+            {"role": "user", "content": user_message}
+        ],
+    )
+
+    return message.content[0].text.strip()
+
+
 SYSTEM_PROMPT = """You are a job description parser. Extract structured data from the provided job description text and return ONLY valid JSON with these fields:
 
 {

@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 
 from ..helpers import get_service, get_service_for_user, get_user_by_api_key
 from ...models import ApplicationStatus, ContactType
-from ...services.ai_parser import is_ai_parsing_available, parse_job_description, analyze_resume_job_fit
+from ...services.ai_parser import is_ai_parsing_available, parse_job_description, analyze_resume_job_fit, generate_cover_letter
 
 bp = Blueprint('api', __name__)
 
@@ -373,6 +373,90 @@ def api_analyze_resume_fit():
         )
 
         return jsonify({'success': True, 'analysis': result})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        session.close()
+
+
+@bp.route('/api/generate-cover-letter', methods=['POST'])
+@login_required
+def api_generate_cover_letter():
+    """API: Generate a cover letter using AI."""
+    if not is_ai_parsing_available():
+        return jsonify({'success': False, 'error': 'AI is not available. Please set ANTHROPIC_API_KEY.'}), 503
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Request body required'}), 400
+
+    service, session = get_service()
+    try:
+        # Get job info
+        app_id = data.get('application_id')
+        job_id = data.get('job_id')
+
+        job = None
+        app = None
+        if app_id:
+            app = service.applications.get_by_id(app_id)
+            if app:
+                job = app.job
+        elif job_id:
+            job = service.jobs.get_by_id(job_id)
+
+        if not job:
+            return jsonify({'success': False, 'error': 'Job not found'}), 404
+
+        # Get job description
+        job_description = job.description or ''
+        if job.requirements:
+            job_description += '\n\nRequirements:\n' + job.requirements
+
+        if len(job_description.strip()) < 50:
+            return jsonify({'success': False, 'error': 'Job description is too short. Please add more details to the job posting.'}), 400
+
+        # Get resume content
+        resume_text = None
+        resume_version_id = data.get('resume_version_id')
+
+        if resume_version_id:
+            resume_version = service.resume_versions.get_by_id(resume_version_id)
+            if resume_version:
+                resume_text = resume_version.content
+        else:
+            # Try to get most recent resume version
+            versions = service.resume_versions.get_all(limit=1)
+            if versions:
+                resume_text = versions[0].content
+
+        # Fall back to user's main resume text
+        if not resume_text:
+            resume_text = current_user.resume_text
+
+        if not resume_text or len(resume_text.strip()) < 100:
+            return jsonify({'success': False, 'error': 'No resume found. Please add a resume first.'}), 400
+
+        # Generate cover letter
+        cover_letter = generate_cover_letter(
+            resume_text=resume_text,
+            job_description=job_description,
+            job_title=job.title,
+            company_name=job.company.name if job.company else None
+        )
+
+        # Optionally save to application
+        if app_id and data.get('save', False):
+            service.applications.update(app_id, cover_letter=cover_letter)
+            session.commit()
+
+        return jsonify({
+            'success': True,
+            'cover_letter': cover_letter,
+            'job_title': job.title,
+            'company_name': job.company.name if job.company else None
+        })
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
