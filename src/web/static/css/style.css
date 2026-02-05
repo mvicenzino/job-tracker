@@ -4882,12 +4882,17 @@ body.demo-active .navbar {
     .mobile-pipeline-tabs {
         display: flex;
         overflow-x: auto;
+        overflow-y: hidden;
         gap: var(--space-2);
         padding: var(--space-3) var(--space-4);
-        margin: 0 calc(-1 * var(--space-4));
+        padding-left: calc(var(--space-4) + var(--safe-left));
+        padding-right: calc(var(--space-4) + var(--safe-right));
+        margin: 0;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        max-width: 100vw;
+        box-sizing: border-box;
     }
 
     .mobile-pipeline-tabs::-webkit-scrollbar {
@@ -5071,6 +5076,19 @@ body.demo-active .navbar {
         height: calc(64px + var(--safe-top));
         padding-left: calc(var(--space-4) + var(--safe-left));
         padding-right: calc(var(--space-4) + var(--safe-right));
+        max-width: 100vw;
+        box-sizing: border-box;
+    }
+
+    /* Hide brand tagline on mobile - prevents overflow */
+    .brand-tagline {
+        display: none !important;
+    }
+
+    /* Constrain brand logo */
+    .brand-logo {
+        max-height: 32px;
+        width: auto;
     }
 
     /* --- Container: Full width with safe padding --- */
@@ -5078,6 +5096,23 @@ body.demo-active .navbar {
         padding-left: calc(var(--space-4) + var(--safe-left));
         padding-right: calc(var(--space-4) + var(--safe-right));
         padding-bottom: var(--space-4);
+        max-width: 100vw;
+        box-sizing: border-box;
+    }
+
+    /* --- Force no horizontal overflow on all major containers --- */
+    html, body, main, .container, .dashboard, .pipeline-page, 
+    .page-header, .stats-grid, .card, .navbar {
+        max-width: 100vw;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
+
+    /* --- Page header: Prevent text truncation issues --- */
+    .page-header h1 {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
     }
 
     /* Lock bottom tab bar position regardless of zoom */
@@ -5145,6 +5180,8 @@ body.demo-active .navbar {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: var(--space-3);
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .stat-card {
