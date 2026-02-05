@@ -42,148 +42,114 @@
     </div>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient"></div>
-            <div class="hero-pattern"></div>
-        </div>
-        <div class="hero-container">
-        <div class="hero-content">
-            <h1 class="hero-title">
-                Take Your Job Search<br>
-                <span class="gradient-text">in Stride</span>
+    <section class="hero-new">
+        <div class="hero-glow"></div>
+        <div class="hero-grid-bg"></div>
+        <div class="hero-container-new">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                <span>Free to use • No credit card required</span>
+            </div>
+            <h1 class="hero-headline">
+                Your Job Search,<br>
+                <span class="hero-highlight">Finally Organized</span>
             </h1>
-            <p class="hero-subtitle">
-                One step at a time. One offer at a time.
+            <p class="hero-tagline">
+                Stop drowning in spreadsheets. Track applications, nail interviews, and land offers — all in one place.
             </p>
-            <div class="hero-cta">
-                <a href="{{ url_for('public.demo') }}" class="btn btn-primary btn-lg">
-                    Try Interactive Demo
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-                        <polygon points="5 3 19 12 5 21 5 3"/>
+            <div class="hero-actions">
+                <a href="{{ url_for('auth.register') }}" class="btn-hero-primary">
+                    Get Started Free
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
                 </a>
-                <a href="{{ url_for('auth.register') }}" class="btn btn-secondary btn-lg">Get Started</a>
+                <a href="{{ url_for('public.demo') }}" class="btn-hero-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    Watch Demo
+                </a>
             </div>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <span class="stat-number">2 min</span>
-                    <span class="stat-label">Setup Time</span>
+            <div class="hero-social-proof">
+                <div class="proof-avatars">
+                    <div class="avatar">M</div>
+                    <div class="avatar">S</div>
+                    <div class="avatar">J</div>
+                    <div class="avatar">+</div>
                 </div>
-                <div class="hero-stat-divider"></div>
-                <div class="hero-stat">
-                    <span class="stat-number">All-in-One</span>
-                    <span class="stat-label">Dashboard</span>
-                </div>
-                <div class="hero-stat-divider"></div>
-                <div class="hero-stat">
-                    <span class="stat-number">Smart</span>
-                    <span class="stat-label">Reminders</span>
-                </div>
+                <span class="proof-text">Join job seekers landing their dream roles</span>
             </div>
         </div>
-        <div class="hero-visual">
-            <div class="preview-stack">
-                <!-- Background card - Pipeline -->
-                <div class="dashboard-preview preview-back">
-                    <div class="preview-header">
-                        <div class="preview-dots">
-                            <span></span><span></span><span></span>
-                        </div>
-                        <span class="preview-title">Pipeline</span>
+        <div class="hero-visual-new">
+            <div class="app-window">
+                <div class="window-header">
+                    <div class="window-dots">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
                     </div>
-                    <div class="preview-content">
-                        <div class="preview-kanban">
-                            <div class="kanban-col">
-                                <div class="kanban-header">Applied</div>
-                                <div class="kanban-card"></div>
-                                <div class="kanban-card"></div>
-                                <div class="kanban-card"></div>
-                            </div>
-                            <div class="kanban-col">
-                                <div class="kanban-header">Interview</div>
-                                <div class="kanban-card highlight"></div>
-                                <div class="kanban-card"></div>
-                            </div>
-                            <div class="kanban-col">
-                                <div class="kanban-header">Offer</div>
-                                <div class="kanban-card success"></div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="window-title">stride-jobs.vercel.app</div>
                 </div>
-                <!-- Middle card - Schedule -->
-                <div class="dashboard-preview preview-mid">
-                    <div class="preview-header">
-                        <div class="preview-dots">
-                            <span></span><span></span><span></span>
-                        </div>
-                        <span class="preview-title">Schedule</span>
-                    </div>
-                    <div class="preview-content">
-                        <div class="preview-events">
-                            <div class="preview-event">
-                                <div class="event-time">10:00</div>
-                                <div class="event-info">
-                                    <span class="event-name">Technical Interview</span>
-                                    <span class="event-company">Acme Corp</span>
-                                </div>
-                            </div>
-                            <div class="preview-event">
-                                <div class="event-time">14:30</div>
-                                <div class="event-info">
-                                    <span class="event-name">Culture Fit Call</span>
-                                    <span class="event-company">StartupXYZ</span>
-                                </div>
-                            </div>
+                <div class="window-content">
+                    <div class="mock-nav">
+                        <div class="mock-logo"></div>
+                        <div class="mock-nav-items">
+                            <span class="active">Dashboard</span>
+                            <span>Pipeline</span>
+                            <span>Schedule</span>
                         </div>
                     </div>
-                </div>
-                <!-- Front card - Dashboard -->
-                <div class="dashboard-preview preview-front">
-                    <div class="preview-header">
-                        <div class="preview-dots">
-                            <span></span><span></span><span></span>
+                    <div class="mock-dashboard">
+                        <div class="mock-greeting">
+                            <div class="greeting-text"></div>
+                            <div class="greeting-sub"></div>
                         </div>
-                        <span class="preview-title">Dashboard</span>
-                    </div>
-                    <div class="preview-content">
-                        <div class="preview-stats">
-                            <div class="preview-stat-card">
-                                <span class="preview-stat-value">12</span>
-                                <span class="preview-stat-label">Active</span>
+                        <div class="mock-stats">
+                            <div class="mock-stat">
+                                <span class="stat-num">12</span>
+                                <span class="stat-label">Active</span>
                             </div>
-                            <div class="preview-stat-card highlight">
-                                <span class="preview-stat-value">3</span>
-                                <span class="preview-stat-label">Interviews</span>
+                            <div class="mock-stat highlight">
+                                <span class="stat-num">4</span>
+                                <span class="stat-label">Interviews</span>
                             </div>
-                            <div class="preview-stat-card">
-                                <span class="preview-stat-value">2</span>
-                                <span class="preview-stat-label">Offers</span>
+                            <div class="mock-stat success">
+                                <span class="stat-num">2</span>
+                                <span class="stat-label">Offers</span>
                             </div>
                         </div>
-                        <div class="preview-pipeline">
-                            <div class="preview-stage" style="--stage-color: #6366f1">
-                                <span class="stage-count">8</span>
-                                <span class="stage-name">Applied</span>
+                        <div class="mock-pipeline">
+                            <div class="pipeline-bar">
+                                <div class="bar-segment applied" style="width: 40%"></div>
+                                <div class="bar-segment screening" style="width: 25%"></div>
+                                <div class="bar-segment interview" style="width: 20%"></div>
+                                <div class="bar-segment offer" style="width: 15%"></div>
                             </div>
-                            <div class="preview-stage" style="--stage-color: #8b5cf6">
-                                <span class="stage-count">4</span>
-                                <span class="stage-name">Screening</span>
-                            </div>
-                            <div class="preview-stage" style="--stage-color: #06b6d4">
-                                <span class="stage-count">3</span>
-                                <span class="stage-name">Interview</span>
-                            </div>
-                            <div class="preview-stage" style="--stage-color: #10b981">
-                                <span class="stage-count">2</span>
-                                <span class="stage-name">Offer</span>
+                            <div class="pipeline-labels">
+                                <span>Applied</span>
+                                <span>Screening</span>
+                                <span>Interview</span>
+                                <span>Offer</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="floating-card card-1">
+                <div class="card-icon">📅</div>
+                <div class="card-text">
+                    <strong>Interview Tomorrow</strong>
+                    <span>Google • 10:00 AM</span>
+                </div>
+            </div>
+            <div class="floating-card card-2">
+                <div class="card-icon">🎉</div>
+                <div class="card-text">
+                    <strong>Offer Received!</strong>
+                    <span>$185,000 • Remote</span>
+                </div>
+            </div>
         </div>
     </section>
 
