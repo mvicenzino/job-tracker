@@ -168,3 +168,118 @@ def save_notifications():
     finally:
         session.close()
     return redirect(url_for('settings.settings'))
+
+
+@bp.route('/export/applications')
+@login_required
+def export_applications():
+    """Export all applications as CSV."""
+    import csv
+    from io import StringIO
+    from flask import Response
+    from ...models import Application, Job, Company
+    
+    db = current_app.extensions['db']
+    session = db.get_session()
+    
+    try:
+        # Get all applications with job and company info
+        apps = session.query(Application, Job, Company).join(
+            Job, Application.job_id == Job.id
+        ).join(
+            Company, Job.company_id == Company.id
+        ).filter(
+            Application.user_id == current_user.id
+        ).order_by(Application.updated_at.desc()).all()
+        
+        # Create CSV
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        # Header row
+        writer.writerow([
+            'Company', 'Job Title', 'Status', 'Date Applied', 'Date Response',
+            'Location', 'Salary Min', 'Salary Max', 'Job URL',
+            'Excitement Level', 'Resume Version', 'Notes', 
+            'Created', 'Updated'
+        ])
+        
+        # Data rows
+        for app, job, company in apps:
+            writer.writerow([
+                company.name,
+                job.title,
+                app.status.value if app.status else '',
+                app.date_applied.isoformat() if app.date_applied else '',
+                app.date_response.isoformat() if app.date_response else '',
+                job.location or '',
+                job.salary_min or '',
+                job.salary_max or '',
+                job.url or '',
+                app.excitement_level or '',
+                app.resume_version or '',
+                app.lessons_learned or '',
+                app.created_at.isoformat() if app.created_at else '',
+                app.updated_at.isoformat() if app.updated_at else '',
+            ])
+        
+        # Return as downloadable CSV
+        output.seek(0)
+        return Response(
+            output.getvalue(),
+            mimetype='text/csv',
+            headers={'Content-Disposition': 'attachment; filename=stride-applications.csv'}
+        )
+    finally:
+        session.close()
+
+
+@bp.route('/export/contacts')
+@login_required
+def export_contacts():
+    """Export all contacts as CSV."""
+    import csv
+    from io import StringIO
+    from flask import Response
+    from ...models import Contact, Company
+    
+    db = current_app.extensions['db']
+    session = db.get_session()
+    
+    try:
+        contacts = session.query(Contact).outerjoin(
+            Company, Contact.company_id == Company.id
+        ).filter(
+            Contact.user_id == current_user.id
+        ).order_by(Contact.name).all()
+        
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        writer.writerow([
+            'Name', 'Email', 'Phone', 'Company', 'Title', 'LinkedIn',
+            'Contact Type', 'Notes', 'Next Follow-up', 'Created'
+        ])
+        
+        for contact in contacts:
+            writer.writerow([
+                contact.name,
+                contact.email or '',
+                contact.phone or '',
+                contact.company.name if contact.company else '',
+                contact.title or '',
+                contact.linkedin_url or '',
+                contact.contact_type.value if contact.contact_type else '',
+                contact.notes or '',
+                contact.next_followup_date.isoformat() if contact.next_followup_date else '',
+                contact.created_at.isoformat() if contact.created_at else '',
+            ])
+        
+        output.seek(0)
+        return Response(
+            output.getvalue(),
+            mimetype='text/csv',
+            headers={'Content-Disposition': 'attachment; filename=stride-contacts.csv'}
+        )
+    finally:
+        session.close()

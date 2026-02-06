@@ -221,6 +221,50 @@
             </form>
         </div>
     </div>
+
+    <!-- Export Data -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Export Your Data</h2>
+        </div>
+        <div class="card-body">
+            <p class="text-secondary mb-4">
+                Download your data anytime. Your data belongs to you.
+            </p>
+            
+            <div class="export-options">
+                <div class="export-option">
+                    <div class="export-info">
+                        <strong>Applications</strong>
+                        <p class="text-muted">All your job applications with status, dates, and notes</p>
+                    </div>
+                    <a href="{{ url_for('settings.export_applications') }}" class="btn btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download CSV
+                    </a>
+                </div>
+                
+                <div class="export-option">
+                    <div class="export-info">
+                        <strong>Contacts</strong>
+                        <p class="text-muted">Your network contacts with company and follow-up info</p>
+                    </div>
+                    <a href="{{ url_for('settings.export_contacts') }}" class="btn btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -541,6 +585,49 @@ document.addEventListener('DOMContentLoaded', function() {
 .btn-success {
     background: var(--color-success);
     color: white;
+}
+
+/* Export options */
+.export-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.export-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4);
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+}
+
+.export-info {
+    flex: 1;
+}
+
+.export-info strong {
+    display: block;
+    margin-bottom: var(--space-1);
+}
+
+.export-info p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+    .export-option {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+    
+    .export-option .btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 </style>
 {% endblock %}
