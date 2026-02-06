@@ -585,3 +585,82 @@ def api_health():
         result['checks']['database_error'] = str(e)
 
     return jsonify(result)
+
+
+@bp.route('/api/cron/notifications', methods=['POST'])
+def cron_generate_notifications():
+    """
+    Cron endpoint: Generate automated notifications for all users.
+    
+    Should be called periodically (e.g., every 30 minutes) by a cron job.
+    Secured by CRON_SECRET environment variable.
+    """
+    import os
+    from flask import current_app
+    from ...services.notification_generator import NotificationGenerator
+    
+    # Verify cron secret (optional but recommended)
+    cron_secret = os.environ.get('CRON_SECRET')
+    provided_secret = request.headers.get('X-Cron-Secret') or request.args.get('secret')
+    
+    if cron_secret and provided_secret != cron_secret:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        db = current_app.extensions['db']
+        session = db.get_session()
+        
+        try:
+            generator = NotificationGenerator(session)
+            results = generator.generate_all()
+            
+            return jsonify({
+                'success': True,
+                'generated': results
+            })
+        finally:
+            session.close()
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@bp.route('/api/notifications/generate', methods=['POST'])
+@login_required
+def generate_my_notifications():
+    """
+    Generate notifications for the current user (manual trigger).
+    Useful for testing or immediate refresh.
+    """
+    from flask import current_app
+    from ...services.notification_generator import NotificationGenerator
+    
+    try:
+        db = current_app.extensions['db']
+        session = db.get_session()
+        
+        try:
+            generator = NotificationGenerator(session)
+            
+            r24, r1 = generator.generate_interview_reminders(current_user.id)
+            followups = generator.generate_follow_up_nudges(current_user.id)
+            
+            return jsonify({
+                'success': True,
+                'generated': {
+                    'interview_reminders_24h': r24,
+                    'interview_reminders_1h': r1,
+                    'follow_up_nudges': followups
+                }
+            })
+        finally:
+            session.close()
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
