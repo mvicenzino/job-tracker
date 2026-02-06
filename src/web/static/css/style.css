@@ -471,6 +471,44 @@ a:hover {
     line-height: 1;
 }
 
+/* Mobile Notification Bell - hidden on desktop, shown on mobile */
+.mobile-notification-bell {
+    display: none;
+    position: absolute;
+    right: var(--space-4);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.mobile-notification-bell:hover,
+.mobile-notification-bell:active {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.mobile-notification-bell.active {
+    color: var(--accent-color);
+}
+
+.mobile-notification-bell .notification-badge {
+    top: 4px;
+    right: 4px;
+}
+
+@media (max-width: 768px) {
+    .mobile-notification-bell {
+        display: flex;
+    }
+}
+
 /* Profile dropdown */
 .nav-profile {
     position: relative;
