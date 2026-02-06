@@ -19,7 +19,7 @@
   "crons": [
     {
       "path": "/api/cron/notifications",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 9 * * *"
     }
   ]
 }
