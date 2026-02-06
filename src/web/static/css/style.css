@@ -471,6 +471,17 @@ a:hover {
     line-height: 1;
 }
 
+.notification-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    background: var(--danger-color, #ef4444);
+    border-radius: 50%;
+    border: 2px solid var(--bg-primary, #fff);
+}
+
 /* Mobile Notification Bell - hidden on desktop, shown on mobile */
 .mobile-notification-bell {
     display: none;
