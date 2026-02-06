@@ -627,13 +627,20 @@ a:hover {
     text-overflow: ellipsis;
 }
 
-/* Mobile Notification Bell - hidden on desktop, shown on mobile */
-.mobile-notification-bell {
+/* Mobile Nav Actions - hidden on desktop, shown on mobile */
+.mobile-nav-actions {
     display: none;
     position: absolute;
     right: var(--space-4);
     top: 50%;
     transform: translateY(-50%);
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.mobile-search-btn,
+.mobile-notification-bell {
+    display: flex;
     width: 40px;
     height: 40px;
     align-items: center;
@@ -642,8 +649,13 @@ a:hover {
     color: var(--text-secondary);
     transition: all 0.2s ease;
     text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
 }
 
+.mobile-search-btn:hover,
+.mobile-search-btn:active,
 .mobile-notification-bell:hover,
 .mobile-notification-bell:active {
     background: var(--bg-secondary);
@@ -654,13 +666,13 @@ a:hover {
     color: var(--accent-color);
 }
 
-.mobile-notification-bell .notification-badge {
-    top: 4px;
-    right: 4px;
+.mobile-notification-bell .notification-dot {
+    top: 6px;
+    right: 6px;
 }
 
 @media (max-width: 768px) {
-    .mobile-notification-bell {
+    .mobile-nav-actions {
         display: flex;
     }
 }
