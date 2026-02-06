@@ -1125,6 +1125,15 @@ a:hover {
     transform: translateY(-1px);
 }
 
+.btn-danger-text {
+    color: var(--color-danger, #ef4444);
+}
+
+.btn-danger-text:hover {
+    color: #dc2626;
+    background: rgba(239, 68, 68, 0.1);
+}
+
 .btn-ghost {
     background: transparent;
     color: var(--color-text-secondary);

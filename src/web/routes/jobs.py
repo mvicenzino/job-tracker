@@ -88,6 +88,28 @@ def toggle_job_flag(job_id):
         session.close()
 
 
+@bp.route('/jobs/<int:job_id>/delete', methods=['POST'])
+@login_required
+def delete_job(job_id):
+    """Delete a job listing."""
+    service, session = get_service()
+    try:
+        job = service.jobs.get_by_id(job_id)
+        if job:
+            # Check if job has applications
+            if job.applications:
+                flash('Cannot delete job with existing applications. Archive the applications first.', 'error')
+            else:
+                service.jobs.delete(job_id)
+                session.commit()
+                flash('Job deleted!', 'success')
+        else:
+            flash('Job not found.', 'error')
+        return redirect(url_for('jobs.jobs'))
+    finally:
+        session.close()
+
+
 @bp.route('/jobs/<int:job_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_job(job_id):

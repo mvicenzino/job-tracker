@@ -9,6 +9,19 @@ function getPageType() {
   return 'unknown';
 }
 
+// Helper: try multiple selectors, return first match text
+function getText(selectors) {
+  for (const sel of selectors) {
+    try {
+      const el = document.querySelector(sel);
+      if (el && el.textContent.trim()) {
+        return el.textContent.trim();
+      }
+    } catch (e) {}
+  }
+  return '';
+}
+
 // Extract LinkedIn profile data (contacts)
 function extractProfileData() {
   const data = {
@@ -20,81 +33,88 @@ function extractProfileData() {
     location: ''
   };
 
-  // Extract name
-  const nameEl = document.querySelector('h1.text-heading-xlarge') ||
-                 document.querySelector('h1[class*="text-heading"]') ||
-                 document.querySelector('.pv-top-card h1') ||
-                 document.querySelector('.ph5 h1') ||
-                 document.querySelector('h1');
-  if (nameEl) {
-    data.name = nameEl.textContent.trim();
-  }
+  // Extract name - multiple fallback selectors
+  data.name = getText([
+    'h1.text-heading-xlarge',
+    'h1[class*="text-heading-xlarge"]',
+    '.pv-top-card h1',
+    '.ph5 h1',
+    '.pv-text-details__left-panel h1',
+    'section.pv-top-card h1',
+    '[data-generated-suggestion-target="urn:li:fsu_profileActionDelegate"] h1',
+    'main h1',
+    'h1'
+  ]);
 
   // Extract headline/title
-  const headlineEl = document.querySelector('.text-body-medium.break-words') ||
-                     document.querySelector('[data-generated-suggestion-target]') ||
-                     document.querySelector('.pv-top-card .text-body-medium') ||
-                     document.querySelector('.ph5 .text-body-medium');
-  if (headlineEl) {
-    data.title = headlineEl.textContent.trim();
-  }
+  data.title = getText([
+    '.text-body-medium.break-words',
+    'div.text-body-medium.break-words',
+    '.pv-top-card .text-body-medium',
+    '.ph5 .text-body-medium',
+    '.pv-text-details__left-panel .text-body-medium',
+    '[data-generated-suggestion-target] + div',
+    'main section .text-body-medium'
+  ]);
 
-  // Extract current company from experience
-  const experienceSection = document.querySelector('#experience') ||
-                            document.querySelector('section[id*="experience"]');
-  if (experienceSection) {
-    const section = experienceSection.closest('section') || experienceSection;
-    const currentRole = section.querySelector('li');
-    if (currentRole) {
-      const companyEl = currentRole.querySelector('.t-14.t-normal span[aria-hidden="true"]') ||
-                        currentRole.querySelector('.t-14.t-normal');
+  // Extract current company - try multiple approaches
+  // Approach 1: From experience section
+  const expSection = document.querySelector('#experience, section[id*="experience"], [id*="profilePagedListComponent"][id*="EXPERIENCE"]');
+  if (expSection) {
+    const section = expSection.closest('section') || expSection.parentElement || expSection;
+    const firstExp = section.querySelector('li, [class*="pvs-entity"]');
+    if (firstExp) {
+      const companyEl = firstExp.querySelector('span[aria-hidden="true"]') ||
+                        firstExp.querySelector('.t-14.t-normal') ||
+                        firstExp.querySelector('[class*="t-normal"]');
       if (companyEl) {
-        const companyText = companyEl.textContent.trim();
-        data.company = companyText.split('·')[0].trim();
+        const text = companyEl.textContent.trim();
+        data.company = text.split('·')[0].split('•')[0].trim();
       }
     }
   }
 
-  // Fallback: try to get company from top card
+  // Approach 2: Company link in top card
   if (!data.company) {
-    const topCardLinks = document.querySelectorAll('.pv-top-card a[href*="/company/"], .ph5 a[href*="/company/"]');
-    if (topCardLinks.length > 0) {
-      data.company = topCardLinks[0].textContent.trim();
+    const companyLinks = document.querySelectorAll('a[href*="/company/"]');
+    for (const link of companyLinks) {
+      // Skip if it's in footer or nav
+      if (link.closest('footer') || link.closest('nav')) continue;
+      const text = link.textContent.trim();
+      if (text && text.length > 1 && text.length < 100) {
+        data.company = text;
+        break;
+      }
     }
   }
 
-  // Fallback: extract from headline
+  // Approach 3: Extract from headline ("Title at Company")
   if (!data.company && data.title) {
-    const atMatch = data.title.match(/(?:at|@)\s+([^|·,]+)/i);
+    const atMatch = data.title.match(/(?:\bat\b|\s@\s)\s*([^|·•,]+)/i);
     if (atMatch) {
       data.company = atMatch[1].trim();
     }
   }
 
   // Extract location
-  const locationEl = document.querySelector('.text-body-small.inline.t-black--light.break-words') ||
-                     document.querySelector('.pv-top-card .pb2.pv-text-details__left-panel span');
-  if (locationEl) {
-    data.location = locationEl.textContent.trim();
+  data.location = getText([
+    '.text-body-small.inline.t-black--light.break-words',
+    '.pv-top-card .pb2.pv-text-details__left-panel span.text-body-small',
+    '.pv-text-details__left-panel span.text-body-small',
+    '.ph5 span.text-body-small',
+    'main span.text-body-small.inline'
+  ]);
+
+  // Clean up location if it includes connection info
+  if (data.location && data.location.includes('connection')) {
+    data.location = data.location.split(/\d+\s*(connections?|followers?)/i)[0].trim();
   }
 
+  console.log('[Stride Extension] Extracted profile:', data);
   return data;
 }
 
-// Helper: try an array of CSS selectors, return the first match's trimmed text
-function trySelectors(selectors) {
-  for (const sel of selectors) {
-    const el = document.querySelector(sel);
-    if (el) {
-      const text = el.textContent.trim();
-      if (text) return text;
-    }
-  }
-  return '';
-}
-
 // Helper: find a dt/dd pair in the About section by label text
-// LinkedIn's About tab renders structured data as <dt>Label</dt><dd>Value</dd>
 function getDDByLabel(label) {
   const dtElements = document.querySelectorAll('dt');
   for (const dt of dtElements) {
@@ -122,45 +142,37 @@ function extractCompanyData() {
   };
 
   // Company name
-  data.name = trySelectors([
+  data.name = getText([
     'h1.org-top-card-summary__title',
     'h1[class*="org-top-card"]',
     '.org-top-card-summary h1',
     'h1[class*="top-card"] span',
     '[data-test-id="org-name"]',
+    'main h1',
     'h1'
   ]);
 
-  // Industry — prefer dt/dd pair, fall back to top card selectors
-  data.industry = getDDByLabel('industry') ||
-    trySelectors([
-      '.org-top-card-summary-info-list__info-item',
-      '[class*="org-top-card"] .text-body-small',
-      '[data-test-id="about-us__industry"] dd',
-      '[aria-label*="industry"]'
-    ]);
+  // Industry
+  data.industry = getDDByLabel('industry') || getText([
+    '.org-top-card-summary-info-list__info-item',
+    '[class*="org-top-card"] .text-body-small',
+    '[data-test-id="about-us__industry"] dd'
+  ]);
 
-  // Company size — prefer dt/dd pair, fall back to about-module selectors
-  const rawSize = getDDByLabel('company size') ||
-    trySelectors([
-      'dd.org-about-company-module__company-size-definition-text',
-      '[data-test-id="about-us__size"] dd',
-      '[aria-label*="company size"]',
-      '[class*="company-size"] dd'
-    ]);
+  // Company size
+  const rawSize = getDDByLabel('company size') || getText([
+    'dd.org-about-company-module__company-size-definition-text',
+    '[data-test-id="about-us__size"] dd'
+  ]);
   if (rawSize) {
-    // Extract the employee range (e.g. "10,001+" or "1,001-5,000")
     const rangeMatch = rawSize.match(/[\d,]+-?[\d,]*/);
     data.size = rangeMatch ? rangeMatch[0] : rawSize.split('\n')[0].trim();
   }
 
-  // Location — prefer dt/dd "Headquarters" pair, fall back to top card heuristic
-  data.location = getDDByLabel('headquarters') ||
-    trySelectors([
-      '[data-test-id="about-us__headquarters"] dd',
-      '[aria-label*="headquarters"]',
-      '[class*="headquarters"] dd'
-    ]);
+  // Location/Headquarters
+  data.location = getDDByLabel('headquarters') || getText([
+    '[data-test-id="about-us__headquarters"] dd'
+  ]);
   if (!data.location) {
     const locationEls = document.querySelectorAll('.org-top-card-summary-info-list__info-item');
     for (const el of locationEls) {
@@ -172,10 +184,9 @@ function extractCompanyData() {
     }
   }
 
-  // Website — prefer dt/dd pair, then data-test-id link, then any about-section link
+  // Website
   const websiteDDText = getDDByLabel('website');
   if (websiteDDText) {
-    // The dd may contain an anchor — try to grab the href
     const dtElements = document.querySelectorAll('dt');
     for (const dt of dtElements) {
       if (dt.textContent.trim().toLowerCase().includes('website')) {
@@ -190,25 +201,21 @@ function extractCompanyData() {
   }
   if (!data.website) {
     const websiteEl = document.querySelector('a[data-test-id="about-us__website"]') ||
-                      document.querySelector('.org-about-company-module__company-page-url a') ||
-                      document.querySelector('[class*="about"] a[href^="http"]:not([href*="linkedin.com"])');
+                      document.querySelector('.org-about-company-module__company-page-url a');
     if (websiteEl) {
       data.website = websiteEl.href || websiteEl.textContent.trim();
     }
   }
 
-  // Description — prefer full About overview text, fall back to tagline
-  data.description = getDDByLabel('overview') ||
-    trySelectors([
-      '[class*="org-about-us"] p',
-      '.org-about-company-module__description',
-      'section[class*="about"] p',
-      '[data-test-id="about-us__description"]',
-      'p[class*="org-about-us"]',
-      '.org-top-card-summary__tagline',
-      '[class*="tagline"]'
-    ]);
+  // Description
+  data.description = getDDByLabel('overview') || getText([
+    '[class*="org-about-us"] p',
+    '.org-about-company-module__description',
+    'section[class*="about"] p',
+    '.org-top-card-summary__tagline'
+  ]);
 
+  console.log('[Stride Extension] Extracted company:', data);
   return data;
 }
 
@@ -226,46 +233,47 @@ function extractJobData() {
   };
 
   // Job title
-  const titleEl = document.querySelector('h1.job-details-jobs-unified-top-card__job-title') ||
-                  document.querySelector('h1.jobs-unified-top-card__job-title') ||
-                  document.querySelector('.job-details-jobs-unified-top-card__job-title') ||
-                  document.querySelector('h1[class*="job-title"]') ||
-                  document.querySelector('.jobs-details h1') ||
-                  document.querySelector('h1');
-  if (titleEl) {
-    data.title = titleEl.textContent.trim();
-  }
+  data.title = getText([
+    'h1.job-details-jobs-unified-top-card__job-title',
+    'h1.jobs-unified-top-card__job-title',
+    '.job-details-jobs-unified-top-card__job-title',
+    'h1[class*="job-title"]',
+    '.jobs-details h1',
+    'h1.t-24',
+    'main h1',
+    'h1'
+  ]);
 
   // Company name
-  const companyEl = document.querySelector('.job-details-jobs-unified-top-card__company-name a') ||
-                    document.querySelector('.jobs-unified-top-card__company-name a') ||
-                    document.querySelector('a[data-tracking-control-name="public_jobs_topcard-org-name"]') ||
-                    document.querySelector('.job-details-jobs-unified-top-card__company-name') ||
-                    document.querySelector('[class*="company-name"]');
-  if (companyEl) {
-    data.company = companyEl.textContent.trim();
-  }
+  data.company = getText([
+    '.job-details-jobs-unified-top-card__company-name a',
+    '.jobs-unified-top-card__company-name a',
+    'a[data-tracking-control-name="public_jobs_topcard-org-name"]',
+    '.job-details-jobs-unified-top-card__company-name',
+    '[class*="jobs-unified-top-card__company-name"]',
+    '.jobs-details [class*="company"]'
+  ]);
 
   // Location
-  const locationEl = document.querySelector('.job-details-jobs-unified-top-card__primary-description-container .tvm__text') ||
-                     document.querySelector('.jobs-unified-top-card__bullet') ||
-                     document.querySelector('.job-details-jobs-unified-top-card__primary-description span') ||
-                     document.querySelector('[class*="job-details"] [class*="location"]');
-  if (locationEl) {
-    data.location = locationEl.textContent.trim();
-  }
+  data.location = getText([
+    '.job-details-jobs-unified-top-card__primary-description-container .tvm__text',
+    '.jobs-unified-top-card__bullet',
+    '.job-details-jobs-unified-top-card__primary-description span',
+    '.tvm__text--positive',
+    '[class*="job-details"] [class*="location"]'
+  ]);
 
-  // Remote type - check for remote/hybrid/onsite indicators
-  const workplaceEl = document.querySelector('.job-details-jobs-unified-top-card__workplace-type') ||
-                      document.querySelector('[class*="workplace-type"]');
-  if (workplaceEl) {
-    const text = workplaceEl.textContent.toLowerCase();
-    if (text.includes('remote')) data.remote_type = 'remote';
-    else if (text.includes('hybrid')) data.remote_type = 'hybrid';
-    else if (text.includes('on-site') || text.includes('onsite')) data.remote_type = 'onsite';
-  }
-
-  // Check location text for remote indicators
+  // Remote type
+  const workplaceText = getText([
+    '.job-details-jobs-unified-top-card__workplace-type',
+    '[class*="workplace-type"]'
+  ]).toLowerCase();
+  
+  if (workplaceText.includes('remote')) data.remote_type = 'remote';
+  else if (workplaceText.includes('hybrid')) data.remote_type = 'hybrid';
+  else if (workplaceText.includes('on-site') || workplaceText.includes('onsite')) data.remote_type = 'onsite';
+  
+  // Check location for remote indicators
   if (!data.remote_type && data.location) {
     const locLower = data.location.toLowerCase();
     if (locLower.includes('remote')) data.remote_type = 'remote';
@@ -273,19 +281,19 @@ function extractJobData() {
   }
 
   // Job description
-  const descEl = document.querySelector('.jobs-description__content') ||
-                 document.querySelector('.job-details-jobs-unified-top-card__job-insight') ||
-                 document.querySelector('[class*="description"]');
+  const descEl = document.querySelector('.jobs-description__content, .jobs-description-content, [class*="jobs-description"]');
   if (descEl) {
-    data.description = descEl.textContent.trim().substring(0, 2000); // Limit length
+    data.description = descEl.textContent.trim().substring(0, 5000);
   }
 
+  console.log('[Stride Extension] Extracted job:', data);
   return data;
 }
 
 // Main extraction function
 function extractData() {
   const pageType = getPageType();
+  console.log('[Stride Extension] Page type:', pageType);
 
   switch (pageType) {
     case 'profile':
@@ -301,6 +309,7 @@ function extractData() {
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('[Stride Extension] Received message:', request.action);
   if (request.action === 'getProfileData' || request.action === 'getData') {
     const data = extractData();
     sendResponse(data);

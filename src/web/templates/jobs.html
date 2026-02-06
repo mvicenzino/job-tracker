@@ -88,6 +88,14 @@
                 <a href="{{ job.job_url }}" target="_blank" class="btn btn-sm btn-ghost">View Posting</a>
                 {% endif %}
                 <a href="{{ url_for('applications.new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Add Lead</a>
+                <form action="{{ url_for('jobs.delete_job', job_id=job.id) }}" method="post" class="delete-form" style="margin-left: auto;">
+                    <button type="submit" class="btn btn-sm btn-ghost btn-danger-text" onclick="return confirm('Delete this job?');" title="Delete job">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                    </button>
+                </form>
             </div>
         </div>
         {% endfor %}
