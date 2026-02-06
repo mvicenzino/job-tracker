@@ -482,24 +482,105 @@ a:hover {
     border: 2px solid var(--bg-primary, #fff);
 }
 
-/* Search Button */
-.nav-search-btn {
+/* Inline Search Bar (navbar) */
+.nav-search-wrapper {
+    position: relative;
+    margin-right: var(--space-2);
+}
+
+.nav-search-input-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border: none;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer;
+    padding: 0 var(--space-3);
     transition: all 0.2s ease;
 }
 
-.nav-search-btn:hover {
-    background: var(--bg-secondary);
+.nav-search-input-container:focus-within {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.nav-search-icon {
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.nav-search-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: var(--space-2) var(--space-2);
+    font-size: 0.875rem;
     color: var(--text-primary);
+    width: 180px;
+    transition: width 0.2s ease;
+}
+
+.nav-search-input:focus {
+    width: 260px;
+}
+
+.nav-search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.nav-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: var(--space-2);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+}
+
+.nav-search-results.active {
+    display: block;
+}
+
+.nav-search-results .search-result-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-3);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: background 0.15s ease;
+}
+
+.nav-search-results .search-result-item:hover {
+    background: var(--bg-secondary);
+}
+
+.nav-search-results .search-result-item:first-child {
+    border-radius: 7px 7px 0 0;
+}
+
+.nav-search-results .search-result-item:last-child {
+    border-radius: 0 0 7px 7px;
+}
+
+.nav-search-results .search-empty {
+    padding: var(--space-4);
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Hide inline search on mobile, show button instead */
+@media (max-width: 768px) {
+    .nav-search-wrapper {
+        display: none;
+    }
 }
 
 /* Search Modal */

@@ -103,13 +103,17 @@
         </div>
 
         <div class="nav-right">
-            <!-- Search Button -->
-            <button type="button" class="nav-search-btn" id="globalSearchBtn" title="Search (Ctrl+K)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="M21 21l-4.35-4.35"/>
-                </svg>
-            </button>
+            <!-- Inline Search Bar (desktop) -->
+            <div class="nav-search-wrapper" id="navSearchWrapper">
+                <div class="nav-search-input-container">
+                    <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <input type="text" class="nav-search-input" id="navSearchInput" placeholder="Search..." autocomplete="off">
+                </div>
+                <div class="nav-search-results" id="navSearchResults"></div>
+            </div>
             <!-- Notification Bell -->
             <a href="{{ url_for('notifications.notifications') }}" class="nav-notification-bell{% if request.endpoint and request.endpoint.startswith('notifications.') %} active{% endif %}" title="Notifications">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -776,7 +780,11 @@
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
-                if (searchModal.classList.contains('active')) {
+                // On mobile, open modal; on desktop, focus inline search
+                var navSearchInput = document.getElementById('navSearchInput');
+                if (navSearchInput && window.innerWidth > 768) {
+                    navSearchInput.focus();
+                } else if (searchModal.classList.contains('active')) {
                     closeSearch();
                 } else {
                     openSearch();
@@ -784,6 +792,73 @@
             }
             if (e.key === 'Escape' && searchModal.classList.contains('active')) {
                 closeSearch();
+            }
+        });
+        
+        // Inline search (navbar - desktop)
+        var navSearchInput = document.getElementById('navSearchInput');
+        var navSearchResults = document.getElementById('navSearchResults');
+        var navSearchTimeout = null;
+        
+        function performNavSearch(query) {
+            if (query.length < 2) {
+                navSearchResults.classList.remove('active');
+                return;
+            }
+            
+            navSearchResults.innerHTML = '<div class="search-empty">Searching...</div>';
+            navSearchResults.classList.add('active');
+            
+            fetch('/api/search?q=' + encodeURIComponent(query))
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.results && data.results.length > 0) {
+                        var html = data.results.map(function(r) {
+                            return '<a href="' + r.url + '" class="search-result-item">' +
+                                '<span class="search-result-icon">' + r.icon + '</span>' +
+                                '<div class="search-result-text">' +
+                                    '<div class="search-result-title">' + r.title + '</div>' +
+                                    (r.subtitle ? '<div class="search-result-subtitle">' + r.subtitle + '</div>' : '') +
+                                '</div>' +
+                            '</a>';
+                        }).join('');
+                        navSearchResults.innerHTML = html;
+                    } else {
+                        navSearchResults.innerHTML = '<div class="search-empty">No results found</div>';
+                    }
+                })
+                .catch(function() {
+                    navSearchResults.classList.remove('active');
+                });
+        }
+        
+        if (navSearchInput) {
+            navSearchInput.addEventListener('input', function() {
+                clearTimeout(navSearchTimeout);
+                navSearchTimeout = setTimeout(function() {
+                    performNavSearch(navSearchInput.value.trim());
+                }, 200);
+            });
+            
+            navSearchInput.addEventListener('focus', function() {
+                if (navSearchInput.value.trim().length >= 2) {
+                    navSearchResults.classList.add('active');
+                }
+            });
+            
+            navSearchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    navSearchResults.classList.remove('active');
+                    navSearchInput.blur();
+                }
+            });
+        }
+        
+        // Close nav search results when clicking outside
+        document.addEventListener('click', function(e) {
+            var wrapper = document.getElementById('navSearchWrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                navSearchResults.classList.remove('active');
             }
         });
     })();
