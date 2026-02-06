@@ -5083,6 +5083,12 @@ body.demo-active .navbar {
     display: none; /* Hidden on desktop */
 }
 
+/* More menu - hidden on desktop */
+.more-menu-overlay,
+.more-menu {
+    display: none;
+}
+
 @media (max-width: 768px) {
     /* Show bottom tab bar on mobile */
     .bottom-tab-bar {
