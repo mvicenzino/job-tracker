@@ -25,6 +25,11 @@ class User(Base, TimestampMixin, UserMixin):
     email_digest_enabled = Column(Boolean, default=False, nullable=True)
     email_digest_frequency = Column(String(20), default='weekly', nullable=True)
     browser_notifications_enabled = Column(Boolean, default=True, nullable=True)
+    
+    # In-app notification preferences
+    notify_interview_reminders = Column(Boolean, default=True, nullable=True)
+    notify_follow_up_nudges = Column(Boolean, default=True, nullable=True)
+    follow_up_nudge_days = Column(Integer, default=7, nullable=True)  # Days after applying to nudge
 
     # Relationships
     companies = relationship("Company", back_populates="user", cascade="all, delete-orphan")

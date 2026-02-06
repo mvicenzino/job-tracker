@@ -119,6 +119,30 @@ class DatabaseConnection:
                         except Exception as e:
                             print(f"[Migration] Failed to add browser_notifications_enabled: {e}")
 
+                    if 'notify_interview_reminders' not in columns:
+                        try:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN notify_interview_reminders BOOLEAN DEFAULT TRUE'))
+                            conn.commit()
+                            print("[Migration] Added notify_interview_reminders column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add notify_interview_reminders: {e}")
+
+                    if 'notify_follow_up_nudges' not in columns:
+                        try:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN notify_follow_up_nudges BOOLEAN DEFAULT TRUE'))
+                            conn.commit()
+                            print("[Migration] Added notify_follow_up_nudges column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add notify_follow_up_nudges: {e}")
+
+                    if 'follow_up_nudge_days' not in columns:
+                        try:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN follow_up_nudge_days INTEGER DEFAULT 7'))
+                            conn.commit()
+                            print("[Migration] Added follow_up_nudge_days column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add follow_up_nudge_days: {e}")
+
             # Check if applications table needs resume_version_id column
             if 'applications' in inspector.get_table_names():
                 app_columns = [col['name'] for col in inspector.get_columns('applications')]

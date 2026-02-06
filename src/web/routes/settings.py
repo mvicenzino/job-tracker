@@ -148,8 +148,21 @@ def save_notifications():
     session = db.get_session()
     try:
         user = session.query(User).get(current_user.id)
+        
+        # Email digest settings
         user.email_digest_enabled = bool(request.form.get('email_digest_enabled'))
         user.email_digest_frequency = request.form.get('email_digest_frequency', 'weekly')
+        
+        # In-app notification settings
+        user.notify_interview_reminders = bool(request.form.get('notify_interview_reminders'))
+        user.notify_follow_up_nudges = bool(request.form.get('notify_follow_up_nudges'))
+        
+        # Follow-up timing
+        try:
+            user.follow_up_nudge_days = int(request.form.get('follow_up_nudge_days', 7))
+        except (ValueError, TypeError):
+            user.follow_up_nudge_days = 7
+        
         session.commit()
         flash('Notification settings saved!', 'success')
     finally:

@@ -34,18 +34,30 @@ class NotificationGenerator:
             'interview_reminders_1h': 0,
             'follow_up_nudges': 0,
             'users_processed': 0,
+            'users_skipped': 0,
         }
         
         users = self.session.query(User).filter(User.is_active == True).all()
         
         for user in users:
-            r24, r1 = self.generate_interview_reminders(user.id)
-            followups = self.generate_follow_up_nudges(user.id)
+            # Check user preferences (default to True if not set)
+            wants_interview_reminders = user.notify_interview_reminders is None or user.notify_interview_reminders
+            wants_follow_up_nudges = user.notify_follow_up_nudges is None or user.notify_follow_up_nudges
             
-            results['interview_reminders_24h'] += r24
-            results['interview_reminders_1h'] += r1
-            results['follow_up_nudges'] += followups
-            results['users_processed'] += 1
+            if wants_interview_reminders:
+                r24, r1 = self.generate_interview_reminders(user.id)
+                results['interview_reminders_24h'] += r24
+                results['interview_reminders_1h'] += r1
+            
+            if wants_follow_up_nudges:
+                days_threshold = user.follow_up_nudge_days or 7
+                followups = self.generate_follow_up_nudges(user.id, days_threshold=days_threshold)
+                results['follow_up_nudges'] += followups
+            
+            if wants_interview_reminders or wants_follow_up_nudges:
+                results['users_processed'] += 1
+            else:
+                results['users_skipped'] += 1
         
         return results
 
