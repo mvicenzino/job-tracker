@@ -664,3 +664,79 @@ def generate_my_notifications():
             'success': False,
             'error': str(e)
         }), 500
+
+
+@bp.route('/api/search')
+@login_required
+def global_search():
+    """Global search across applications, contacts, and companies."""
+    from ...models import Application, Job, Company, Contact
+    
+    query = request.args.get('q', '').strip()
+    if not query or len(query) < 2:
+        return jsonify({'results': []})
+    
+    db = current_app.extensions['db']
+    session = db.get_session()
+    
+    try:
+        search_term = f"%{query}%"
+        results = []
+        
+        # Search applications (via company name and job title)
+        apps = session.query(Application, Job, Company).join(
+            Job, Application.job_id == Job.id
+        ).join(
+            Company, Job.company_id == Company.id
+        ).filter(
+            Application.user_id == current_user.id,
+            (Company.name.ilike(search_term)) | (Job.title.ilike(search_term))
+        ).limit(5).all()
+        
+        for app, job, company in apps:
+            results.append({
+                'type': 'application',
+                'icon': '📄',
+                'title': f"{job.title} at {company.name}",
+                'subtitle': app.status.value.replace('_', ' ').title() if app.status else '',
+                'url': f"/applications/{app.id}"
+            })
+        
+        # Search contacts
+        contacts = session.query(Contact).outerjoin(
+            Company, Contact.company_id == Company.id
+        ).filter(
+            Contact.user_id == current_user.id,
+            (Contact.name.ilike(search_term)) | 
+            (Contact.email.ilike(search_term)) |
+            (Company.name.ilike(search_term))
+        ).limit(5).all()
+        
+        for contact in contacts:
+            results.append({
+                'type': 'contact',
+                'icon': '👤',
+                'title': contact.name,
+                'subtitle': contact.company.name if contact.company else (contact.title or ''),
+                'url': f"/contacts/{contact.id}"
+            })
+        
+        # Search companies
+        companies = session.query(Company).filter(
+            Company.user_id == current_user.id,
+            Company.name.ilike(search_term)
+        ).limit(5).all()
+        
+        for company in companies:
+            results.append({
+                'type': 'company',
+                'icon': '🏢',
+                'title': company.name,
+                'subtitle': company.industry or '',
+                'url': f"/companies/{company.id}"
+            })
+        
+        return jsonify({'results': results[:10]})  # Max 10 total results
+        
+    finally:
+        session.close()

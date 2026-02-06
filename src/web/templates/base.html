@@ -95,6 +95,13 @@
         </div>
 
         <div class="nav-right">
+            <!-- Search Button -->
+            <button type="button" class="nav-search-btn" id="globalSearchBtn" title="Search (Ctrl+K)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="M21 21l-4.35-4.35"/>
+                </svg>
+            </button>
             <!-- Notification Bell -->
             <a href="{{ url_for('notifications.notifications') }}" class="nav-notification-bell{% if request.endpoint and request.endpoint.startswith('notifications.') %} active{% endif %}" title="Notifications">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -660,6 +667,116 @@
         }
     })();
     </script>
+    
+    {% if current_user.is_authenticated %}
+    <!-- Global Search Modal -->
+    <div class="search-modal-overlay" id="searchModalOverlay"></div>
+    <div class="search-modal" id="searchModal">
+        <div class="search-input-wrapper">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" id="globalSearchInput" placeholder="Search applications, contacts, companies..." autocomplete="off">
+            <kbd class="search-shortcut">ESC</kbd>
+        </div>
+        <div class="search-results" id="searchResults">
+            <div class="search-empty">Start typing to search...</div>
+        </div>
+    </div>
+    
+    <script>
+    (function() {
+        var searchBtn = document.getElementById('globalSearchBtn');
+        var searchModal = document.getElementById('searchModal');
+        var searchOverlay = document.getElementById('searchModalOverlay');
+        var searchInput = document.getElementById('globalSearchInput');
+        var searchResults = document.getElementById('searchResults');
+        var searchTimeout = null;
+        
+        function openSearch() {
+            searchModal.classList.add('active');
+            searchOverlay.classList.add('active');
+            searchInput.value = '';
+            searchResults.innerHTML = '<div class="search-empty">Start typing to search...</div>';
+            setTimeout(function() { searchInput.focus(); }, 50);
+        }
+        
+        function closeSearch() {
+            searchModal.classList.remove('active');
+            searchOverlay.classList.remove('active');
+        }
+        
+        function performSearch(query) {
+            if (query.length < 2) {
+                searchResults.innerHTML = '<div class="search-empty">Start typing to search...</div>';
+                return;
+            }
+            
+            searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
+            
+            fetch('/api/search?q=' + encodeURIComponent(query))
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.results && data.results.length > 0) {
+                        var html = data.results.map(function(r) {
+                            return '<a href="' + r.url + '" class="search-result-item">' +
+                                '<span class="search-result-icon">' + r.icon + '</span>' +
+                                '<div class="search-result-text">' +
+                                    '<div class="search-result-title">' + r.title + '</div>' +
+                                    (r.subtitle ? '<div class="search-result-subtitle">' + r.subtitle + '</div>' : '') +
+                                '</div>' +
+                            '</a>';
+                        }).join('');
+                        searchResults.innerHTML = html;
+                    } else {
+                        searchResults.innerHTML = '<div class="search-empty">No results found</div>';
+                    }
+                })
+                .catch(function() {
+                    searchResults.innerHTML = '<div class="search-empty">Search failed</div>';
+                });
+        }
+        
+        if (searchBtn) {
+            searchBtn.addEventListener('click', openSearch);
+        }
+        
+        if (searchOverlay) {
+            searchOverlay.addEventListener('click', closeSearch);
+        }
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() {
+                    performSearch(searchInput.value.trim());
+                }, 200);
+            });
+            
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeSearch();
+            });
+        }
+        
+        // Keyboard shortcut: Ctrl+K or Cmd+K
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                if (searchModal.classList.contains('active')) {
+                    closeSearch();
+                } else {
+                    openSearch();
+                }
+            }
+            if (e.key === 'Escape' && searchModal.classList.contains('active')) {
+                closeSearch();
+            }
+        });
+    })();
+    </script>
+    {% endif %}
+    
     {% block scripts %}{% endblock %}
 </body>
 </html>
