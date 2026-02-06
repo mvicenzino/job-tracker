@@ -16,6 +16,7 @@ def applications():
     try:
         search = request.args.get('search', '').strip()
         status_str = request.args.get('status', '').strip()
+        view = request.args.get('view', 'all').strip()
 
         # Parse status string to enum
         status = None
@@ -25,17 +26,44 @@ def applications():
             except ValueError:
                 pass
 
-        # Use search method if filters are active, otherwise get all
+        # Define which statuses are "leads" vs "applied"
+        lead_statuses = [ApplicationStatus.INTERESTED, ApplicationStatus.PREPARING]
+        applied_statuses = [s for s in ApplicationStatus if s not in lead_statuses]
+
+        # Get all apps for counting
+        all_apps = service.applications.get_with_company_info()
+        
+        # Calculate counts
+        counts = {
+            'all': len(all_apps),
+            'leads': len([a for a, j, c in all_apps if a.status in lead_statuses]),
+            'applied': len([a for a, j, c in all_apps if a.status in applied_statuses]),
+        }
+
+        # Filter by view
+        if view == 'leads':
+            apps = [a for a in all_apps if a[0].status in lead_statuses]
+        elif view == 'applied':
+            apps = [a for a in all_apps if a[0].status in applied_statuses]
+        else:
+            apps = all_apps
+
+        # Apply additional search/status filters
         if search or status:
             apps = service.applications.search_with_company_info(search=search, status=status)
-        else:
-            apps = service.applications.get_with_company_info()
+            # Re-filter by view if needed
+            if view == 'leads':
+                apps = [a for a in apps if a[0].status in lead_statuses]
+            elif view == 'applied':
+                apps = [a for a in apps if a[0].status in applied_statuses]
 
         return render_template(
             'applications.html',
             applications=apps,
             search=search,
             status=status_str,
+            view=view,
+            counts=counts,
             ApplicationStatus=ApplicationStatus
         )
     finally:
@@ -106,6 +134,84 @@ def new_application():
     finally:
         session.close()
     return render_template('application_form.html', prefill=prefill, resume_versions=resume_versions)
+
+
+@bp.route('/applications/<int:app_id>/review')
+@login_required
+def review_lead(app_id):
+    """Review a newly imported lead before adding to pipeline."""
+    service, session = get_service()
+    try:
+        app = service.applications.get_by_id(app_id)
+        if not app:
+            flash('Application not found.', 'error')
+            return redirect(url_for('applications.applications'))
+        
+        job = app.job
+        company = job.company if job else None
+        
+        return render_template('review_lead.html',
+                             application=app,
+                             job=job,
+                             company=company)
+    finally:
+        session.close()
+
+
+@bp.route('/applications/<int:app_id>/confirm', methods=['POST'])
+@login_required
+def confirm_lead(app_id):
+    """Process the lead review decision."""
+    service, session = get_service()
+    try:
+        action = request.form.get('action')
+        app = service.applications.get_by_id(app_id)
+        
+        if not app:
+            flash('Application not found.', 'error')
+            return redirect(url_for('applications.applications'))
+        
+        if action == 'delete':
+            # Delete the lead
+            service.applications.delete(app_id)
+            session.commit()
+            flash('Lead removed.', 'success')
+            return redirect(url_for('jobs.jobs'))
+        
+        elif action == 'save':
+            # Keep as saved job, delete the application
+            job = app.job
+            if job:
+                job.is_flagged = True
+            service.applications.delete(app_id)
+            session.commit()
+            flash('Job saved for later.', 'success')
+            return redirect(url_for('jobs.jobs'))
+        
+        else:  # action == 'add' (Good Fit)
+            # Update excitement level and notes
+            excitement = request.form.get('excitement_level', type=int)
+            notes = request.form.get('notes', '').strip()
+            
+            if excitement:
+                app.excitement_level = excitement
+            
+            # Add note if provided
+            if notes:
+                from ...models import Note
+                note = Note(
+                    user_id=app.user_id,
+                    application_id=app.id,
+                    content=f"Initial assessment: {notes}"
+                )
+                session.add(note)
+            
+            session.commit()
+            flash('Lead added to your pipeline!', 'success')
+            return redirect(url_for('applications.application_detail', app_id=app_id))
+    
+    finally:
+        session.close()
 
 
 @bp.route('/applications/<int:app_id>')

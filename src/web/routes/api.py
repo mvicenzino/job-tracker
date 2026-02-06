@@ -320,17 +320,34 @@ def api_create_job():
             is_flagged=data.get('is_flagged', False)
         )
         
-        # Create notification for the new job
+        # Also create a lead (application in INTERESTED status) if requested
+        application = None
+        review_url = None
+        create_lead = data.get('create_lead', True)  # Default to creating lead
+        
+        if create_lead:
+            from ...models import Application, ApplicationStatus
+            application = Application(
+                user_id=user.id,
+                job_id=job.id,
+                status=ApplicationStatus.INTERESTED
+            )
+            session.add(application)
+            session.commit()
+            review_url = f"/applications/{application.id}/review"
+        
+        # Create notification for the new lead
         try:
             from ...repositories.notification import NotificationRepository
             notif_repo = NotificationRepository(session)
             notif_repo.create(
                 user_id=user.id,
                 notification_type='job_added',
-                title=f"New job added: {job.title}",
+                title=f"New lead: {job.title}",
                 message=f"{job.company.name} • {data.get('location', 'Location TBD')}",
-                link_url=f"/jobs",
-                job_id=job.id
+                link_url=review_url or f"/jobs",
+                job_id=job.id,
+                application_id=application.id if application else None
             )
         except Exception as notif_error:
             # Don't fail the job creation if notification fails
@@ -342,7 +359,11 @@ def api_create_job():
                 'id': job.id,
                 'title': job.title,
                 'company': job.company.name
-            }
+            },
+            'application': {
+                'id': application.id,
+                'review_url': review_url
+            } if application else None
         })
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response

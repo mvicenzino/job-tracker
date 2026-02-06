@@ -312,10 +312,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         messageEl.className = 'message success';
         submitBtn.textContent = 'Added!';
 
-        setTimeout(() => {
-          submitBtn.disabled = false;
-          submitBtn.textContent = submitBtnText;
-        }, 2000);
+        // For jobs, redirect to review page if available
+        if (dataType === 'job' && result.application && result.application.review_url) {
+          messageEl.textContent = `✓ ${itemName} added! Opening review...`;
+          setTimeout(() => {
+            chrome.tabs.create({ url: settings.serverUrl + result.application.review_url });
+            window.close();
+          }, 500);
+        } else {
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = submitBtnText;
+          }, 2000);
+        }
       } else {
         throw new Error(result.error || `Failed to add ${dataType}`);
       }

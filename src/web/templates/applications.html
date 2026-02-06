@@ -1,15 +1,29 @@
 {% extends "base.html" %}
 
-{% block title %}Applications - Stride{% endblock %}
+{% block title %}{% if view == 'leads' %}Leads{% elif view == 'applied' %}Applications{% else %}Pipeline{% endif %} - Stride{% endblock %}
 
 {% block content %}
 <div class="list-page">
     <header class="page-header">
-        <h1>All Applications</h1>
+        <h1>{% if view == 'leads' %}Leads{% elif view == 'applied' %}Applications{% else %}Pipeline{% endif %}</h1>
         <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Lead</a>
     </header>
 
+    <!-- Tabs for Leads vs Applications -->
+    <div class="pipeline-tabs">
+        <a href="{{ url_for('applications.applications', view='all') }}" class="pipeline-tab {% if view == 'all' or not view %}active{% endif %}">
+            All <span class="tab-count">{{ counts.all }}</span>
+        </a>
+        <a href="{{ url_for('applications.applications', view='leads') }}" class="pipeline-tab {% if view == 'leads' %}active{% endif %}">
+            Leads <span class="tab-count">{{ counts.leads }}</span>
+        </a>
+        <a href="{{ url_for('applications.applications', view='applied') }}" class="pipeline-tab {% if view == 'applied' %}active{% endif %}">
+            Applied <span class="tab-count">{{ counts.applied }}</span>
+        </a>
+    </div>
+
     <form class="filter-bar" method="GET" action="{{ url_for('applications.applications') }}">
+        <input type="hidden" name="view" value="{{ view or 'all' }}">
         <div class="search-form">
             <input type="text" name="search" placeholder="Search by company or position..." value="{{ search or '' }}">
             <select name="status" class="filter-select" title="Filter by application status">
@@ -24,7 +38,7 @@
         <div class="filter-buttons">
             <button type="submit" class="btn btn-primary btn-sm">Search</button>
             {% if search or status %}
-            <a href="{{ url_for('applications.applications') }}" class="btn btn-secondary btn-sm">Clear</a>
+            <a href="{{ url_for('applications.applications', view=view) }}" class="btn btn-secondary btn-sm">Clear</a>
             {% endif %}
         </div>
     </form>

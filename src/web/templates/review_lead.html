@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block title %}Review Lead - {{ job.title }} - Stride{% endblock %}
+
+{% block content %}
+<div class="review-lead-page">
+    <div class="review-header">
+        <span class="review-badge">New Lead</span>
+        <h1>Does this role fit your goals?</h1>
+        <p class="subtitle">Take a moment to evaluate this opportunity before adding it to your pipeline.</p>
+    </div>
+
+    <div class="review-content">
+        <!-- Job Details Card -->
+        <div class="card review-job-card">
+            <div class="card-header">
+                <div class="job-header-info">
+                    <h2>{{ job.title }}</h2>
+                    <span class="company-name">{{ company.name }}</span>
+                </div>
+                {% if job.job_url %}
+                <a href="{{ job.job_url }}" target="_blank" class="btn btn-ghost btn-sm">View Original →</a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="job-meta-grid">
+                    {% if job.location %}
+                    <div class="meta-item">
+                        <span class="meta-label">Location</span>
+                        <span class="meta-value">{{ job.location }}</span>
+                    </div>
+                    {% endif %}
+                    {% if job.remote_type %}
+                    <div class="meta-item">
+                        <span class="meta-label">Work Type</span>
+                        <span class="meta-value">{{ job.remote_type|title }}</span>
+                    </div>
+                    {% endif %}
+                    {% if job.salary_min or job.salary_max %}
+                    <div class="meta-item">
+                        <span class="meta-label">Salary</span>
+                        <span class="meta-value">
+                            {% if job.salary_min and job.salary_max %}
+                                ${{ "{:,}".format(job.salary_min) }} - ${{ "{:,}".format(job.salary_max) }}
+                            {% elif job.salary_min %}
+                                ${{ "{:,}".format(job.salary_min) }}+
+                            {% else %}
+                                Up to ${{ "{:,}".format(job.salary_max) }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% if job.source %}
+                    <div class="meta-item">
+                        <span class="meta-label">Source</span>
+                        <span class="meta-value">{{ job.source }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if job.description %}
+                <div class="job-description">
+                    <h4>Job Description</h4>
+                    <div class="description-text">{{ job.description[:1500] }}{% if job.description|length > 1500 %}...{% endif %}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Fit Assessment Card -->
+        <div class="card review-assessment-card">
+            <div class="card-header">
+                <h3>Quick Fit Check</h3>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('applications.confirm_lead', app_id=application.id) }}" method="POST" class="fit-assessment-form">
+                    
+                    <div class="assessment-question">
+                        <label>How excited are you about this role?</label>
+                        <div class="excitement-scale">
+                            {% for i in range(1, 6) %}
+                            <label class="excitement-option">
+                                <input type="radio" name="excitement_level" value="{{ i }}" {% if i == 3 %}checked{% endif %}>
+                                <span class="excitement-emoji">
+                                    {% if i == 1 %}😐{% elif i == 2 %}🙂{% elif i == 3 %}😊{% elif i == 4 %}😃{% else %}🤩{% endif %}
+                                </span>
+                                <span class="excitement-label">
+                                    {% if i == 1 %}Meh{% elif i == 2 %}Okay{% elif i == 3 %}Good{% elif i == 4 %}Great{% else %}Dream Job{% endif %}
+                                </span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="assessment-checklist">
+                        <label class="checklist-item">
+                            <input type="checkbox" name="salary_match" value="1">
+                            <span>Salary meets my expectations</span>
+                        </label>
+                        <label class="checklist-item">
+                            <input type="checkbox" name="location_match" value="1">
+                            <span>Location/remote policy works for me</span>
+                        </label>
+                        <label class="checklist-item">
+                            <input type="checkbox" name="skills_match" value="1">
+                            <span>I have the required skills</span>
+                        </label>
+                        <label class="checklist-item">
+                            <input type="checkbox" name="has_referral" value="1">
+                            <span>I have a referral or connection</span>
+                        </label>
+                    </div>
+
+                    <div class="assessment-notes">
+                        <label for="notes">Any notes? (optional)</label>
+                        <textarea name="notes" id="notes" rows="2" placeholder="Why this role interests you, concerns, things to research..."></textarea>
+                    </div>
+
+                    <div class="review-actions">
+                        <button type="submit" name="action" value="add" class="btn btn-primary btn-lg">
+                            ✓ Good Fit — Add to Pipeline
+                        </button>
+                        <button type="submit" name="action" value="save" class="btn btn-secondary">
+                            Save for Later
+                        </button>
+                        <button type="submit" name="action" value="delete" class="btn btn-ghost btn-danger-text" onclick="return confirm('Delete this lead?');">
+                            Not a Fit — Delete
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.review-lead-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-4);
+}
+
+.review-header {
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.review-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--accent-color);
+    color: white;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+}
+
+.review-header h1 {
+    margin: 0 0 var(--space-2);
+    font-size: 1.75rem;
+}
+
+.review-header .subtitle {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.review-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.review-job-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.job-header-info h2 {
+    margin: 0 0 var(--space-1);
+    font-size: 1.25rem;
+}
+
+.job-header-info .company-name {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.job-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+    padding: var(--space-4);
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.meta-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.meta-value {
+    font-weight: 500;
+}
+
+.job-description h4 {
+    margin: 0 0 var(--space-2);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.description-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: var(--space-3);
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+}
+
+.review-assessment-card .card-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.assessment-question {
+    margin-bottom: var(--space-5);
+}
+
+.assessment-question label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: var(--space-3);
+}
+
+.excitement-scale {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: space-between;
+}
+
+.excitement-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-3);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.excitement-option:hover {
+    border-color: var(--accent-color);
+}
+
+.excitement-option input {
+    display: none;
+}
+
+.excitement-option input:checked + .excitement-emoji {
+    transform: scale(1.2);
+}
+
+.excitement-option:has(input:checked) {
+    border-color: var(--accent-color);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.excitement-emoji {
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.excitement-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.assessment-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    cursor: pointer;
+}
+
+.checklist-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--accent-color);
+}
+
+.assessment-notes {
+    margin-bottom: var(--space-5);
+}
+
+.assessment-notes label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: var(--space-2);
+}
+
+.assessment-notes textarea {
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+}
+
+.review-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-color);
+}
+
+.review-actions .btn-lg {
+    flex: 1;
+    min-width: 200px;
+}
+
+@media (max-width: 600px) {
+    .excitement-scale {
+        flex-wrap: wrap;
+    }
+    
+    .excitement-option {
+        flex: 0 0 calc(33% - var(--space-2));
+    }
+    
+    .review-actions {
+        flex-direction: column;
+    }
+    
+    .review-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

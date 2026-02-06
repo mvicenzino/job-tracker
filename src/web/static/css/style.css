@@ -3214,6 +3214,56 @@ a:hover {
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
+/* Pipeline Tabs (Leads vs Applications) */
+.pipeline-tabs {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--space-3);
+}
+
+.pipeline-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.pipeline-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+}
+
+.pipeline-tab.active {
+    color: var(--accent-color);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.pipeline-tab .tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.pipeline-tab.active .tab-count {
+    background: var(--accent-color);
+    color: white;
+}
+
 .filter-bar {
     display: flex;
     justify-content: space-between;
