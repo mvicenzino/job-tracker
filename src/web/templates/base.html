@@ -12,10 +12,11 @@
     <script>
     (function() {
         var saved = localStorage.getItem('stride-theme');
-        if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        // Default to light mode unless user explicitly chose dark
+        if (saved === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
             document.getElementById('theme-color-meta').content = '#1e293b';
-        } else if (saved === 'light') {
+        } else {
             document.documentElement.setAttribute('data-theme', 'light');
         }
     })();
@@ -548,9 +549,7 @@
         var themeColorMeta = document.getElementById('theme-color-meta');
 
         function isDark() {
-            return document.documentElement.getAttribute('data-theme') === 'dark' ||
-                (!document.documentElement.getAttribute('data-theme') && 
-                 window.matchMedia('(prefers-color-scheme: dark)').matches);
+            return document.documentElement.getAttribute('data-theme') === 'dark';
         }
 
         function updateThemeUI() {
