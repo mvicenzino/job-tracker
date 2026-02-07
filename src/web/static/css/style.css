@@ -650,18 +650,26 @@ a:hover {
 
 .search-input-wrapper input {
     flex: 1;
-    border: none;
-    outline: none;
-    box-shadow: none;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-appearance: none;
     font-size: 1rem;
     background: transparent;
     color: var(--color-text);
     min-width: 0;
 }
 
-.search-input-wrapper input:focus {
+.search-input-wrapper input:focus,
+.search-input-wrapper input:focus-visible,
+.search-input-wrapper input:active {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.search-input-wrapper:focus-within {
     outline: none;
-    border: none;
     box-shadow: none;
 }
 
