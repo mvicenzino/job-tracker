@@ -1,4 +1,4 @@
-"""About and Blog routes."""
+"""About and Notes routes."""
 from flask import Blueprint, render_template, abort
 from flask_login import login_required
 from markupsafe import Markup
@@ -8,7 +8,13 @@ bp = Blueprint('about', __name__)
 
 
 # =============================================================================
-# BLOG POSTS
+# NEWSLETTER
+# =============================================================================
+NEWSLETTER_URL = 'https://www.linkedin.com/newsletters/stride-7423041699884695552'
+
+
+# =============================================================================
+# NOTES (Blog Posts)
 # =============================================================================
 # Add new posts here. Format:
 # {
@@ -24,7 +30,7 @@ bp = Blueprint('about', __name__)
 # }
 # =============================================================================
 
-BLOG_POSTS = [
+NOTES = [
     # Example post (uncomment and modify to add your first post):
     # {
     #     'slug': 'welcome-to-stride',
@@ -72,11 +78,11 @@ def render_markdown(text):
     return Markup(html)
 
 
-def get_post_by_slug(slug):
-    """Find a post by its slug."""
-    for post in BLOG_POSTS:
-        if post['slug'] == slug:
-            return post
+def get_note_by_slug(slug):
+    """Find a note by its slug."""
+    for note in NOTES:
+        if note['slug'] == slug:
+            return note
     return None
 
 
@@ -87,20 +93,20 @@ def about():
     return render_template('about.html')
 
 
-@bp.route('/blog')
+@bp.route('/notes')
 @login_required
-def blog():
-    """Blog listing page."""
+def notes():
+    """Notes listing page."""
     # Sort posts by date (newest first) - assumes consistent date format
-    posts = sorted(BLOG_POSTS, key=lambda x: x.get('date', ''), reverse=True)
-    return render_template('blog.html', posts=posts)
+    posts = sorted(NOTES, key=lambda x: x.get('date', ''), reverse=True)
+    return render_template('notes.html', posts=posts, newsletter_url=NEWSLETTER_URL)
 
 
-@bp.route('/blog/<slug>')
+@bp.route('/notes/<slug>')
 @login_required
-def blog_post(slug):
-    """Individual blog post page."""
-    post = get_post_by_slug(slug)
+def note(slug):
+    """Individual note page."""
+    post = get_note_by_slug(slug)
     
     if not post:
         abort(404)
@@ -109,4 +115,21 @@ def blog_post(slug):
     post_data = post.copy()
     post_data['content_html'] = render_markdown(post.get('content', ''))
     
-    return render_template('blog_post.html', post=post_data)
+    return render_template('note.html', post=post_data)
+
+
+# Keep old URLs working (redirect)
+@bp.route('/blog')
+@login_required
+def blog():
+    """Redirect old blog URL to notes."""
+    from flask import redirect, url_for
+    return redirect(url_for('about.notes'))
+
+
+@bp.route('/blog/<slug>')
+@login_required
+def blog_post(slug):
+    """Redirect old blog post URLs to notes."""
+    from flask import redirect, url_for
+    return redirect(url_for('about.note', slug=slug))
