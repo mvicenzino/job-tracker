@@ -641,6 +641,15 @@ a:hover {
     border-bottom: 1px solid var(--color-border-light);
     gap: var(--space-3);
     background: var(--color-bg-subtle);
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.search-input-wrapper *,
+.search-input-wrapper *:focus,
+.search-input-wrapper *:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .search-input-wrapper .search-icon {
