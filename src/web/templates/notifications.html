@@ -3,232 +3,265 @@
 {% block title %}Notifications - Stride{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div class="page-header-content">
-        <h1>Notifications</h1>
-        {% if unread_count > 0 %}
-        <span class="badge badge-primary">{{ unread_count }} unread</span>
-        {% endif %}
-    </div>
-    <div class="page-header-actions">
-        {% if notifications %}
-        <form action="{{ url_for('notifications.mark_all_read') }}" method="POST" style="display: inline;">
-            <button type="submit" class="btn btn-secondary btn-sm">Mark All Read</button>
-        </form>
-        <form action="{{ url_for('notifications.clear_read') }}" method="POST" style="display: inline;">
-            <button type="submit" class="btn btn-ghost btn-sm">Clear Read</button>
-        </form>
-        {% endif %}
-    </div>
-</div>
-
-<div class="notifications-list">
-    {% if notifications %}
-        {% for notification in notifications %}
-        <div class="notification-item {% if not notification.is_read %}unread{% endif %}" data-id="{{ notification.id }}">
-            <div class="notification-icon">
-                {% if notification.notification_type == 'job_added' %}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                </svg>
-                {% elif notification.notification_type == 'application_update' %}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
-                </svg>
-                {% else %}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                </svg>
-                {% endif %}
-            </div>
-            <div class="notification-content">
-                <div class="notification-header">
-                    <h3 class="notification-title">{{ notification.title }}</h3>
-                    <span class="notification-time">{{ notification.created_at.strftime('%b %d, %I:%M %p') }}</span>
-                </div>
-                {% if notification.message %}
-                <p class="notification-message">{{ notification.message }}</p>
-                {% endif %}
-                <div class="notification-actions">
-                    {% if notification.link_url %}
-                    <a href="{{ notification.link_url }}" class="btn btn-sm btn-primary">View</a>
-                    {% endif %}
-                    {% if not notification.is_read %}
-                    <form action="{{ url_for('notifications.mark_read', notification_id=notification.id) }}" method="POST" style="display: inline;">
-                        <button type="submit" class="btn btn-sm btn-ghost">Mark Read</button>
-                    </form>
-                    {% endif %}
-                    <form action="{{ url_for('notifications.delete', notification_id=notification.id) }}" method="POST" style="display: inline;">
-                        <button type="submit" class="btn btn-sm btn-ghost btn-danger">Dismiss</button>
-                    </form>
-                </div>
-            </div>
-            {% if not notification.is_read %}
-            <div class="notification-unread-dot"></div>
+<div class="notifications-page">
+    <header class="page-header">
+        <div>
+            <h1>Notifications</h1>
+            {% if unread_count > 0 %}
+            <p class="subtitle">{{ unread_count }} unread notification{% if unread_count > 1 %}s{% endif %}</p>
+            {% else %}
+            <p class="subtitle">You're all caught up</p>
             {% endif %}
         </div>
-        {% endfor %}
-    {% else %}
-        <div class="empty-state">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-            <h3>No notifications yet</h3>
-            <p>You'll see alerts here when new jobs are added or important updates happen.</p>
+        {% if notifications %}
+        <div class="header-actions">
+            <form action="{{ url_for('notifications.mark_all_read') }}" method="POST">
+                <button type="submit" class="btn btn-secondary btn-sm">Mark All Read</button>
+            </form>
+            <form action="{{ url_for('notifications.clear_read') }}" method="POST">
+                <button type="submit" class="btn btn-ghost btn-sm">Clear Read</button>
+            </form>
         </div>
-    {% endif %}
+        {% endif %}
+    </header>
+
+    <div class="notifications-container">
+        {% if notifications %}
+        <div class="card">
+            <div class="notifications-list">
+                {% for notification in notifications %}
+                <div class="notification-item {% if not notification.is_read %}unread{% endif %}" data-id="{{ notification.id }}">
+                    <div class="notification-icon {% if notification.notification_type == 'job_added' %}icon-job{% elif notification.notification_type == 'application_update' %}icon-app{% else %}icon-default{% endif %}">
+                        {% if notification.notification_type == 'job_added' %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                        </svg>
+                        {% elif notification.notification_type == 'application_update' %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                        {% elif notification.notification_type == 'followup_reminder' %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        {% elif notification.notification_type == 'interview_reminder' %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        {% else %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="notification-body">
+                        <div class="notification-main">
+                            <h3 class="notification-title">{{ notification.title }}</h3>
+                            {% if notification.message %}
+                            <p class="notification-message">{{ notification.message }}</p>
+                            {% endif %}
+                            <span class="notification-time">{{ notification.created_at.strftime('%b %d at %I:%M %p') }}</span>
+                        </div>
+                        <div class="notification-actions">
+                            {% if notification.link_url %}
+                            <a href="{{ notification.link_url }}" class="btn btn-sm btn-primary">View</a>
+                            {% endif %}
+                            {% if not notification.is_read %}
+                            <form action="{{ url_for('notifications.mark_read', notification_id=notification.id) }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-ghost">Mark Read</button>
+                            </form>
+                            {% endif %}
+                            <form action="{{ url_for('notifications.delete', notification_id=notification.id) }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-ghost text-danger">Dismiss</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% if not notification.is_read %}
+                    <span class="unread-indicator"></span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="empty-state-visual">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                </div>
+                <p>No notifications</p>
+                <p class="empty-hint">You'll see alerts here when new jobs are added, interviews are scheduled, or contacts need follow-up.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </div>
 
 <style>
-.notifications-list {
+.notifications-page {
     max-width: 800px;
     margin: 0 auto;
 }
 
-.notification-item {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    margin-bottom: 0.75rem;
-    position: relative;
-    transition: all 0.2s ease;
+.notifications-container .card {
+    overflow: hidden;
 }
 
-.notification-item.unread {
-    background: var(--accent-soft);
-    border-color: var(--accent-color);
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    position: relative;
+    border-bottom: 1px solid var(--color-border-light);
+    transition: background var(--transition-fast);
+}
+
+.notification-item:last-child {
+    border-bottom: none;
 }
 
 .notification-item:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background: var(--color-bg-subtle);
+}
+
+.notification-item.unread {
+    background: var(--color-primary-subtle);
+}
+
+.notification-item.unread:hover {
+    background: var(--color-primary-light);
 }
 
 .notification-icon {
     flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    background: var(--bg-secondary);
-    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--accent-color);
+    background: var(--color-bg-subtle);
+    color: var(--color-text-muted);
 }
 
 .notification-item.unread .notification-icon {
-    background: var(--accent-color);
+    background: var(--color-primary);
     color: white;
 }
 
-.notification-content {
-    flex: 1;
-    min-width: 0;
+.notification-icon.icon-job {
+    background: var(--color-info-light);
+    color: var(--color-info);
 }
 
-.notification-header {
+.notification-item.unread .notification-icon.icon-job {
+    background: var(--color-info);
+    color: white;
+}
+
+.notification-icon.icon-app {
+    background: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.notification-item.unread .notification-icon.icon-app {
+    background: var(--color-success);
+    color: white;
+}
+
+.notification-body {
+    flex: 1;
+    min-width: 0;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 0.25rem;
+    gap: var(--space-4);
+}
+
+.notification-main {
+    flex: 1;
+    min-width: 0;
 }
 
 .notification-title {
     font-size: 0.9375rem;
     font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.notification-time {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    white-space: nowrap;
+    color: var(--color-text);
+    margin: 0 0 var(--space-1);
+    line-height: 1.4;
 }
 
 .notification-message {
     font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin: 0.25rem 0 0.75rem;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-2);
     line-height: 1.5;
+}
+
+.notification-time {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
 }
 
 .notification-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-2);
+    flex-shrink: 0;
 }
 
-.notification-unread-dot {
+.unread-indicator {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 50%;
+    right: var(--space-4);
+    transform: translateY(-50%);
     width: 8px;
     height: 8px;
-    background: var(--accent-color);
+    background: var(--color-primary);
     border-radius: 50%;
 }
 
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text-muted);
+.text-danger {
+    color: var(--color-danger) !important;
 }
 
-.empty-state svg {
-    margin-bottom: 1rem;
-    opacity: 0.5;
+.text-danger:hover {
+    background: var(--color-danger-light) !important;
 }
 
-.empty-state h3 {
-    color: var(--text-primary);
-    margin: 0 0 0.5rem;
-}
-
-.empty-state p {
-    margin: 0;
-    max-width: 300px;
-    margin: 0 auto;
-}
-
-.btn-danger {
-    color: var(--danger-color) !important;
-}
-
-.btn-danger:hover {
-    background: var(--danger-soft) !important;
-}
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.page-header-content {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.page-header h1 {
-    margin: 0;
-}
-
-.page-header-actions {
-    display: flex;
-    gap: 0.5rem;
+@media (max-width: 640px) {
+    .notification-body {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    
+    .notification-actions {
+        width: 100%;
+    }
+    
+    .unread-indicator {
+        top: var(--space-4);
+        transform: none;
+    }
 }
 </style>
 {% endblock %}
