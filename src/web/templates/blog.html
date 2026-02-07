@@ -5,34 +5,33 @@
 {% block content %}
 <div class="page-header">
     <h1>Blog</h1>
-    <p class="page-subtitle">Tips, insights, and updates from the Stride team</p>
+    <p class="page-subtitle">Thoughts on job searching, building Stride, and what's next</p>
 </div>
 
 <div class="blog-container">
     {% if posts %}
-    <div class="blog-grid">
+    <div class="blog-list">
         {% for post in posts %}
-        <a href="{{ url_for('about.blog_post', slug=post.slug) }}" class="blog-card card">
-            <div class="blog-card-content">
-                <span class="blog-date">{{ post.date }}</span>
-                <h2 class="blog-title">{{ post.title }}</h2>
-                <p class="blog-excerpt">{{ post.excerpt }}</p>
-                <span class="blog-author">By {{ post.author }}</span>
+        <a href="{{ url_for('about.blog_post', slug=post.slug) }}" class="blog-item">
+            <div class="blog-item-meta">
+                <span class="blog-item-date">{{ post.date }}</span>
             </div>
+            <h2 class="blog-item-title">{{ post.title }}</h2>
+            <p class="blog-item-excerpt">{{ post.excerpt }}</p>
+            <span class="blog-item-read">Read more →</span>
         </a>
         {% endfor %}
     </div>
     {% else %}
     <div class="blog-empty">
         <div class="blog-empty-icon">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
         </div>
         <h2>Coming Soon</h2>
-        <p>We're working on some great content for you. Check back soon for job search tips, product updates, and more.</p>
-        <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+        <p>I'm working on some posts about job searching, building in public, and lessons learned. Check back soon!</p>
     </div>
     {% endif %}
 </div>
@@ -45,54 +44,63 @@
 }
 
 .blog-container {
-    max-width: 900px;
-    margin: 0 auto;
+    max-width: 700px;
 }
 
-.blog-grid {
-    display: grid;
-    gap: var(--space-5);
+.blog-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
 }
 
-.blog-card {
+.blog-item {
     display: block;
     text-decoration: none;
-    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    padding: var(--space-5) 0;
+    border-bottom: 1px solid var(--color-border-light);
+    transition: opacity var(--transition-fast);
 }
 
-.blog-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+.blog-item:first-child {
+    padding-top: 0;
 }
 
-.blog-card-content {
-    padding: var(--space-5);
+.blog-item:last-child {
+    border-bottom: none;
 }
 
-.blog-date {
+.blog-item:hover {
+    opacity: 0.8;
+}
+
+.blog-item-meta {
+    margin-bottom: var(--space-2);
+}
+
+.blog-item-date {
     font-size: 0.8125rem;
     color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
 }
 
-.blog-title {
+.blog-item-title {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--color-text);
-    margin: var(--space-2) 0 var(--space-3);
+    margin-bottom: var(--space-2);
+    line-height: 1.3;
 }
 
-.blog-excerpt {
+.blog-item-excerpt {
     font-size: 0.9375rem;
     color: var(--color-text-secondary);
     line-height: 1.6;
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-3);
 }
 
-.blog-author {
-    font-size: 0.8125rem;
-    color: var(--color-text-muted);
+.blog-item-read {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-primary);
 }
 
 .blog-empty {
@@ -103,11 +111,11 @@
 .blog-empty-icon {
     color: var(--color-text-muted);
     margin-bottom: var(--space-4);
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 .blog-empty h2 {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: var(--color-text);
     margin-bottom: var(--space-3);
@@ -116,16 +124,17 @@
 .blog-empty p {
     color: var(--color-text-secondary);
     max-width: 400px;
-    margin: 0 auto var(--space-6);
+    margin: 0 auto;
     line-height: 1.6;
+    font-size: 0.9375rem;
 }
 
 @media (max-width: 768px) {
-    .blog-card-content {
-        padding: var(--space-4);
+    .blog-item {
+        padding: var(--space-4) 0;
     }
     
-    .blog-title {
+    .blog-item-title {
         font-size: 1.125rem;
     }
 }
