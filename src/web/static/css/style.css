@@ -652,10 +652,17 @@ a:hover {
     flex: 1;
     border: none;
     outline: none;
+    box-shadow: none;
     font-size: 1rem;
     background: transparent;
     color: var(--color-text);
     min-width: 0;
+}
+
+.search-input-wrapper input:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
 }
 
 .search-input-wrapper input::placeholder {
