@@ -413,6 +413,13 @@ a:hover {
     font-size: 0.875rem;
     font-weight: 700;
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+.sidebar-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .sidebar-profile-info {
@@ -1110,6 +1117,27 @@ a:hover {
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--color-text);
+}
+
+.nav-profile-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.nav-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .profile-chevron {

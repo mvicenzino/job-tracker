@@ -8,6 +8,55 @@
 </div>
 
 <div class="settings-grid">
+    <!-- Profile Section -->
+    <div class="card" id="profile">
+        <div class="card-header">
+            <h2>Profile</h2>
+        </div>
+        <div class="card-body">
+            <div class="profile-section">
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar-preview">
+                        {% if current_user.avatar_url %}
+                        <img src="{{ current_user.avatar_url }}" alt="Your avatar" class="avatar-image">
+                        {% else %}
+                        <span class="avatar-placeholder">{{ current_user.email[0]|upper }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="profile-avatar-actions">
+                        <form method="POST" action="{{ url_for('settings.upload_avatar') }}" enctype="multipart/form-data" class="avatar-upload-form">
+                            <label class="btn btn-secondary btn-sm avatar-upload-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                Upload Photo
+                                <input type="file" name="avatar" accept="image/*" onchange="this.form.submit()" hidden>
+                            </label>
+                        </form>
+                        {% if current_user.avatar_url %}
+                        <form method="POST" action="{{ url_for('settings.delete_avatar') }}" style="display: inline;">
+                            <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Remove your avatar?')">Remove</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                <form method="POST" action="{{ url_for('settings.save_profile') }}" class="profile-form">
+                    <div class="form-group">
+                        <label for="display_name">Display Name</label>
+                        <input type="text" id="display_name" name="display_name" 
+                               value="{{ current_user.display_name or '' }}" 
+                               placeholder="{{ current_user.first_name }}"
+                               class="form-input">
+                        <p class="form-hint">Leave blank to use your email username</p>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="card" id="resume">
         <div class="card-header">
             <h2>Resume</h2>
@@ -346,6 +395,90 @@ document.addEventListener('DOMContentLoaded', function() {
     display: grid;
     gap: var(--space-6);
     max-width: 800px;
+}
+
+/* Profile section */
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.profile-avatar-section {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.profile-avatar-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.profile-avatar-preview .avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-avatar-preview .avatar-placeholder {
+    font-size: 2rem;
+    font-weight: 600;
+    color: white;
+}
+
+.profile-avatar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.avatar-upload-btn {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.profile-form {
+    max-width: 400px;
+}
+
+.form-group {
+    margin-bottom: var(--space-4);
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: var(--space-2);
+}
+
+.form-input {
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    background: var(--color-surface);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-hint {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: var(--space-1);
 }
 
 .api-key-display {

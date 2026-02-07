@@ -30,6 +30,10 @@ class User(Base, TimestampMixin, UserMixin):
     notify_interview_reminders = Column(Boolean, default=True, nullable=True)
     notify_follow_up_nudges = Column(Boolean, default=True, nullable=True)
     follow_up_nudge_days = Column(Integer, default=7, nullable=True)  # Days after applying to nudge
+    
+    # Profile
+    avatar_url = Column(String(500), nullable=True)  # URL to user's profile photo
+    display_name = Column(String(100), nullable=True)  # Optional display name
 
     # Relationships
     companies = relationship("Company", back_populates="user", cascade="all, delete-orphan")
