@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title if post else 'Post Not Found' }} - Stride Blog{% endblock %}
+
+{% block content %}
+{% if post %}
+<article class="blog-post-container">
+    <header class="blog-post-header">
+        <a href="{{ url_for('about.blog') }}" class="blog-back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5"/>
+                <path d="M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Blog
+        </a>
+        <h1>{{ post.title }}</h1>
+        <div class="blog-post-meta">
+            <span class="blog-post-date">{{ post.date }}</span>
+            <span class="blog-post-divider">•</span>
+            <span class="blog-post-author">By {{ post.author }}</span>
+        </div>
+    </header>
+    
+    <div class="blog-post-content">
+        {{ post.content|safe }}
+    </div>
+    
+    <footer class="blog-post-footer">
+        <a href="{{ url_for('about.blog') }}" class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5"/>
+                <path d="M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Blog
+        </a>
+    </footer>
+</article>
+{% else %}
+<div class="blog-not-found">
+    <h1>Post Not Found</h1>
+    <p>Sorry, we couldn't find the blog post you're looking for.</p>
+    <a href="{{ url_for('about.blog') }}" class="btn btn-primary">Back to Blog</a>
+</div>
+{% endif %}
+
+<style>
+.blog-post-container {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.blog-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    margin-bottom: var(--space-4);
+    transition: color var(--transition-fast);
+}
+
+.blog-back-link:hover {
+    color: var(--color-primary);
+}
+
+.blog-post-header {
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.blog-post-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
+}
+
+.blog-post-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+}
+
+.blog-post-divider {
+    opacity: 0.5;
+}
+
+.blog-post-content {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+}
+
+.blog-post-content h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: var(--space-8) 0 var(--space-4);
+}
+
+.blog-post-content h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: var(--space-6) 0 var(--space-3);
+}
+
+.blog-post-content p {
+    margin-bottom: var(--space-4);
+}
+
+.blog-post-content ul,
+.blog-post-content ol {
+    margin-bottom: var(--space-4);
+    padding-left: var(--space-6);
+}
+
+.blog-post-content li {
+    margin-bottom: var(--space-2);
+}
+
+.blog-post-content blockquote {
+    border-left: 3px solid var(--color-primary);
+    padding-left: var(--space-4);
+    margin: var(--space-6) 0;
+    font-style: italic;
+    color: var(--color-text-muted);
+}
+
+.blog-post-content a {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.blog-post-content a:hover {
+    text-decoration: none;
+}
+
+.blog-post-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    margin: var(--space-6) 0;
+}
+
+.blog-post-footer {
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border-light);
+}
+
+.blog-post-footer .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.blog-not-found {
+    text-align: center;
+    padding: var(--space-12) var(--space-4);
+}
+
+.blog-not-found h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: var(--space-3);
+}
+
+.blog-not-found p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+}
+
+@media (max-width: 768px) {
+    .blog-post-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .blog-post-content {
+        font-size: 1rem;
+    }
+}
+</style>
+{% endblock %}

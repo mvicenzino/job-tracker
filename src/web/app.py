@@ -221,6 +221,7 @@ def create_app(db_path: str = None, database_url: str = None):
     from .routes.feedback import bp as feedback_bp
     from .routes.resumes import bp as resumes_bp
     from .routes.notifications import bp as notifications_bp
+    from .routes.about import bp as about_bp
 
     app.register_blueprint(public_bp)
     app.register_blueprint(auth_bp)
@@ -238,6 +239,7 @@ def create_app(db_path: str = None, database_url: str = None):
     app.register_blueprint(feedback_bp)
     app.register_blueprint(resumes_bp)
     app.register_blueprint(notifications_bp)
+    app.register_blueprint(about_bp)
 
     return app
 

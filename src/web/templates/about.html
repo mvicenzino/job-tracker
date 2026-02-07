@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}About Stride{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>About Stride</h1>
+</div>
+
+<div class="about-container">
+    <div class="about-hero">
+        <div class="about-hero-content">
+            <h2>The job search is a marathon, not a sprint.</h2>
+            <p class="about-tagline">That's why we built Stride — to help you take it one step at a time.</p>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <h3>Why I Built Stride</h3>
+        <div class="about-content">
+            <p>
+                I've been there — refreshing inboxes, juggling spreadsheets, losing track of which company 
+                I talked to last week. The modern job search is overwhelming. Dozens of applications. 
+                Countless follow-ups. The mental load of keeping it all straight while staying motivated.
+            </p>
+            <p>
+                After going through the process myself, I realized there had to be a better way. 
+                Not another complicated tool with features you'll never use. Just something simple, 
+                focused, and actually helpful.
+            </p>
+            <p>
+                <strong>Stride exists to bring order to the chaos.</strong>
+            </p>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <h3>Why "Stride"?</h3>
+        <div class="about-content">
+            <p>
+                Landing your next role isn't about luck — it's about organization, focus, and grit. 
+                It's about showing up every day, taking one step forward, and trusting the process.
+            </p>
+            <p>
+                That's why we named it Stride. Not a sprint. Not a scramble. A steady, confident 
+                stride toward what's next.
+            </p>
+            <p class="about-highlight">
+                One application. One follow-up. One conversation at a time.
+            </p>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <h3>The Philosophy</h3>
+        <div class="about-content">
+            <p>
+                Stride keeps everything in one place so you can focus on what actually matters: 
+                telling your story, building relationships, and finding the right fit.
+            </p>
+            <ul class="about-list">
+                <li>No more scattered notes</li>
+                <li>No more "wait, did I already apply there?"</li>
+                <li>Just clarity, momentum, and progress you can see</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="about-section about-founder">
+        <h3>About the Founder</h3>
+        <div class="about-founder-content">
+            <div class="about-founder-info">
+                <p>
+                    Hi, I'm <strong>Mike Vicenzino</strong> — a designer and developer who's spent 
+                    years building products for companies of all sizes. I built Stride because I 
+                    wanted a tool I'd actually use myself.
+                </p>
+                <p>
+                    If you have feedback, ideas, or just want to say hi, I'd love to hear from you.
+                </p>
+                <div class="about-founder-links">
+                    <a href="https://www.linkedin.com/in/mvicenzino/" target="_blank" rel="noopener" class="btn btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        Connect on LinkedIn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="about-cta">
+        <h3>Your next chapter starts with a single step.</h3>
+        <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+    </div>
+</div>
+
+<style>
+.about-container {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.about-hero {
+    text-align: center;
+    padding: var(--space-8) 0;
+    margin-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.about-hero h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+}
+
+.about-tagline {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+}
+
+.about-section {
+    margin-bottom: var(--space-8);
+}
+
+.about-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
+}
+
+.about-content p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-4);
+}
+
+.about-content p:last-child {
+    margin-bottom: 0;
+}
+
+.about-highlight {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--color-primary) !important;
+    font-style: italic;
+}
+
+.about-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.about-list li {
+    position: relative;
+    padding-left: var(--space-6);
+    margin-bottom: var(--space-3);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.about-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--color-success);
+    font-weight: 600;
+}
+
+.about-founder-content {
+    display: flex;
+    gap: var(--space-6);
+    align-items: flex-start;
+}
+
+.about-founder-info {
+    flex: 1;
+}
+
+.about-founder-info p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-4);
+}
+
+.about-founder-links {
+    margin-top: var(--space-4);
+}
+
+.about-founder-links .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.about-cta {
+    text-align: center;
+    padding: var(--space-8);
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-lg);
+    margin-top: var(--space-8);
+}
+
+.about-cta h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
+}
+
+.btn-lg {
+    padding: var(--space-3) var(--space-6);
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .about-hero h2 {
+        font-size: 1.5rem;
+    }
+    
+    .about-founder-content {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
