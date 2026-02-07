@@ -270,7 +270,7 @@ a:hover {
 }
 
 .sidebar-logo {
-    height: 32px;
+    height: 38px;
     width: auto;
 }
 
@@ -531,7 +531,7 @@ a:hover {
 }
 
 .brand-logo {
-    height: 42px;
+    height: 48px;
     width: auto;
 }
 
@@ -4697,7 +4697,7 @@ a:hover {
 
     /* Mobile logo size */
     .brand-logo {
-        height: 32px;
+        height: 36px;
     }
 
     /* Hide More dropdown on mobile (items shown flat) */
