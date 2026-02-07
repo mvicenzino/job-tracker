@@ -753,7 +753,7 @@ def global_search():
                     'icon': '👤',
                     'title': contact.name,
                     'subtitle': subtitle,
-                    'url': f"/contacts/{contact.id}"
+                    'url': f"/contacts/{contact.id}/edit"
                 })
         except Exception as e:
             logging.error(f"Search contacts error: {e}")
@@ -771,7 +771,7 @@ def global_search():
                     'icon': '🏢',
                     'title': company.name,
                     'subtitle': company.industry or '',
-                    'url': f"/companies/{company.id}"
+                    'url': f"/companies/{company.id}/edit"
                 })
         except Exception as e:
             logging.error(f"Search companies error: {e}")
