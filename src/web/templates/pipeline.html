@@ -5,25 +5,143 @@
 {% block content %}
 <div class="pipeline-page">
     <header class="page-header">
-        <h1>Application Pipeline</h1>
-        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary btn-desktop-only">+ Add Lead</a>
+        <div>
+            <h1>Application Pipeline</h1>
+        </div>
+        <div class="header-actions">
+            <!-- View Toggle -->
+            <div class="view-toggle" id="viewToggle">
+                <button type="button" class="view-toggle-btn active" data-view="board" title="Board view">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                </button>
+                <button type="button" class="view-toggle-btn" data-view="list" title="List view">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6"/>
+                        <line x1="8" y1="12" x2="21" y2="12"/>
+                        <line x1="8" y1="18" x2="21" y2="18"/>
+                        <line x1="3" y1="6" x2="3.01" y2="6"/>
+                        <line x1="3" y1="12" x2="3.01" y2="12"/>
+                        <line x1="3" y1="18" x2="3.01" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary btn-desktop-only">+ Add Lead</a>
+        </div>
     </header>
 
-    <!-- Mobile Status Tabs -->
-    <div class="mobile-pipeline-tabs" id="pipelineTabs">
-        {% set active_statuses = ['interested', 'preparing', 'applied', 'screening', 'interviewing', 'final_round', 'offer', 'negotiating'] %}
-        {% for status in active_statuses %}
-        <button type="button" 
-                class="pipeline-tab {% if loop.first %}active{% endif %}" 
-                data-status="{{ status }}"
-                style="--tab-color: {{ status|status_color }}">
-            <span class="tab-count">{{ pipeline.get(status, [])|length }}</span>
-            <span class="tab-name">{{ status|replace('_', ' ')|title }}</span>
-        </button>
-        {% endfor %}
+    <!-- List View -->
+    <div class="pipeline-list-view" id="pipelineListView" style="display: none;">
+        <div class="list-view-table-wrapper">
+            <table class="list-view-table">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Position</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th class="text-center">Excitement</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set all_apps = [] %}
+                    {% for status, apps in pipeline.items() %}
+                        {% for app in apps %}
+                            {% set _ = all_apps.append(app) %}
+                        {% endfor %}
+                    {% endfor %}
+                    {% for app in all_apps|sort(attribute='created_at', reverse=true) %}
+                    <tr class="list-view-row" data-status="{{ app.status.value }}">
+                        <td class="col-company">
+                            <a href="{{ url_for('applications.application_detail', app_id=app.id) }}">
+                                {{ app.job.company.name }}
+                            </a>
+                        </td>
+                        <td class="col-position">
+                            <a href="{{ url_for('applications.application_detail', app_id=app.id) }}">
+                                {{ app.job.title }}
+                            </a>
+                        </td>
+                        <td class="col-status">
+                            <div class="status-dropdown">
+                                <button type="button" class="status-badge-btn" style="--status-color: {{ app.status.value|status_color }}">
+                                    <span class="status-dot"></span>
+                                    {{ app.status.value|replace('_', ' ')|title }}
+                                    <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"/>
+                                    </svg>
+                                </button>
+                                <div class="status-dropdown-menu">
+                                    {% for s in ApplicationStatus %}
+                                    <form action="{{ url_for('applications.update_status', app_id=app.id) }}" method="post">
+                                        <input type="hidden" name="status" value="{{ s.value }}">
+                                        <button type="submit" class="status-dropdown-item {% if s.value == app.status.value %}active{% endif %}">
+                                            <span class="status-dot" style="background-color: {{ s.value|status_color }}"></span>
+                                            {{ s.value|replace('_', ' ')|title }}
+                                        </button>
+                                    </form>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="col-date">
+                            {% if app.date_applied %}
+                            {{ app.date_applied.strftime('%b %d, %Y') }}
+                            {% elif app.created_at %}
+                            {{ app.created_at.strftime('%b %d, %Y') }}
+                            {% endif %}
+                        </td>
+                        <td class="col-excitement text-center">
+                            {% if app.excitement_level %}
+                            <span class="excitement-stars">{% for i in range(app.excitement_level) %}⭐{% endfor %}</span>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="col-actions">
+                            <a href="{{ url_for('applications.application_detail', app_id=app.id) }}" class="btn btn-sm btn-ghost">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if not all_apps %}
+        <div class="empty-state-visual">
+            <div class="empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                </svg>
+            </div>
+            <p>No applications yet</p>
+            <p class="empty-hint">Add your first lead to get started</p>
+        </div>
+        {% endif %}
     </div>
 
-    <div class="pipeline-board">
+    <!-- Board View -->
+    <div class="pipeline-board-view" id="pipelineBoardView">
+        <!-- Mobile Status Tabs -->
+        <div class="mobile-pipeline-tabs" id="pipelineTabs">
+            {% set active_statuses = ['interested', 'preparing', 'applied', 'screening', 'interviewing', 'final_round', 'offer', 'negotiating'] %}
+            {% for status in active_statuses %}
+            <button type="button" 
+                    class="pipeline-tab {% if loop.first %}active{% endif %}" 
+                    data-status="{{ status }}"
+                    style="--tab-color: {{ status|status_color }}">
+                <span class="tab-count">{{ pipeline.get(status, [])|length }}</span>
+                <span class="tab-name">{{ status|replace('_', ' ')|title }}</span>
+            </button>
+            {% endfor %}
+        </div>
+
+        <div class="pipeline-board">
         {% set active_statuses = ['interested', 'preparing', 'applied', 'screening', 'interviewing', 'final_round', 'offer', 'negotiating'] %}
         {% for status in active_statuses %}
         <div class="pipeline-column" data-status="{{ status }}">
@@ -87,31 +205,32 @@
         {% if pipeline.get(status) %}{% set has_closed = true %}{% endif %}
     {% endfor %}
 
-    {% if has_closed %}
-    <section class="closed-section">
-        <h2>Closed</h2>
-        <div class="closed-grid">
-            {% for status in closed_statuses %}
-            {% if pipeline.get(status) %}
-            <div class="closed-column">
-                <h3 style="color: {{ status|status_color }}">
-                    {{ status|replace('_', ' ')|title }} ({{ pipeline.get(status)|length }})
-                </h3>
-                <ul class="closed-list">
-                    {% for app in pipeline.get(status)[:5] %}
-                    <li>
-                        <a href="{{ url_for('applications.application_detail', app_id=app.id) }}">
-                            {{ app.job.title }} @ {{ app.job.company.name }}
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
+        {% if has_closed %}
+        <section class="closed-section">
+            <h2>Closed</h2>
+            <div class="closed-grid">
+                {% for status in closed_statuses %}
+                {% if pipeline.get(status) %}
+                <div class="closed-column">
+                    <h3 style="color: {{ status|status_color }}">
+                        {{ status|replace('_', ' ')|title }} ({{ pipeline.get(status)|length }})
+                    </h3>
+                    <ul class="closed-list">
+                        {% for app in pipeline.get(status)[:5] %}
+                        <li>
+                            <a href="{{ url_for('applications.application_detail', app_id=app.id) }}">
+                                {{ app.job.title }} @ {{ app.job.company.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                {% endfor %}
             </div>
-            {% endif %}
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
+        </section>
+        {% endif %}
+    </div><!-- end board view -->
 </div>
 
 {% endblock %}
@@ -119,41 +238,76 @@
 {% block scripts %}
 <script>
 (function() {
+    // === View Toggle ===
+    var viewToggle = document.getElementById('viewToggle');
+    var boardView = document.getElementById('pipelineBoardView');
+    var listView = document.getElementById('pipelineListView');
+    var toggleBtns = viewToggle ? viewToggle.querySelectorAll('.view-toggle-btn') : [];
+
+    function switchView(view) {
+        toggleBtns.forEach(function(btn) {
+            btn.classList.toggle('active', btn.dataset.view === view);
+        });
+        if (boardView) boardView.style.display = view === 'board' ? 'block' : 'none';
+        if (listView) listView.style.display = view === 'list' ? 'block' : 'none';
+        localStorage.setItem('stride-pipeline-view', view);
+    }
+
+    toggleBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            switchView(this.dataset.view);
+        });
+    });
+
+    // Restore saved view preference
+    var savedView = localStorage.getItem('stride-pipeline-view') || 'board';
+    switchView(savedView);
+
+    // === Mobile Tabs ===
     var tabs = document.querySelectorAll('.pipeline-tab');
     var columns = document.querySelectorAll('.pipeline-column');
     
     function switchTab(status) {
-        // Update active tab
         tabs.forEach(function(tab) {
-            if (tab.dataset.status === status) {
-                tab.classList.add('active');
-            } else {
-                tab.classList.remove('active');
-            }
+            tab.classList.toggle('active', tab.dataset.status === status);
         });
-        
-        // Update visible column (mobile only - CSS handles showing/hiding)
         columns.forEach(function(col) {
-            if (col.dataset.status === status) {
-                col.classList.add('mobile-visible');
-            } else {
-                col.classList.remove('mobile-visible');
-            }
+            col.classList.toggle('mobile-visible', col.dataset.status === status);
         });
     }
     
     tabs.forEach(function(tab) {
         tab.addEventListener('click', function() {
             switchTab(this.dataset.status);
-            // Scroll tab into view
             this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         });
     });
     
-    // Initialize first column as visible on mobile
     if (columns.length > 0) {
         columns[0].classList.add('mobile-visible');
     }
+
+    // === Status Dropdowns (List View) ===
+    document.querySelectorAll('.status-dropdown').forEach(function(dropdown) {
+        var btn = dropdown.querySelector('.status-badge-btn');
+        var menu = dropdown.querySelector('.status-dropdown-menu');
+        
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Close other dropdowns
+            document.querySelectorAll('.status-dropdown.open').forEach(function(d) {
+                if (d !== dropdown) d.classList.remove('open');
+            });
+            dropdown.classList.toggle('open');
+        });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.status-dropdown.open').forEach(function(d) {
+            d.classList.remove('open');
+        });
+    });
 })();
 </script>
 {% endblock %}
