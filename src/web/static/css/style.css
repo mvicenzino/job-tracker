@@ -465,6 +465,21 @@ a:hover {
     color: var(--color-primary);
 }
 
+.sidebar-profile-btn {
+    position: relative;
+}
+
+.sidebar-notification-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    background: var(--color-danger);
+    border-radius: 50%;
+    border: 2px solid var(--color-bg-subtle);
+}
+
 /* === Navbar === */
 .navbar {
     display: flex;
