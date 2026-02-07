@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" fill="none">
+  <defs>
+    <linearGradient id="foot1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <linearGradient id="foot2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- First "foot" - upper curve of S, like a right footstep -->
+  <path d="M65 10 
+           C80 10, 88 22, 88 35 
+           C88 48, 75 55, 55 55
+           C45 55, 40 52, 38 48
+           L42 44
+           C44 47, 48 49, 55 49
+           C70 49, 80 44, 80 35
+           C80 26, 72 18, 60 18
+           C50 18, 42 22, 38 28
+           L32 24
+           C38 16, 50 10, 65 10Z" 
+        fill="url(#foot1)"/>
+  
+  <!-- Second "foot" - lower curve of S, like a left footstep -->
+  <path d="M35 110 
+           C20 110, 12 98, 12 85 
+           C12 72, 25 65, 45 65
+           C55 65, 60 68, 62 72
+           L58 76
+           C56 73, 52 71, 45 71
+           C30 71, 20 76, 20 85
+           C20 94, 28 102, 40 102
+           C50 102, 58 98, 62 92
+           L68 96
+           C62 104, 50 110, 35 110Z" 
+        fill="url(#foot2)"/>
+</svg>

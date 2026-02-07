@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="fig1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <!-- S that hints at a figure mid-stride -->
+  <!-- Head -->
+  <circle cx="62" cy="18" r="10" fill="url(#fig1)"/>
+  <!-- Body curves into S -->
+  <path d="M62 28 C62 38, 55 42, 45 45 C35 48, 30 55, 35 65 C40 75, 55 78, 65 82 L58 90 C45 86, 25 78, 22 62 C19 46, 35 38, 50 34 C58 32, 62 28, 62 28" 
+        fill="url(#fig1)"/>
+  <!-- Forward leg suggestion -->
+  <path d="M65 82 L78 95" stroke="url(#fig1)" stroke-width="8" stroke-linecap="round"/>
+</svg>

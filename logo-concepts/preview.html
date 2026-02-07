@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stride Logo Concepts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            padding: 2rem;
+        }
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 3rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .card h3 {
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        .card p {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+        .logo-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+        }
+        .logo-container img {
+            width: 80px;
+            height: 80px;
+        }
+        .with-wordmark {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .with-wordmark img {
+            width: 50px;
+            height: 50px;
+        }
+        .wordmark {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #6366f1;
+        }
+        .sizes {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        .sizes img {
+            opacity: 0.8;
+        }
+        .sizes .s64 { width: 64px; height: 64px; }
+        .sizes .s32 { width: 32px; height: 32px; }
+        .sizes .s16 { width: 16px; height: 16px; }
+        .dark-preview {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 3rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .dark-preview h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .dark-grid {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+        .dark-grid img {
+            width: 60px;
+            height: 60px;
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Stride Logo Concepts</h1>
+    <p class="subtitle">Exploring the S — one step at a time</p>
+
+    <div class="grid">
+        <div class="card">
+            <h3>01 — Flowing S</h3>
+            <p>Smooth curves suggest forward motion and momentum. Gradient adds depth.</p>
+            <div class="logo-container">
+                <div class="with-wordmark">
+                    <img src="01-flowing-s.svg" alt="Flowing S">
+                    <span class="wordmark">Stride</span>
+                </div>
+            </div>
+            <div class="sizes">
+                <img src="01-flowing-s.svg" class="s64">
+                <img src="01-flowing-s.svg" class="s32">
+                <img src="01-flowing-s.svg" class="s16">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>02 — Minimal S</h3>
+            <p>Single stroke, single color. Works at any size, any context.</p>
+            <div class="logo-container">
+                <div class="with-wordmark">
+                    <img src="02-minimal-s.svg" alt="Minimal S">
+                    <span class="wordmark">Stride</span>
+                </div>
+            </div>
+            <div class="sizes">
+                <img src="02-minimal-s.svg" class="s64">
+                <img src="02-minimal-s.svg" class="s32">
+                <img src="02-minimal-s.svg" class="s16">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>03 — Stepping S</h3>
+            <p>Building blocks form an S — each step is progress.</p>
+            <div class="logo-container">
+                <div class="with-wordmark">
+                    <img src="03-stepping-s.svg" alt="Stepping S">
+                    <span class="wordmark">Stride</span>
+                </div>
+            </div>
+            <div class="sizes">
+                <img src="03-stepping-s.svg" class="s64">
+                <img src="03-stepping-s.svg" class="s32">
+                <img src="03-stepping-s.svg" class="s16">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>04 — Geometric S</h3>
+            <p>Bold, angular, modern. Strong presence, confident stance.</p>
+            <div class="logo-container">
+                <div class="with-wordmark">
+                    <img src="04-geometric-s.svg" alt="Geometric S">
+                    <span class="wordmark">Stride</span>
+                </div>
+            </div>
+            <div class="sizes">
+                <img src="04-geometric-s.svg" class="s64">
+                <img src="04-geometric-s.svg" class="s32">
+                <img src="04-geometric-s.svg" class="s16">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>05 — Stride Figure</h3>
+            <p>Abstract figure mid-stride. The S becomes a person in motion.</p>
+            <div class="logo-container">
+                <div class="with-wordmark">
+                    <img src="05-stride-figure-s.svg" alt="Stride Figure">
+                    <span class="wordmark">Stride</span>
+                </div>
+            </div>
+            <div class="sizes">
+                <img src="05-stride-figure-s.svg" class="s64">
+                <img src="05-stride-figure-s.svg" class="s32">
+                <img src="05-stride-figure-s.svg" class="s16">
+            </div>
+        </div>
+    </div>
+
+    <div class="dark-preview">
+        <h2>Dark Background Test</h2>
+        <div class="dark-grid">
+            <img src="01-flowing-s.svg" alt="1">
+            <img src="02-minimal-s.svg" alt="2">
+            <img src="03-stepping-s.svg" alt="3">
+            <img src="04-geometric-s.svg" alt="4">
+            <img src="05-stride-figure-s.svg" alt="5">
+        </div>
+    </div>
+</body>
+</html>

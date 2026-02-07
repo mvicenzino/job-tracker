@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="flow1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="50%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="flow2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <!-- Main S curve - flowing wave -->
+  <path d="M70 20 C45 20, 25 30, 25 45 C25 55, 40 60, 50 60 C60 60, 75 65, 75 78 C75 90, 55 95, 30 90" 
+        stroke="url(#flow1)" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <!-- Inner highlight -->
+  <path d="M65 25 C48 25, 32 32, 32 44 C32 52, 42 56, 50 56" 
+        stroke="url(#flow2)" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.6"/>
+</svg>

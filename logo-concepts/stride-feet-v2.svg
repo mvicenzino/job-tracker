@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" fill="none">
+  <defs>
+    <linearGradient id="step1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="step2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0369a1"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Upper foot/step - abstract curved shape suggesting right foot mid-stride -->
+  <ellipse cx="58" cy="28" rx="28" ry="18" fill="url(#step1)" transform="rotate(-15 58 28)"/>
+  
+  <!-- Lower foot/step - abstract curved shape suggesting left foot following -->
+  <ellipse cx="42" cy="92" rx="28" ry="18" fill="url(#step2)" transform="rotate(15 42 92)"/>
+</svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Clean minimal S - single stroke, perfect for small sizes -->
+  <path d="M68 22 C40 18, 22 32, 22 46 C22 58, 38 62, 50 62 C62 62, 78 66, 78 80 C78 94, 60 98, 32 92" 
+        stroke="#6366f1" stroke-width="10" stroke-linecap="round" fill="none"/>
+</svg>

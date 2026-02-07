@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="step1" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <!-- S shape made of ascending steps/blocks -->
+  <rect x="55" y="15" width="18" height="10" rx="3" fill="url(#step1)"/>
+  <rect x="38" y="28" width="18" height="10" rx="3" fill="url(#step1)" opacity="0.9"/>
+  <rect x="28" y="41" width="18" height="10" rx="3" fill="url(#step1)" opacity="0.8"/>
+  <rect x="42" y="54" width="18" height="10" rx="3" fill="url(#step1)" opacity="0.85"/>
+  <rect x="56" y="67" width="18" height="10" rx="3" fill="url(#step1)" opacity="0.9"/>
+  <rect x="32" y="80" width="18" height="10" rx="3" fill="url(#step1)"/>
+</svg>

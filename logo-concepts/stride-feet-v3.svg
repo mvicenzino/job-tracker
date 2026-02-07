@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" fill="none">
+  <defs>
+    <linearGradient id="topFoot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="bottomFoot" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="50%" stop-color="#0369a1"/>
+      <stop offset="100%" stop-color="#075985"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Top abstract footstep - flowing curve that forms upper S -->
+  <path d="M72 8
+           Q90 15, 85 35
+           Q80 52, 50 55
+           Q35 56, 30 50
+           Q28 45, 35 42
+           Q50 40, 65 35
+           Q78 28, 72 18
+           Q68 12, 55 12
+           Q42 14, 38 22
+           Q35 18, 40 12
+           Q52 5, 72 8Z" 
+        fill="url(#topFoot)"/>
+  
+  <!-- Bottom abstract footstep - flowing curve that forms lower S -->
+  <path d="M28 112
+           Q10 105, 15 85
+           Q20 68, 50 65
+           Q65 64, 70 70
+           Q72 75, 65 78
+           Q50 80, 35 85
+           Q22 92, 28 102
+           Q32 108, 45 108
+           Q58 106, 62 98
+           Q65 102, 60 108
+           Q48 115, 28 112Z" 
+        fill="url(#bottomFoot)"/>
+</svg>
