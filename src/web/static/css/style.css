@@ -6197,7 +6197,7 @@ body.demo-active .navbar {
 
     /* Constrain brand logo */
     .brand-logo {
-        max-height: 32px;
+        max-height: 36px;
         width: auto;
     }
 
