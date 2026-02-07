@@ -1,5 +1,5 @@
 ---
-title: Welcome to Stride News
+title: "Welcome to Stride News — Edition #1"
 slug: welcome-to-stride-news
 excerpt: If you're reading this, you're probably navigating something. Maybe a career transition, maybe sensing the ground shifting beneath you. Whatever brought you here, welcome.
 date: January 2026
