@@ -232,12 +232,12 @@
 .unread-indicator {
     position: absolute;
     top: 50%;
-    right: var(--space-4);
+    left: 0;
     transform: translateY(-50%);
-    width: 8px;
-    height: 8px;
+    width: 4px;
+    height: 40px;
     background: var(--color-primary);
-    border-radius: 50%;
+    border-radius: 0 4px 4px 0;
 }
 
 .text-danger {
@@ -256,11 +256,6 @@
     
     .notification-actions {
         width: 100%;
-    }
-    
-    .unread-indicator {
-        top: var(--space-4);
-        transform: none;
     }
 }
 </style>
