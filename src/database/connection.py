@@ -143,6 +143,23 @@ class DatabaseConnection:
                         except Exception as e:
                             print(f"[Migration] Failed to add follow_up_nudge_days: {e}")
 
+                    # Profile fields
+                    if 'avatar_url' not in columns:
+                        try:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN avatar_url VARCHAR(500)'))
+                            conn.commit()
+                            print("[Migration] Added avatar_url column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add avatar_url: {e}")
+
+                    if 'display_name' not in columns:
+                        try:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN display_name VARCHAR(100)'))
+                            conn.commit()
+                            print("[Migration] Added display_name column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add display_name: {e}")
+
             # Check if applications table needs resume_version_id column
             if 'applications' in inspector.get_table_names():
                 app_columns = [col['name'] for col in inspector.get_columns('applications')]
