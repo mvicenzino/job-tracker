@@ -491,40 +491,44 @@ a:hover {
 .nav-search-input-container {
     display: flex;
     align-items: center;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 0 var(--space-3);
     transition: all 0.2s ease;
 }
 
 .nav-search-input-container:focus-within {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: var(--color-border);
+    box-shadow: none;
 }
 
 .nav-search-icon {
-    color: var(--text-secondary);
+    color: var(--color-text-muted);
     flex-shrink: 0;
 }
 
 .nav-search-input {
     border: none;
     outline: none;
+    box-shadow: none;
     background: transparent;
     padding: var(--space-2) var(--space-2);
     font-size: 0.875rem;
-    color: var(--text-primary);
+    color: var(--color-text);
     width: 180px;
     transition: width 0.2s ease;
 }
 
-.nav-search-input:focus {
+.nav-search-input:focus,
+.nav-search-input:focus-visible {
     width: 260px;
+    outline: none;
+    box-shadow: none;
 }
 
 .nav-search-input::placeholder {
-    color: var(--text-secondary);
+    color: var(--color-text-muted);
 }
 
 .nav-search-results {
