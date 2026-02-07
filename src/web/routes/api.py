@@ -1,9 +1,10 @@
 """API routes for AJAX operations and Chrome extension."""
-from flask import Blueprint, request, jsonify
+import logging
+from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required, current_user
 
 from ..helpers import get_service, get_service_for_user, get_user_by_api_key
-from ...models import ApplicationStatus, ContactType
+from ...models import ApplicationStatus, ContactType, Application, Job, Company, Contact
 from ...services.ai_parser import is_ai_parsing_available, parse_job_description, analyze_resume_job_fit, generate_cover_letter
 
 bp = Blueprint('api', __name__)
@@ -691,9 +692,6 @@ def generate_my_notifications():
 @login_required
 def global_search():
     """Global search across applications, contacts, and companies."""
-    from ...models import Application, Job, Company, Contact
-    import logging
-    
     query = request.args.get('q', '').strip()
     if not query or len(query) < 2:
         return jsonify({'results': []})
