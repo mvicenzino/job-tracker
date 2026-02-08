@@ -7,6 +7,16 @@ import json
 
 BLS_API_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 
+
+def safe_float(value, default=0.0):
+    """Safely convert BLS value to float, handling '-' for missing data."""
+    if value is None or value == '-' or value == '':
+        return default
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return default
+
 # Key BLS Series IDs
 SERIES = {
     # Job Openings (JOLTS) - Total Nonfarm
@@ -87,8 +97,8 @@ def get_market_overview():
             latest = data_points[0]
             previous = data_points[1]
             
-            latest_val = float(latest.get('value', 0))
-            prev_val = float(previous.get('value', 0))
+            latest_val = safe_float(latest.get('value'))
+            prev_val = safe_float(previous.get('value'))
             
             # Calculate change
             if prev_val > 0:
@@ -126,9 +136,9 @@ def get_industry_trends():
             previous = data_points[1]
             year_ago = data_points[12] if len(data_points) > 12 else previous
             
-            latest_val = float(latest.get('value', 0))
-            prev_val = float(previous.get('value', 0))
-            year_ago_val = float(year_ago.get('value', 0))
+            latest_val = safe_float(latest.get('value'))
+            prev_val = safe_float(previous.get('value'))
+            year_ago_val = safe_float(year_ago.get('value'))
             
             mom_change = ((latest_val - prev_val) / prev_val * 100) if prev_val > 0 else 0
             yoy_change = ((latest_val - year_ago_val) / year_ago_val * 100) if year_ago_val > 0 else 0
@@ -159,11 +169,18 @@ def get_historical_trend(series_name: str, months: int = 24):
     
     data_points = raw_data[0].get('data', [])[:months]
     
-    # Reverse to get chronological order
-    return [
-        {
-            'period': f"{dp.get('periodName', '')[:3]} {dp.get('year', '')}",
-            'value': float(dp.get('value', 0))
-        }
-        for dp in reversed(data_points)
-    ]
+    # Reverse to get chronological order, skip entries with missing values
+    result = []
+    for dp in reversed(data_points):
+        val = dp.get('value', '0')
+        # BLS returns '-' for missing/unavailable data
+        if val == '-' or val == '':
+            continue
+        try:
+            result.append({
+                'period': f"{dp.get('periodName', '')[:3]} {dp.get('year', '')}",
+                'value': float(val)
+            })
+        except (ValueError, TypeError):
+            continue  # Skip bad values
+    return result
