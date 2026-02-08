@@ -637,17 +637,39 @@
 
 .feature-preview {
     margin-top: 1rem;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    border: 1px solid var(--landing-border);
-    background: var(--landing-bg);
+    background: #1e1e2e;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.feature-preview::before {
+    content: '';
+    display: block;
+    height: 36px;
+    background: linear-gradient(180deg, #3d3d4d 0%, #2d2d3d 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.feature-preview::after {
+    content: '';
+    position: absolute;
+    top: 13px;
+    left: 14px;
+    width: 10px;
+    height: 10px;
+    background: #ff5f57;
+    border-radius: 50%;
+    box-shadow: 
+        16px 0 0 #ffbd2e,
+        32px 0 0 #28c840;
 }
 
 .feature-preview img {
     width: 100%;
     height: auto;
     display: block;
-    border-radius: 7px;
 }
 
 .feature-highlight {
