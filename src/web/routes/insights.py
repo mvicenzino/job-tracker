@@ -11,10 +11,21 @@ insights_bp = Blueprint('insights', __name__, url_prefix='/insights')
 @login_required
 def market_insights():
     """Display job market insights from BLS data."""
-    overview = get_market_overview()
-    industries = get_industry_trends()
-    job_openings_history = get_historical_trend('job_openings', 24)
-    unemployment_history = get_historical_trend('unemployment_rate', 24)
+    try:
+        overview = get_market_overview()
+    except Exception as e:
+        return f"BLS Overview Error: {e}", 500
+    
+    try:
+        industries = get_industry_trends()
+    except Exception as e:
+        return f"BLS Industries Error: {e}", 500
+    
+    try:
+        job_openings_history = get_historical_trend('job_openings', 24)
+        unemployment_history = get_historical_trend('unemployment_rate', 24)
+    except Exception as e:
+        return f"BLS History Error: {e}", 500
     
     # Format industry names nicely
     industry_labels = {
@@ -26,9 +37,12 @@ def market_insights():
         'manufacturing': 'Manufacturing',
     }
     
-    return render_template('insights.html',
-                         overview=overview,
-                         industries=industries,
-                         industry_labels=industry_labels,
-                         job_openings_history=job_openings_history,
-                         unemployment_history=unemployment_history)
+    try:
+        return render_template('insights.html',
+                             overview=overview,
+                             industries=industries,
+                             industry_labels=industry_labels,
+                             job_openings_history=job_openings_history,
+                             unemployment_history=unemployment_history)
+    except Exception as e:
+        return f"Template Error: {e}", 500
