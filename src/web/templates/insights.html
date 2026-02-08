@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}Market Insights - Stride{% endblock %}
+
+{% block content %}
+<div class="insights-page">
+    <header class="page-header">
+        <div>
+            <h1>Market Insights</h1>
+            <p class="page-subtitle">Job market trends from the Bureau of Labor Statistics</p>
+        </div>
+    </header>
+
+    <!-- Overview Cards -->
+    <div class="insights-overview">
+        {% if overview.job_openings %}
+        <div class="insight-card">
+            <div class="insight-icon">📊</div>
+            <div class="insight-content">
+                <div class="insight-value">{{ "{:,.0f}".format(overview.job_openings.value) }}K</div>
+                <div class="insight-label">Job Openings</div>
+                <div class="insight-change {% if overview.job_openings.change > 0 %}positive{% else %}negative{% endif %}">
+                    {% if overview.job_openings.change > 0 %}↑{% else %}↓{% endif %} {{ "{:.1f}".format(overview.job_openings.change|abs) }}% vs last month
+                </div>
+                <div class="insight-period">{{ overview.job_openings.period }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if overview.unemployment_rate %}
+        <div class="insight-card">
+            <div class="insight-icon">📉</div>
+            <div class="insight-content">
+                <div class="insight-value">{{ "{:.1f}".format(overview.unemployment_rate.value) }}%</div>
+                <div class="insight-label">Unemployment Rate</div>
+                <div class="insight-change {% if overview.unemployment_rate.change < 0 %}positive{% else %}negative{% endif %}">
+                    {% if overview.unemployment_rate.change > 0 %}↑{% else %}↓{% endif %} {{ "{:.1f}".format(overview.unemployment_rate.change|abs) }}% vs last month
+                </div>
+                <div class="insight-period">{{ overview.unemployment_rate.period }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if overview.hires %}
+        <div class="insight-card">
+            <div class="insight-icon">🤝</div>
+            <div class="insight-content">
+                <div class="insight-value">{{ "{:,.0f}".format(overview.hires.value) }}K</div>
+                <div class="insight-label">Total Hires</div>
+                <div class="insight-change {% if overview.hires.change > 0 %}positive{% else %}negative{% endif %}">
+                    {% if overview.hires.change > 0 %}↑{% else %}↓{% endif %} {{ "{:.1f}".format(overview.hires.change|abs) }}% vs last month
+                </div>
+                <div class="insight-period">{{ overview.hires.period }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if overview.quits %}
+        <div class="insight-card">
+            <div class="insight-icon">🚀</div>
+            <div class="insight-content">
+                <div class="insight-value">{{ "{:,.0f}".format(overview.quits.value) }}K</div>
+                <div class="insight-label">Voluntary Quits</div>
+                <div class="insight-change {% if overview.quits.change > 0 %}positive{% else %}negative{% endif %}">
+                    {% if overview.quits.change > 0 %}↑{% else %}↓{% endif %} {{ "{:.1f}".format(overview.quits.change|abs) }}% vs last month
+                </div>
+                <div class="insight-period">{{ overview.quits.period }}</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Industry Breakdown -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Job Openings by Industry</h2>
+            <span class="card-subtitle">Monthly data in thousands</span>
+        </div>
+        <div class="card-body">
+            <div class="industry-grid">
+                {% for key, data in industries.items() %}
+                <div class="industry-item">
+                    <div class="industry-name">{{ industry_labels.get(key, key) }}</div>
+                    <div class="industry-stats">
+                        <span class="industry-value">{{ "{:,.0f}".format(data.value) }}K openings</span>
+                        <span class="industry-change {% if data.yoy_change > 0 %}positive{% else %}negative{% endif %}">
+                            {% if data.yoy_change > 0 %}↑{% else %}↓{% endif %} {{ "{:.1f}".format(data.yoy_change|abs) }}% YoY
+                        </span>
+                    </div>
+                    <div class="industry-bar">
+                        <div class="industry-bar-fill" style="width: {{ (data.value / 2000 * 100)|min(100) }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Historical Chart -->
+    {% if job_openings_history %}
+    <div class="card">
+        <div class="card-header">
+            <h2>Job Openings Trend</h2>
+            <span class="card-subtitle">Last 24 months (in thousands)</span>
+        </div>
+        <div class="card-body">
+            <div class="trend-chart" id="jobOpeningsChart">
+                <div class="chart-bars">
+                    {% for point in job_openings_history %}
+                    <div class="chart-bar-container" title="{{ point.period }}: {{ "{:,.0f}".format(point.value) }}K">
+                        <div class="chart-bar" style="height: {{ (point.value / 12000 * 100)|min(100) }}%"></div>
+                        <div class="chart-label">{{ point.period[-7:] }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Data Attribution -->
+    <div class="data-attribution">
+        <p>📊 Data sourced from the <a href="https://www.bls.gov/" target="_blank">U.S. Bureau of Labor Statistics</a></p>
+        <p>JOLTS (Job Openings and Labor Turnover Survey) and Current Employment Statistics</p>
+    </div>
+</div>
+
+<style>
+.insights-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-subtitle {
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+.insights-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.insight-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.insight-icon {
+    font-size: 2rem;
+}
+
+.insight-content {
+    flex: 1;
+}
+
+.insight-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+
+.insight-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+.insight-change {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.insight-change.positive { color: #10b981; }
+.insight-change.negative { color: #ef4444; }
+
+.insight-period {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.card-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.industry-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.industry-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.industry-item:last-child {
+    border-bottom: none;
+}
+
+.industry-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.industry-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.industry-value {
+    color: var(--text-muted);
+}
+
+.industry-change {
+    font-weight: 500;
+}
+
+.industry-change.positive { color: #10b981; }
+.industry-change.negative { color: #ef4444; }
+
+.industry-bar {
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.industry-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.trend-chart {
+    padding: 1rem 0;
+}
+
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 200px;
+}
+
+.chart-bar-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    cursor: pointer;
+}
+
+.chart-bar {
+    width: 100%;
+    background: linear-gradient(180deg, #6366f1, #8b5cf6);
+    border-radius: 3px 3px 0 0;
+    min-height: 4px;
+    transition: opacity 0.2s;
+}
+
+.chart-bar-container:hover .chart-bar {
+    opacity: 0.8;
+}
+
+.chart-label {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    white-space: nowrap;
+}
+
+.data-attribution {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--card-bg);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.data-attribution a {
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .insights-overview {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .chart-label {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .insights-overview {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

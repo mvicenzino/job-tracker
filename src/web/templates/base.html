@@ -37,7 +37,7 @@
     <div class="nav-overlay" id="nav-overlay"></div>
 
     {% set network_active = request.endpoint and (request.endpoint.startswith('contacts.') or request.endpoint.startswith('companies.') or request.endpoint.startswith('jobs.')) %}
-    {% set insights_active = request.endpoint and (request.endpoint == 'compare.compare_offers' or 'reflections' in request.endpoint) %}
+    {% set insights_active = request.endpoint and (request.endpoint == 'compare.compare_offers' or 'reflections' in request.endpoint or request.endpoint == 'insights.market_insights') %}
 
     <nav class="navbar">
         <div class="nav-left">
@@ -101,6 +101,7 @@
                     Insights <span class="nav-dropdown-chevron">▾</span>
                 </button>
                 <div class="nav-dropdown-menu">
+                    <a href="{{ url_for('insights.market_insights') }}" class="{% if request.endpoint == 'insights.market_insights' %}active{% endif %}">Market Insights</a>
                     <a href="{{ url_for('compare.compare_offers') }}" class="{% if request.endpoint == 'compare.compare_offers' %}active{% endif %}">Compare Offers</a>
                     <a href="{{ url_for('reflections.reflections') }}" class="{% if request.endpoint and 'reflections' in request.endpoint %}active{% endif %}">Reflections</a>
                 </div>
@@ -276,6 +277,15 @@
 
             <div class="sidebar-section">
                 <span class="sidebar-section-title">Insights</span>
+                <a href="{{ url_for('insights.market_insights') }}" class="sidebar-link {% if request.endpoint == 'insights.market_insights' %}active{% endif %}">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3v18h18"/>
+                        <path d="M18 17V9"/>
+                        <path d="M13 17V5"/>
+                        <path d="M8 17v-3"/>
+                    </svg>
+                    <span>Market Insights</span>
+                </a>
                 <a href="{{ url_for('compare.compare_offers') }}" class="sidebar-link {% if request.endpoint == 'compare.compare_offers' %}active{% endif %}">
                     <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="20" x2="18" y2="10"/>
