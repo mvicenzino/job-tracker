@@ -107,8 +107,78 @@
 
     <header class="page-header dashboard-header">
         <div class="greeting">
-            <h1>{% if onboarding.show %}Let's get started{% else %}Welcome back{% if current_user.display_name %}, {{ current_user.display_name }}{% elif current_user.first_name %}, {{ current_user.first_name }}{% endif %}{% endif %}</h1>
-            <p class="subtitle">{% if onboarding.show %}Your job search command center{% else %}Here's what's happening with your job search{% endif %}</p>
+            {% if onboarding.show %}
+            <h1>Let's get started</h1>
+            <p class="subtitle">Your job search command center</p>
+            {% else %}
+            <h1 id="greeting-text">Welcome back{% if current_user.display_name %}, {{ current_user.display_name }}{% elif current_user.first_name %}, {{ current_user.first_name }}{% endif %}</h1>
+            <p class="subtitle" id="greeting-subtitle">Here's what's happening with your job search</p>
+            <script>
+            (function() {
+                var name = "{% if current_user.display_name %}{{ current_user.display_name }}{% elif current_user.first_name %}{{ current_user.first_name }}{% endif %}";
+                var hour = new Date().getHours();
+                var greetings, subtitles;
+                
+                if (hour >= 5 && hour < 12) {
+                    greetings = [
+                        "Good morning" + (name ? ", " + name : ""),
+                        "Morning" + (name ? ", " + name : ""),
+                        "Rise and grind" + (name ? ", " + name : "") + " ☀️",
+                        "Ready to make moves" + (name ? ", " + name : "") + "?"
+                    ];
+                    subtitles = [
+                        "Let's make today count",
+                        "Fresh day, fresh opportunities",
+                        "Here's what's on deck",
+                        "Time to move the needle"
+                    ];
+                } else if (hour >= 12 && hour < 17) {
+                    greetings = [
+                        "Good afternoon" + (name ? ", " + name : ""),
+                        "Hey" + (name ? ", " + name : "") + " 👋",
+                        "Back at it" + (name ? ", " + name : "") + "?",
+                        "How's the search going" + (name ? ", " + name : "") + "?"
+                    ];
+                    subtitles = [
+                        "Here's where things stand",
+                        "Let's keep the momentum",
+                        "Your pipeline at a glance",
+                        "Making progress?"
+                    ];
+                } else if (hour >= 17 && hour < 21) {
+                    greetings = [
+                        "Good evening" + (name ? ", " + name : ""),
+                        "Evening" + (name ? ", " + name : ""),
+                        "Wrapping up the day" + (name ? ", " + name : "") + "?",
+                        "Still grinding" + (name ? ", " + name : "") + "? 💪"
+                    ];
+                    subtitles = [
+                        "Here's your daily snapshot",
+                        "Nice work today",
+                        "Let's see how you're doing",
+                        "One step at a time"
+                    ];
+                } else {
+                    greetings = [
+                        "Hey" + (name ? ", " + name : "") + " 🌙",
+                        "Burning the midnight oil" + (name ? ", " + name : "") + "?",
+                        "Late night session" + (name ? ", " + name : "") + "?",
+                        "Can't sleep" + (name ? ", " + name : "") + "?"
+                    ];
+                    subtitles = [
+                        "The hustle never stops",
+                        "Here's your overview",
+                        "Remember to rest too",
+                        "Night owl mode activated"
+                    ];
+                }
+                
+                var idx = Math.floor(Math.random() * greetings.length);
+                document.getElementById('greeting-text').textContent = greetings[idx];
+                document.getElementById('greeting-subtitle').textContent = subtitles[idx];
+            })();
+            </script>
+            {% endif %}
         </div>
         <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Lead</a>
     </header>
