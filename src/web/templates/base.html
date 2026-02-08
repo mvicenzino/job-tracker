@@ -29,7 +29,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260207p">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260208a">
     {% block head %}{% endblock %}
 </head>
 <body class="{% if current_user.is_authenticated %}has-sidebar{% endif %}{% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %} demo-active{% endif %}">
@@ -359,6 +359,22 @@
                         </svg>
                         {% if unread_notifications_count > 0 %}<span class="sidebar-notification-dot"></span>{% endif %}
                     </a>
+                    <button type="button" class="sidebar-profile-btn sidebar-theme-toggle" id="sidebarThemeToggle" title="Toggle theme">
+                        <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                        <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
                     <a href="{{ url_for('auth.logout') }}" class="sidebar-profile-btn" title="{% if current_user.email == 'demo@stride-jobs.com' %}Exit Demo{% else %}Logout{% endif %}">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -786,6 +802,24 @@
         if (themeToggle) {
             themeToggle.addEventListener('click', toggleTheme);
             updateThemeUI();
+        }
+
+        // Sidebar theme toggle (desktop)
+        var sidebarThemeToggle = document.getElementById('sidebarThemeToggle');
+        if (sidebarThemeToggle) {
+            sidebarThemeToggle.addEventListener('click', function() {
+                var currentlyDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                if (currentlyDark) {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    localStorage.setItem('stride-theme', 'light');
+                    if (themeColorMeta) themeColorMeta.content = '#6366f1';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('stride-theme', 'dark');
+                    if (themeColorMeta) themeColorMeta.content = '#1e293b';
+                }
+                if (themeLabel) updateThemeUI();
+            });
         }
     })();
     </script>

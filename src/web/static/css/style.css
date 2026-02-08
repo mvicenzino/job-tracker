@@ -487,6 +487,25 @@ a:hover {
     border: 2px solid var(--color-bg-subtle);
 }
 
+/* Sidebar theme toggle */
+.sidebar-theme-toggle {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.sidebar-theme-toggle .theme-icon-dark {
+    display: none;
+}
+
+[data-theme="dark"] .sidebar-theme-toggle .theme-icon-light {
+    display: none;
+}
+
+[data-theme="dark"] .sidebar-theme-toggle .theme-icon-dark {
+    display: block;
+}
+
 /* === Navbar === */
 .navbar {
     display: flex;
