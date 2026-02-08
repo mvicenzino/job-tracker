@@ -1206,19 +1206,20 @@
     align-items: center;
     gap: 0.5rem;
     padding: 1rem 2rem;
-    background: white;
-    color: var(--landing-text);
+    background: transparent;
+    color: var(--landing-accent);
     font-size: 1.0625rem;
     font-weight: 600;
     border-radius: 12px;
     text-decoration: none;
-    border: 1px solid var(--landing-border);
+    border: 2px solid var(--landing-accent);
     transition: all 0.2s ease;
 }
 
 .btn-hero-secondary:hover {
-    background: var(--landing-bg);
+    background: rgba(99, 102, 241, 0.1);
     border-color: var(--landing-accent);
+    transform: translateY(-2px);
 }
 
 .btn-hero-secondary svg {
