@@ -465,6 +465,22 @@
         </div>
     </footer>
 
+    <!-- Video Demo Modal -->
+    <div class="demo-modal" id="demoModal">
+        <div class="demo-modal-content">
+            <button class="demo-modal-close" id="closeModal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <video id="demoVideo" controls playsinline>
+                <source src="{{ url_for('static', filename='video/demo.mp4') }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+
     <script>
         // Mobile menu toggle
         const menuToggle = document.getElementById('menuToggle');
@@ -541,21 +557,5 @@
             }
         });
     </script>
-
-    <!-- Video Demo Modal -->
-    <div class="demo-modal" id="demoModal">
-        <div class="demo-modal-content">
-            <button class="demo-modal-close" id="closeModal">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-            </button>
-            <video id="demoVideo" controls playsinline>
-                <source src="{{ url_for('static', filename='video/demo.mp4') }}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-    </div>
 </body>
 </html>
