@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 1280px;
+            height: 720px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', -apple-system, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Animated background glow */
+        .glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            animation: fadeInUp 1s ease-out forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .logo-icon {
+            width: 72px;
+            height: 72px;
+            animation: scaleIn 0.6s ease-out 0.2s forwards;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        
+        @keyframes scaleIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .logo-text {
+            font-size: 64px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -2px;
+            animation: slideIn 0.6s ease-out 0.3s forwards;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .tagline {
+            font-size: 28px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: -0.5px;
+            animation: fadeIn 0.8s ease-out 0.6s forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        .accent {
+            color: #818cf8;
+        }
+        
+        /* Subtle floating particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(129, 140, 248, 0.4);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 80%; top: 30%; animation-delay: 1s; }
+        .particle:nth-child(3) { left: 20%; top: 70%; animation-delay: 2s; }
+        .particle:nth-child(4) { left: 70%; top: 80%; animation-delay: 0.5s; }
+        .particle:nth-child(5) { left: 90%; top: 50%; animation-delay: 1.5s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+            50% { transform: translateY(-20px) scale(1.2); opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    
+    <div class="content">
+        <div class="logo-container">
+            <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+                <path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" stroke="#818cf8" stroke-width="3" fill="none"/>
+                <path d="M50 25 L75 40 L75 60 L50 75 L25 60 L25 40 Z" stroke="#6366f1" stroke-width="2" fill="rgba(99, 102, 241, 0.1)"/>
+                <path d="M35 45 L45 55 L65 35" stroke="#818cf8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="logo-text">Stride</span>
+        </div>
+        <p class="tagline">Your Job Search, <span class="accent">Finally Organized</span></p>
+    </div>
+</body>
+</html>
