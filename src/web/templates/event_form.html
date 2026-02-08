@@ -9,9 +9,11 @@
     </header>
 
     <form method="post" class="form card">
-        <div class="form-group">
+        <div class="form-group mention-container">
             <label for="title">Event Title *</label>
-            <input type="text" id="title" name="title" required placeholder="e.g., Coffee chat with John">
+            <input type="text" id="title" name="title" required placeholder="e.g., Coffee chat with @John" autocomplete="off">
+            <div class="mention-dropdown" id="titleMentions"></div>
+            <small class="form-hint">Type @ to mention a contact</small>
         </div>
 
         <div class="form-row">
@@ -65,9 +67,10 @@
             <input type="url" id="meeting_link" name="meeting_link" placeholder="https://zoom.us/...">
         </div>
 
-        <div class="form-group">
+        <div class="form-group mention-container">
             <label for="prep_notes">Preparation Notes</label>
-            <textarea id="prep_notes" name="prep_notes" rows="3" placeholder="What to prepare or remember"></textarea>
+            <textarea id="prep_notes" name="prep_notes" rows="3" placeholder="What to prepare or remember. Type @ to mention contacts"></textarea>
+            <div class="mention-dropdown" id="prepMentions"></div>
         </div>
 
         <div class="form-actions">
@@ -76,4 +79,184 @@
         </div>
     </form>
 </div>
+
+<style>
+.mention-container {
+    position: relative;
+}
+.mention-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+}
+.mention-dropdown.active {
+    display: block;
+}
+.mention-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.mention-item:hover, .mention-item.selected {
+    background: var(--hover-bg, #f5f5f5);
+}
+.mention-item .contact-name {
+    font-weight: 500;
+}
+.mention-item .contact-company {
+    font-size: 0.85em;
+    color: var(--text-muted);
+}
+.form-hint {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 4px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Contact data from server
+    const contacts = [
+        {% for contact in contacts %}
+        { id: {{ contact.id }}, name: "{{ contact.name }}", company: "{{ contact.company.name if contact.company else '' }}" },
+        {% endfor %}
+    ];
+    
+    function setupMentions(inputEl, dropdownEl) {
+        let mentionStart = -1;
+        let selectedIndex = 0;
+        
+        inputEl.addEventListener('input', function(e) {
+            const value = this.value;
+            const cursorPos = this.selectionStart;
+            
+            // Find @ symbol before cursor
+            let atPos = -1;
+            for (let i = cursorPos - 1; i >= 0; i--) {
+                if (value[i] === '@') {
+                    atPos = i;
+                    break;
+                } else if (value[i] === ' ' || value[i] === '\n') {
+                    break;
+                }
+            }
+            
+            if (atPos >= 0) {
+                mentionStart = atPos;
+                const query = value.substring(atPos + 1, cursorPos).toLowerCase();
+                const matches = contacts.filter(c => 
+                    c.name.toLowerCase().includes(query) ||
+                    c.company.toLowerCase().includes(query)
+                ).slice(0, 5);
+                
+                if (matches.length > 0) {
+                    dropdownEl.innerHTML = matches.map((c, i) => `
+                        <div class="mention-item ${i === 0 ? 'selected' : ''}" data-id="${c.id}" data-name="${c.name}">
+                            <span class="contact-name">@${c.name}</span>
+                            ${c.company ? `<span class="contact-company">${c.company}</span>` : ''}
+                        </div>
+                    `).join('');
+                    dropdownEl.classList.add('active');
+                    selectedIndex = 0;
+                    
+                    // Click handlers
+                    dropdownEl.querySelectorAll('.mention-item').forEach(item => {
+                        item.addEventListener('click', () => selectMention(item));
+                    });
+                } else {
+                    dropdownEl.classList.remove('active');
+                }
+            } else {
+                mentionStart = -1;
+                dropdownEl.classList.remove('active');
+            }
+        });
+        
+        inputEl.addEventListener('keydown', function(e) {
+            if (!dropdownEl.classList.contains('active')) return;
+            
+            const items = dropdownEl.querySelectorAll('.mention-item');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                updateSelection(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = Math.max(selectedIndex - 1, 0);
+                updateSelection(items);
+            } else if (e.key === 'Enter' || e.key === 'Tab') {
+                if (items[selectedIndex]) {
+                    e.preventDefault();
+                    selectMention(items[selectedIndex]);
+                }
+            } else if (e.key === 'Escape') {
+                dropdownEl.classList.remove('active');
+            }
+        });
+        
+        function updateSelection(items) {
+            items.forEach((item, i) => {
+                item.classList.toggle('selected', i === selectedIndex);
+            });
+        }
+        
+        function selectMention(item) {
+            const name = item.dataset.name;
+            const id = item.dataset.id;
+            const value = inputEl.value;
+            const cursorPos = inputEl.selectionStart;
+            
+            // Replace @query with @Name
+            const before = value.substring(0, mentionStart);
+            const after = value.substring(cursorPos);
+            inputEl.value = before + '@' + name + ' ' + after;
+            
+            // Set cursor position
+            const newPos = mentionStart + name.length + 2;
+            inputEl.setSelectionRange(newPos, newPos);
+            inputEl.focus();
+            
+            // Auto-select contact in dropdown
+            const contactSelect = document.getElementById('contact_id');
+            if (contactSelect) {
+                contactSelect.value = id;
+            }
+            
+            dropdownEl.classList.remove('active');
+        }
+        
+        // Close on click outside
+        document.addEventListener('click', function(e) {
+            if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
+                dropdownEl.classList.remove('active');
+            }
+        });
+    }
+    
+    // Setup for title and prep_notes
+    const titleInput = document.getElementById('title');
+    const titleDropdown = document.getElementById('titleMentions');
+    if (titleInput && titleDropdown) {
+        setupMentions(titleInput, titleDropdown);
+    }
+    
+    const prepInput = document.getElementById('prep_notes');
+    const prepDropdown = document.getElementById('prepMentions');
+    if (prepInput && prepDropdown) {
+        setupMentions(prepInput, prepDropdown);
+    }
+});
+</script>
 {% endblock %}
