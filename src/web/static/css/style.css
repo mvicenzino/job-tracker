@@ -286,6 +286,35 @@ a:hover {
     margin-left: var(--space-2);
 }
 
+/* Demo banner for sample data notice */
+.demo-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: var(--radius);
+    margin-bottom: var(--space-5);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.demo-banner svg {
+    flex-shrink: 0;
+    color: var(--color-primary);
+}
+
+.demo-banner a {
+    color: var(--color-primary);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.demo-banner a:hover {
+    text-decoration: underline;
+}
+
 .sidebar-nav {
     flex: 1;
     overflow-y: auto;
