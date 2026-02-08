@@ -63,6 +63,7 @@
                     <th>Company</th>
                     <th>Title</th>
                     <th>Type</th>
+                    <th>Notes</th>
                     <th>Last Contact</th>
                     <th>Next Follow-up</th>
                     <th>Actions</th>
@@ -83,6 +84,13 @@
                         <span class="badge badge-{{ contact.contact_type.value }}">
                             {{ contact.contact_type.value|replace('_', ' ')|title }}
                         </span>
+                    </td>
+                    <td class="notes-cell" title="{{ contact.notes or '' }}">
+                        {% if contact.notes %}
+                        {{ contact.notes[:50] }}{% if contact.notes|length > 50 %}...{% endif %}
+                        {% else %}
+                        -
+                        {% endif %}
                     </td>
                     <td>{{ contact.last_contact_date.strftime('%b %d') if contact.last_contact_date else '-' }}</td>
                     <td>

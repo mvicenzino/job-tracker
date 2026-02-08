@@ -6967,3 +6967,14 @@ body.demo-active .navbar {
     background: var(--color-surface-elevated);
     border-color: var(--color-border);
 }
+
+/* Notes cell in contacts table */
+.notes-cell {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    cursor: help;
+}
