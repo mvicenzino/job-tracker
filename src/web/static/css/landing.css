@@ -1877,3 +1877,73 @@
         color: #94a3b8;
     }
 }
+
+/* Video Demo Modal */
+.demo-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.demo-modal.active {
+    display: flex;
+    opacity: 1;
+}
+
+.demo-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 900px;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+}
+
+.demo-modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 10;
+}
+
+.demo-modal-close svg {
+    width: 24px;
+    height: 24px;
+    stroke: #fff;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.demo-modal-close:hover svg {
+    opacity: 1;
+}
+
+.demo-modal video {
+    width: 100%;
+    display: block;
+    border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+    .demo-modal-content {
+        width: 95%;
+    }
+    
+    .demo-modal-close {
+        top: -36px;
+    }
+}
