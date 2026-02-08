@@ -107,7 +107,7 @@
 
     <header class="page-header dashboard-header">
         <div class="greeting">
-            <h1>{% if onboarding.show %}Let's get started{% else %}Welcome back{% if current_user.first_name %}, {{ current_user.first_name }}{% endif %}{% endif %}</h1>
+            <h1>{% if onboarding.show %}Let's get started{% else %}Welcome back{% if current_user.display_name %}, {{ current_user.display_name }}{% elif current_user.first_name %}, {{ current_user.first_name }}{% endif %}{% endif %}</h1>
             <p class="subtitle">{% if onboarding.show %}Your job search command center{% else %}Here's what's happening with your job search{% endif %}</p>
         </div>
         <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Lead</a>
