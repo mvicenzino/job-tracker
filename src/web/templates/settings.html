@@ -8,6 +8,43 @@
 </div>
 
 <div class="settings-grid">
+    <!-- Appearance Section -->
+    <div class="card" id="appearance">
+        <div class="card-header">
+            <h2>Appearance</h2>
+        </div>
+        <div class="card-body">
+            <div class="appearance-setting">
+                <div class="appearance-setting-info">
+                    <strong>Theme</strong>
+                    <p class="text-muted">Choose your preferred color scheme</p>
+                </div>
+                <div class="theme-toggle-buttons">
+                    <button type="button" class="theme-btn" data-theme="light" id="themeLightBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                        Light
+                    </button>
+                    <button type="button" class="theme-btn" data-theme="dark" id="themeDarkBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                        Dark
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Profile Section -->
     <div class="card" id="profile">
         <div class="card-header">
@@ -387,6 +424,37 @@ document.addEventListener('DOMContentLoaded', function() {
             freqRow.style.opacity = this.checked ? '1' : '0.5';
         });
     }
+
+    // Theme toggle
+    var lightBtn = document.getElementById('themeLightBtn');
+    var darkBtn = document.getElementById('themeDarkBtn');
+    var themeColorMeta = document.getElementById('theme-color-meta');
+
+    function updateThemeButtons() {
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+            darkBtn.classList.add('active');
+            lightBtn.classList.remove('active');
+        } else {
+            lightBtn.classList.add('active');
+            darkBtn.classList.remove('active');
+        }
+    }
+
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('stride-theme', theme);
+        if (themeColorMeta) {
+            themeColorMeta.content = theme === 'dark' ? '#1e293b' : '#6366f1';
+        }
+        updateThemeButtons();
+    }
+
+    if (lightBtn && darkBtn) {
+        updateThemeButtons();
+        lightBtn.addEventListener('click', function() { setTheme('light'); });
+        darkBtn.addEventListener('click', function() { setTheme('dark'); });
+    }
 });
 </script>
 
@@ -395,6 +463,54 @@ document.addEventListener('DOMContentLoaded', function() {
     display: grid;
     gap: var(--space-6);
     max-width: 800px;
+}
+
+/* Appearance section */
+.appearance-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.appearance-setting-info strong {
+    display: block;
+    margin-bottom: var(--space-1);
+}
+
+.theme-toggle-buttons {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.theme-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.theme-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.theme-btn.active {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+}
+
+.theme-btn.active svg {
+    stroke: white;
 }
 
 /* Profile section */
