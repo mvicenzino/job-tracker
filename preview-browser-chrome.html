@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Browser Chrome Preview</title>
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+        }
+        h1 {
+            width: 100%;
+            text-align: center;
+            color: #333;
+        }
+        .feature-preview {
+            width: 320px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #1e1e2e;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .feature-preview::before {
+            content: '';
+            display: block;
+            height: 36px;
+            background: linear-gradient(180deg, #3d3d4d 0%, #2d2d3d 100%);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        }
+        .feature-preview::after {
+            content: '';
+            position: absolute;
+            top: 13px;
+            left: 14px;
+            width: 10px;
+            height: 10px;
+            background: #ff5f57;
+            border-radius: 50%;
+            box-shadow: 
+                16px 0 0 #ffbd2e,
+                32px 0 0 #28c840;
+        }
+        .feature-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .label {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Feature Screenshots with Browser Chrome</h1>
+    
+    <div>
+        <div class="feature-preview">
+            <img src="src/web/static/img/features/pipeline.png" alt="Pipeline">
+        </div>
+        <div class="label">Visual Pipeline</div>
+    </div>
+    
+    <div>
+        <div class="feature-preview">
+            <img src="src/web/static/img/features/dashboard.png" alt="Dashboard">
+        </div>
+        <div class="label">Dashboard</div>
+    </div>
+    
+    <div>
+        <div class="feature-preview">
+            <img src="src/web/static/img/features/schedule.png" alt="Schedule">
+        </div>
+        <div class="label">Schedule</div>
+    </div>
+    
+    <div>
+        <div class="feature-preview">
+            <img src="src/web/static/img/features/contacts.png" alt="Contacts">
+        </div>
+        <div class="label">Contacts</div>
+    </div>
+    
+    <div>
+        <div class="feature-preview">
+            <img src="src/web/static/img/features/companies.png" alt="Companies">
+        </div>
+        <div class="label">Companies</div>
+    </div>
+</body>
+</html>
