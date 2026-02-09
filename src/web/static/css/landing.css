@@ -1280,6 +1280,46 @@
     color: var(--landing-accent);
 }
 
+/* Hero Demo CTA - Prominent Try Demo Button */
+.hero-demo-cta {
+    margin-bottom: 2rem;
+}
+
+.btn-try-demo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+    animation: demo-pulse 3s ease-in-out infinite;
+}
+
+.btn-try-demo:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.45);
+    color: white;
+}
+
+.btn-try-demo svg {
+    width: 18px;
+    height: 18px;
+    fill: white;
+    stroke: none;
+}
+
+@keyframes demo-pulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35); }
+    50% { box-shadow: 0 4px 30px rgba(16, 185, 129, 0.5); }
+}
+
 /* Social Proof */
 .hero-social-proof {
     display: flex;
@@ -1732,6 +1772,15 @@
         width: 100%;
         max-width: 280px;
         justify-content: center;
+    }
+
+    .hero-demo-cta {
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-try-demo {
+        font-size: 0.9375rem;
+        padding: 0.75rem 1.25rem;
     }
 
     .hero-social-proof {

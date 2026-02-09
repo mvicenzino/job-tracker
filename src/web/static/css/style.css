@@ -6191,6 +6191,49 @@ body.demo-active .navbar {
     .mobile-pipeline-tabs {
         display: none;
     }
+}
+
+/* Smaller desktop screens - ensure pipeline board scrolls properly */
+@media (min-width: 769px) and (max-width: 1400px) {
+    .pipeline-board-view {
+        overflow-x: auto;
+        margin: 0 calc(-1 * var(--space-4));
+        padding: 0 var(--space-4);
+    }
+
+    .pipeline-board {
+        min-width: max-content;
+        padding-right: var(--space-4);
+    }
+
+    .pipeline-column {
+        min-width: 260px;
+        max-width: 280px;
+    }
+}
+
+/* Even smaller desktops - more compact columns */
+@media (min-width: 769px) and (max-width: 1200px) {
+    .pipeline-column {
+        min-width: 220px;
+        max-width: 240px;
+    }
+
+    .pipeline-card {
+        padding: var(--space-3);
+    }
+
+    .pipeline-card .card-title {
+        font-size: 0.875rem;
+    }
+
+    .column-header h3 {
+        font-size: 0.75rem;
+    }
+
+    .column-description {
+        display: none;
+    }
     
     .pipeline-column {
         display: flex !important;
