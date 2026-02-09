@@ -88,7 +88,7 @@
                         </span>
                     </div>
                     <div class="industry-bar">
-                        <div class="industry-bar-fill" style="width: {{ (data.value / 2000 * 100)|min(100) }}%"></div>
+                        <div class="industry-bar-fill" style="width: {{ [data.value / 2000 * 100, 100]|min }}%"></div>
                     </div>
                 </div>
                 {% endfor %}
@@ -108,7 +108,7 @@
                 <div class="chart-bars">
                     {% for point in job_openings_history %}
                     <div class="chart-bar-container" title="{{ point.period }}: {{ "{:,.0f}".format(point.value) }}K">
-                        <div class="chart-bar" style="height: {{ (point.value / 12000 * 100)|min(100) }}%"></div>
+                        <div class="chart-bar" style="height: {{ [point.value / 12000 * 100, 100]|min }}%"></div>
                         <div class="chart-label">{{ point.period[-7:] }}</div>
                     </div>
                     {% endfor %}
