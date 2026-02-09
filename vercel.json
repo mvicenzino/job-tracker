@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "analytics": {
+    "enabled": true
+  },
   "builds": [
     {
       "src": "api/index.py",
