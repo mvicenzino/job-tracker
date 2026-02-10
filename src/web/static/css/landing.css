@@ -823,7 +823,7 @@
 /* CTA Section */
 .cta-section {
     padding: 6rem 2rem;
-    background: var(--landing-text);
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%);
 }
 
 .cta-card {
@@ -860,11 +860,13 @@
 
 .cta-buttons .btn-primary {
     background: white;
-    color: var(--landing-text);
+    color: #4f46e5;
+    font-weight: 600;
 }
 
 .cta-buttons .btn-primary:hover {
-    background: var(--landing-bg);
+    background: #f0f4ff;
+    transform: translateY(-2px);
 }
 
 .cta-buttons .btn-secondary {
