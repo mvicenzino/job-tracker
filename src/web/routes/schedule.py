@@ -65,6 +65,53 @@ def new_event():
         session.close()
 
 
+@bp.route('/events/<int:event_id>')
+@login_required
+def event_detail(event_id):
+    """View event detail."""
+    service, session = get_service()
+    try:
+        event = service.events.get_by_id(event_id)
+        if not event:
+            flash('Event not found.', 'error')
+            return redirect(url_for('schedule.schedule'))
+        return render_template('event_detail.html', event=event)
+    finally:
+        session.close()
+
+
+@bp.route('/events/<int:event_id>/update', methods=['POST'])
+@login_required
+def update_event(event_id):
+    """Update event details including outcome notes."""
+    service, session = get_service()
+    try:
+        event = service.events.get_by_id(event_id)
+        if not event:
+            flash('Event not found.', 'error')
+            return redirect(url_for('schedule.schedule'))
+
+        # Update outcome notes
+        outcome_notes = request.form.get('outcome_notes')
+        if outcome_notes is not None:
+            event.outcome_notes = outcome_notes
+
+        # Update completion status if provided
+        completed = request.form.get('completed')
+        if completed is not None:
+            event.completed = completed == 'true'
+
+        went_well = request.form.get('went_well')
+        if went_well:
+            event.went_well = went_well == 'true'
+
+        session.commit()
+        flash('Event updated!', 'success')
+        return redirect(url_for('schedule.event_detail', event_id=event_id))
+    finally:
+        session.close()
+
+
 @bp.route('/events/<int:event_id>/complete', methods=['POST'])
 @login_required
 def complete_event(event_id):

@@ -280,10 +280,42 @@ function extractJobData() {
     else if (locLower.includes('hybrid')) data.remote_type = 'hybrid';
   }
 
-  // Job description
-  const descEl = document.querySelector('.jobs-description__content, .jobs-description-content, [class*="jobs-description"]');
-  if (descEl) {
-    data.description = descEl.textContent.trim().substring(0, 5000);
+  // Job description - try multiple selectors
+  const descSelectors = [
+    '.jobs-description__content',
+    '.jobs-description-content',
+    '.jobs-description-content__text',
+    '#job-details',
+    '[class*="jobs-description"]',
+    '[class*="description__text"]',
+    '.job-details-about-the-job-module__description',
+    'article[class*="jobs-description"]',
+    '.jobs-box__html-content'
+  ];
+  
+  for (const selector of descSelectors) {
+    try {
+      const el = document.querySelector(selector);
+      if (el && el.textContent.trim().length > 50) {
+        data.description = el.textContent.trim().substring(0, 5000);
+        console.log('[Stride Extension] Found description with selector:', selector);
+        break;
+      }
+    } catch (e) {}
+  }
+  
+  // Fallback: try to find any large text block in the main content
+  if (!data.description) {
+    const mainContent = document.querySelector('main') || document.body;
+    const textBlocks = mainContent.querySelectorAll('p, div, section');
+    for (const block of textBlocks) {
+      const text = block.textContent.trim();
+      if (text.length > 200 && text.length < 10000 && !block.closest('nav') && !block.closest('header')) {
+        data.description = text.substring(0, 5000);
+        console.log('[Stride Extension] Found description via fallback');
+        break;
+      }
+    }
   }
 
   console.log('[Stride Extension] Extracted job:', data);

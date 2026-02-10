@@ -3,7 +3,7 @@
   "name": "Stride - LinkedIn Import",
   "version": "1.2",
   "description": "Save LinkedIn profiles, companies, and job listings directly to your Stride job search tracker. One click to capture contacts, companies, and jobs as you browse.",
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "scripting"],
   "host_permissions": [
     "https://www.linkedin.com/*",
     "https://*.vercel.app/*"

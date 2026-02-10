@@ -214,14 +214,42 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateViewLink(settings.serverUrl, pageType);
 
   // Get data from content script
-  try {
-    const response = await chrome.tabs.sendMessage(tab.id, { action: 'getData' });
-    if (response) {
-      populateForm(response);
+  async function tryGetData() {
+    try {
+      const response = await chrome.tabs.sendMessage(tab.id, { action: 'getData' });
+      console.log('[Stride Popup] Received from content script:', response);
+      if (response && response.type) {
+        populateForm(response);
+        return true;
+      }
+    } catch (error) {
+      console.log('[Stride Popup] Content script not responding, trying to inject...');
     }
-  } catch (error) {
-    console.log('Could not get data from content script:', error);
-    // Fallback: populate URL fields
+    return false;
+  }
+  
+  // First attempt
+  let gotData = await tryGetData();
+  
+  // If failed, try to inject content script and retry
+  if (!gotData) {
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content.js']
+      });
+      console.log('[Stride Popup] Content script injected, retrying...');
+      // Wait a moment for script to initialize
+      await new Promise(resolve => setTimeout(resolve, 200));
+      gotData = await tryGetData();
+    } catch (injectError) {
+      console.log('[Stride Popup] Could not inject content script:', injectError);
+    }
+  }
+  
+  // Final fallback: populate URL fields only
+  if (!gotData) {
+    console.log('[Stride Popup] Using fallback - URL only');
     if (pageType === 'profile') {
       document.getElementById('contact_linkedin_url').value = tab.url.split('?')[0];
     } else if (pageType === 'company') {
@@ -229,6 +257,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (pageType === 'job') {
       document.getElementById('job_url').value = tab.url.split('?')[0];
     }
+    messageEl.textContent = 'Tip: Refresh the page for full data extraction';
+    messageEl.className = 'message warning';
   }
 
   // Handle contact form submission
