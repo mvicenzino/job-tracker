@@ -12,6 +12,7 @@ from .checklist import ChecklistItem
 from .reflection import WeeklyReflection
 from .resume_version import ResumeVersion
 from .notification import Notification
+from .interview_prep import InterviewPrep
 
 __all__ = [
     'Base',
@@ -31,5 +32,6 @@ __all__ = [
     'ChecklistItem',
     'WeeklyReflection',
     'ResumeVersion',
-    'Notification'
+    'Notification',
+    'InterviewPrep'
 ]

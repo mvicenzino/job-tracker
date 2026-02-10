@@ -190,6 +190,120 @@ Write a compelling cover letter that highlights the candidate's most relevant qu
     return message.content[0].text.strip()
 
 
+INTERVIEW_PREP_PROMPT = """You are an expert interview coach. Generate comprehensive interview preparation materials based on the job description and candidate's resume.
+
+Return a JSON object with exactly this structure:
+
+{
+  "questions": [
+    {
+      "question": "The interview question they might ask",
+      "category": "technical|behavioral|situational",
+      "tip": "A specific tip connecting this question to something on the candidate's resume"
+    }
+  ],
+  "talking_points": [
+    {
+      "point": "A key strength or experience to highlight",
+      "relevance": "Why this matters for this specific role"
+    }
+  ],
+  "questions_to_ask": [
+    "A thoughtful question to ask the interviewer"
+  ],
+  "company_brief": {
+    "description": "1-2 sentence summary of what the company does",
+    "focus_areas": "Key areas the company seems to focus on based on the job description"
+  }
+}
+
+Guidelines:
+- Generate 5-7 interview questions (mix of technical and behavioral)
+- For each question, include a specific tip that references the candidate's actual experience from their resume
+- Generate 4-5 talking points that match resume experience to job requirements
+- Generate 3 insightful questions to ask the interviewer, based on the job posting
+- Keep the company brief concise and focused on what's in the job description
+- Be specific - reference actual skills, projects, and experiences from the resume
+- Return ONLY valid JSON, no markdown fences or extra text"""
+
+
+def generate_interview_prep(resume_text: str, job_description: str, job_title: str = None, company_name: str = None) -> dict:
+    """Generate interview preparation materials based on resume and job description.
+
+    Args:
+        resume_text: The candidate's resume content
+        job_description: The job posting description/requirements
+        job_title: Optional job title for context
+        company_name: Optional company name for context
+
+    Returns:
+        A dict with interview prep materials (questions, talking_points, questions_to_ask, company_brief)
+
+    Raises:
+        RuntimeError: If the API call fails or response can't be parsed
+    """
+    import anthropic
+
+    # Build context
+    context_parts = []
+    if job_title:
+        context_parts.append(f"Job Title: {job_title}")
+    if company_name:
+        context_parts.append(f"Company: {company_name}")
+    context = "\n".join(context_parts) if context_parts else ""
+
+    # Truncate inputs to stay within limits
+    resume_text = resume_text[:6000] if resume_text else ""
+    job_description = job_description[:6000] if job_description else ""
+
+    user_message = f"""Generate interview preparation materials for this candidate and role:
+
+{context}
+
+=== JOB DESCRIPTION ===
+{job_description}
+
+=== CANDIDATE RESUME ===
+{resume_text}
+
+Generate comprehensive interview prep including likely questions, talking points, and questions to ask."""
+
+    client = anthropic.Anthropic()
+    message = client.messages.create(
+        model="claude-3-5-haiku-20241022",
+        max_tokens=2048,
+        temperature=0.3,  # Slightly creative for better variety
+        system=INTERVIEW_PREP_PROMPT,
+        messages=[
+            {"role": "user", "content": user_message}
+        ],
+    )
+
+    response_text = message.content[0].text.strip()
+
+    # Strip markdown code fences if present
+    response_text = re.sub(r'^```(?:json)?\s*', '', response_text)
+    response_text = re.sub(r'\s*```$', '', response_text)
+    response_text = response_text.strip()
+
+    try:
+        data = json.loads(response_text)
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"Failed to parse AI response as JSON: {e}")
+
+    # Validate and ensure required fields exist
+    if not isinstance(data.get("questions"), list):
+        data["questions"] = []
+    if not isinstance(data.get("talking_points"), list):
+        data["talking_points"] = []
+    if not isinstance(data.get("questions_to_ask"), list):
+        data["questions_to_ask"] = []
+    if not isinstance(data.get("company_brief"), dict):
+        data["company_brief"] = {}
+
+    return data
+
+
 SYSTEM_PROMPT = """You are a job description parser. Extract structured data from the provided job description text and return ONLY valid JSON with these fields:
 
 {

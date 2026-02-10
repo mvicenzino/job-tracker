@@ -4,8 +4,8 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required, current_user
 
 from ..helpers import get_service, get_service_for_user, get_user_by_api_key
-from ...models import ApplicationStatus, ContactType, Application, Job, Company, Contact
-from ...services.ai_parser import is_ai_parsing_available, parse_job_description, analyze_resume_job_fit, generate_cover_letter
+from ...models import ApplicationStatus, ContactType, Application, Job, Company, Contact, InterviewPrep
+from ...services.ai_parser import is_ai_parsing_available, parse_job_description, analyze_resume_job_fit, generate_cover_letter, generate_interview_prep
 
 bp = Blueprint('api', __name__)
 
@@ -589,39 +589,39 @@ def api_score_batch():
     """API: Score all unscored jobs for the current user."""
     if not is_ai_parsing_available():
         return jsonify({'success': False, 'error': 'AI scoring is not available. Please set ANTHROPIC_API_KEY.'}), 503
-    
+
     service, session = get_service()
     try:
         # Check resume
         if not current_user.resume_text or len(current_user.resume_text.strip()) < 100:
             return jsonify({'success': False, 'error': 'No resume found. Please add a resume first.'}), 400
-        
+
         # Get all jobs without scores
         from ...models import Job
         from datetime import datetime
         import json
-        
+
         unscored_jobs = session.query(Job).filter(
             Job.user_id == current_user.id,
             Job.fit_score.is_(None)
         ).all()
-        
+
         if not unscored_jobs:
             return jsonify({'success': True, 'message': 'All jobs already scored', 'scored': 0})
-        
+
         scored_count = 0
         errors = []
-        
+
         for job in unscored_jobs:
             job_desc = job.description or ''
             if job.requirements:
                 job_desc += '\n\nRequirements:\n' + job.requirements
-            
+
             # Skip jobs with insufficient description
             if len(job_desc.strip()) < 50:
                 errors.append(f"Job {job.id} ({job.title}): description too short")
                 continue
-            
+
             try:
                 analysis = analyze_resume_job_fit(
                     resume_text=current_user.resume_text,
@@ -635,22 +635,155 @@ def api_score_batch():
                 scored_count += 1
             except Exception as e:
                 errors.append(f"Job {job.id} ({job.title}): {str(e)}")
-        
+
         session.commit()
-        
+
         result = {
             'success': True,
             'scored': scored_count,
             'total': len(unscored_jobs)
         }
-        
+
         if errors:
             result['errors'] = errors[:5]  # Limit error list
-        
+
         return jsonify(result)
-        
+
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        session.close()
+
+
+@bp.route('/api/applications/<int:app_id>/interview-prep', methods=['GET', 'POST'])
+@login_required
+def api_interview_prep(app_id):
+    """API: Get or generate interview prep materials for an application."""
+    from flask import current_app
+
+    service, session = get_service()
+    try:
+        # Get the application
+        app = service.applications.get_by_id(app_id)
+        if not app:
+            return jsonify({'success': False, 'error': 'Application not found'}), 404
+
+        job = app.job
+        if not job:
+            return jsonify({'success': False, 'error': 'Job not found for this application'}), 404
+
+        # GET: Return existing prep if available
+        if request.method == 'GET':
+            existing_prep = session.query(InterviewPrep).filter(
+                InterviewPrep.application_id == app_id,
+                InterviewPrep.user_id == current_user.id
+            ).order_by(InterviewPrep.created_at.desc()).first()
+
+            if existing_prep:
+                return jsonify({'success': True, 'prep': existing_prep.to_dict()})
+            else:
+                return jsonify({'success': True, 'prep': None})
+
+        # POST: Generate new prep
+        if not is_ai_parsing_available():
+            return jsonify({'success': False, 'error': 'AI is not available. Please set ANTHROPIC_API_KEY.'}), 503
+
+        data = request.get_json() or {}
+
+        # Get job description
+        job_description = job.description or ''
+        if job.requirements:
+            job_description += '\n\nRequirements:\n' + job.requirements
+
+        if len(job_description.strip()) < 50:
+            return jsonify({'success': False, 'error': 'Job description is too short. Please add more details to the job posting.'}), 400
+
+        # Get resume content
+        resume_text = None
+        resume_version_id = data.get('resume_version_id')
+
+        if resume_version_id:
+            resume_version = service.resume_versions.get_by_id(resume_version_id)
+            if resume_version:
+                resume_text = resume_version.content
+        else:
+            # Try to get most recent resume version
+            versions = service.resume_versions.get_all(limit=1)
+            if versions:
+                resume_text = versions[0].content
+                resume_version_id = versions[0].id
+
+        # Fall back to user's main resume text
+        if not resume_text:
+            resume_text = current_user.resume_text
+
+        if not resume_text or len(resume_text.strip()) < 100:
+            return jsonify({'success': False, 'error': 'No resume found. Please add a resume first.'}), 400
+
+        # Generate interview prep using AI
+        try:
+            prep_data = generate_interview_prep(
+                resume_text=resume_text,
+                job_description=job_description,
+                job_title=job.title,
+                company_name=job.company.name if job.company else None
+            )
+        except Exception as e:
+            logging.error(f"Interview prep generation failed: {e}")
+            return jsonify({'success': False, 'error': f'AI generation failed: {str(e)}'}), 500
+
+        # Check if we should regenerate (delete old) or create new
+        regenerate = data.get('regenerate', False)
+        if regenerate:
+            # Delete existing preps for this application
+            session.query(InterviewPrep).filter(
+                InterviewPrep.application_id == app_id,
+                InterviewPrep.user_id == current_user.id
+            ).delete()
+
+        # Save to database
+        interview_prep = InterviewPrep(
+            user_id=current_user.id,
+            application_id=app_id,
+            resume_version_id=resume_version_id,
+            questions=prep_data.get('questions', []),
+            talking_points=prep_data.get('talking_points', []),
+            questions_to_ask=prep_data.get('questions_to_ask', []),
+            company_brief=prep_data.get('company_brief', {})
+        )
+        session.add(interview_prep)
+        session.commit()
+
+        return jsonify({
+            'success': True,
+            'prep': interview_prep.to_dict()
+        })
+
+    except Exception as e:
+        logging.error(f"Interview prep error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        session.close()
+
+
+@bp.route('/api/contacts/search')
+@login_required
+def api_contacts_search():
+    """API: Search contacts by name for @mention autocomplete."""
+    service, session = get_service()
+    try:
+        q = request.args.get('q', '').strip()
+        if not q:
+            return jsonify([])
+        contacts = service.contacts.search_by_name(q)
+        return jsonify([
+            {
+                'id': c.id,
+                'name': c.name,
+                'company': c.company.name if c.company else None
+            }
+            for c in contacts[:10]
+        ])
     finally:
         session.close()
 

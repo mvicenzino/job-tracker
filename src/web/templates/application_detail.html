@@ -314,6 +314,156 @@
         </section>
         {% endif %}
 
+        <!-- Job Info -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Job Details</h2>
+                <a href="{{ url_for('jobs.edit_job', job_id=details.job.id, app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+            </div>
+            <div class="card-body">
+                <dl class="detail-list">
+                    <dt>Title</dt>
+                    <dd>{{ details.job.title }}</dd>
+
+                    {% if details.job.salary_min and details.job.salary_max %}
+                    <dt>Salary Range</dt>
+                    <dd>${{ "{:,}".format(details.job.salary_min) }} - ${{ "{:,}".format(details.job.salary_max) }}</dd>
+                    {% endif %}
+
+                    {% if details.job.remote_type %}
+                    <dt>Work Type</dt>
+                    <dd>{{ details.job.remote_type|title }}</dd>
+                    {% endif %}
+
+                    {% if details.job.location %}
+                    <dt>Location</dt>
+                    <dd>{{ details.job.location }}</dd>
+                    {% endif %}
+
+                    {% if details.job.source %}
+                    <dt>Source</dt>
+                    <dd>{{ details.job.source }}</dd>
+                    {% endif %}
+
+                    {% if details.job.job_url %}
+                    <dt>Job Posting</dt>
+                    <dd><a href="{{ details.job.job_url }}" target="_blank">View Original Posting →</a></dd>
+                    {% endif %}
+                </dl>
+
+                {% if details.job.description %}
+                <div class="detail-section">
+                    <h3>Description</h3>
+                    <div class="detail-text">{{ details.job.description }}</div>
+                </div>
+                {% endif %}
+
+                {% if details.job.requirements %}
+                <div class="detail-section">
+                    <h3>Requirements</h3>
+                    <div class="detail-text">{{ details.job.requirements }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Resume Fit Analysis -->
+        {% if ai_parsing_enabled %}
+        <section class="card resume-fit-card">
+            <div class="card-header">
+                <h2>Resume Fit Analysis</h2>
+                <span class="badge badge-info">AI-Powered</span>
+            </div>
+            <div class="card-body">
+                <div id="resumeFitPrompt" class="resume-fit-prompt">
+                    <p>See how well your resume matches this job's requirements and get suggestions to improve your fit.</p>
+                    <div class="resume-fit-controls">
+                        <select id="resumeVersionSelect" class="resume-version-select">
+                            {% for version in resume_versions %}
+                            <option value="{{ version.id }}">{{ version.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="button" class="btn btn-primary" onclick="analyzeResumeFit()">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            Analyze Fit
+                        </button>
+                    </div>
+                    {% if not resume_versions %}
+                    <p class="resume-fit-warning">
+                        <a href="{{ url_for('resumes.new_resume') }}">Add a resume</a> first to use this feature.
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div id="resumeFitLoading" class="resume-fit-loading" style="display:none;">
+                    <div class="loading-spinner"></div>
+                    <p>Analyzing your resume against this job...</p>
+                </div>
+
+                <div id="resumeFitResults" class="resume-fit-results" style="display:none;">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+
+                <div id="resumeFitError" class="resume-fit-error" style="display:none;">
+                    <p id="resumeFitErrorMessage"></p>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="resetResumeFit()">Try Again</button>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Interview Prep -->
+        {% if ai_parsing_enabled %}
+        <section class="card interview-prep-card">
+            <div class="card-header">
+                <h2>Interview Prep</h2>
+                <span class="badge badge-info">AI-Powered</span>
+            </div>
+            <div class="card-body">
+                <div id="interviewPrepPrompt" class="interview-prep-prompt">
+                    <p>Get AI-generated interview preparation materials tailored to this role and your experience.</p>
+                    <div class="interview-prep-controls">
+                        <select id="prepResumeVersionSelect" class="resume-version-select">
+                            {% for version in resume_versions %}
+                            <option value="{{ version.id }}">{{ version.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="button" class="btn btn-primary" onclick="generateInterviewPrep()">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                            Generate Prep
+                        </button>
+                    </div>
+                    {% if not resume_versions %}
+                    <p class="interview-prep-warning">
+                        <a href="{{ url_for('resumes.new_resume') }}">Add a resume</a> first to use this feature.
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div id="interviewPrepLoading" class="interview-prep-loading" style="display:none;">
+                    <div class="loading-spinner"></div>
+                    <p>Generating your interview prep materials...</p>
+                </div>
+
+                <div id="interviewPrepResults" class="interview-prep-results" style="display:none;">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+
+                <div id="interviewPrepError" class="interview-prep-error" style="display:none;">
+                    <p id="interviewPrepErrorMessage"></p>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="resetInterviewPrep()">Try Again</button>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
         <!-- Company Info -->
         <section class="card">
             <div class="card-header">
@@ -1016,6 +1166,315 @@
         width: 100%;
     }
 }
+
+/* Interview Prep Styles */
+.interview-prep-card .badge {
+    font-size: 0.7rem;
+}
+
+.interview-prep-prompt p {
+    margin: 0 0 var(--space-4);
+    color: var(--color-text-secondary);
+}
+
+.interview-prep-controls {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.interview-prep-warning {
+    margin-top: var(--space-3);
+    font-size: 0.875rem;
+    color: var(--color-warning);
+}
+
+.interview-prep-loading {
+    text-align: center;
+    padding: var(--space-6);
+}
+
+.interview-prep-loading p {
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.interview-prep-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius);
+    padding: var(--space-4);
+    text-align: center;
+}
+
+.interview-prep-error p {
+    color: #dc2626;
+    margin: 0 0 var(--space-3);
+}
+
+.interview-prep-results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.prep-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.prep-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.prep-date {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.prep-section {
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.prep-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-bg-subtle);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+}
+
+.prep-section-header:hover {
+    background: var(--color-bg-hover);
+}
+
+.prep-section-header h4 {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.prep-section-header .count {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    font-weight: normal;
+    background: var(--color-bg);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+}
+
+.prep-section-toggle {
+    font-size: 1.25rem;
+    color: var(--color-text-secondary);
+    transition: transform 0.2s;
+}
+
+.prep-section.expanded .prep-section-toggle {
+    transform: rotate(180deg);
+}
+
+.prep-section-content {
+    display: none;
+    padding: var(--space-4);
+}
+
+.prep-section.expanded .prep-section-content {
+    display: block;
+}
+
+.prep-question-item {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.prep-question-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.prep-question-item:first-child {
+    padding-top: 0;
+}
+
+.question-category {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-2);
+}
+
+.question-category.technical {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.question-category.behavioral {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.question-category.situational {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.question-text {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    margin-bottom: var(--space-2);
+    line-height: 1.5;
+}
+
+.question-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    background: var(--color-bg-subtle);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius);
+    margin-top: var(--space-2);
+}
+
+.question-tip .tip-icon {
+    flex-shrink: 0;
+}
+
+.prep-talking-point {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.prep-talking-point:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.prep-talking-point:first-child {
+    padding-top: 0;
+}
+
+.talking-point-text {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    margin-bottom: var(--space-1);
+}
+
+.talking-point-relevance {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+}
+
+.prep-ask-question {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.prep-ask-question:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.prep-ask-question:first-child {
+    padding-top: 0;
+}
+
+.ask-question-number {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: var(--color-primary);
+    color: white;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.ask-question-text {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+.company-brief-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.company-brief-item {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.company-brief-item dt {
+    flex-shrink: 0;
+    width: 100px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.company-brief-item dd {
+    margin: 0;
+    font-size: 0.9375rem;
+}
+
+.prep-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border-light);
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.prep-actions-left {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.prep-actions-right {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.copy-success {
+    display: none;
+    color: var(--color-success);
+    font-size: 0.875rem;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.copy-success.show {
+    display: flex;
+}
 </style>
 
 {% if ai_parsing_enabled %}
@@ -1240,6 +1699,259 @@ setTimeout(function() {
     analyzeResumeFit();
 }, 500);
 {% endif %}
+
+// Interview Prep Functions
+var existingPrepData = null;
+
+// Check for existing prep on page load
+document.addEventListener('DOMContentLoaded', function() {
+    checkExistingPrep();
+});
+
+function checkExistingPrep() {
+    fetch('/api/applications/' + applicationId + '/interview-prep')
+        .then(function(resp) { return resp.json(); })
+        .then(function(data) {
+            if (data.success && data.prep) {
+                existingPrepData = data.prep;
+                renderInterviewPrepResults(data.prep);
+                document.getElementById('interviewPrepPrompt').style.display = 'none';
+                document.getElementById('interviewPrepResults').style.display = 'flex';
+            }
+        })
+        .catch(function(err) {
+            console.log('No existing prep found');
+        });
+}
+
+function generateInterviewPrep(regenerate) {
+    var select = document.getElementById('prepResumeVersionSelect');
+    var resumeVersionId = select ? select.value : null;
+
+    // Show loading state
+    document.getElementById('interviewPrepPrompt').style.display = 'none';
+    document.getElementById('interviewPrepResults').style.display = 'none';
+    document.getElementById('interviewPrepLoading').style.display = 'block';
+    document.getElementById('interviewPrepError').style.display = 'none';
+
+    fetch('/api/applications/' + applicationId + '/interview-prep', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            resume_version_id: resumeVersionId,
+            regenerate: regenerate || false
+        })
+    })
+    .then(function(resp) { return resp.json(); })
+    .then(function(data) {
+        document.getElementById('interviewPrepLoading').style.display = 'none';
+
+        if (data.success) {
+            existingPrepData = data.prep;
+            renderInterviewPrepResults(data.prep);
+            document.getElementById('interviewPrepResults').style.display = 'flex';
+        } else {
+            document.getElementById('interviewPrepErrorMessage').textContent = data.error || 'Generation failed';
+            document.getElementById('interviewPrepError').style.display = 'block';
+        }
+    })
+    .catch(function(err) {
+        document.getElementById('interviewPrepLoading').style.display = 'none';
+        document.getElementById('interviewPrepErrorMessage').textContent = 'Network error: ' + err.message;
+        document.getElementById('interviewPrepError').style.display = 'block';
+    });
+}
+
+function resetInterviewPrep() {
+    document.getElementById('interviewPrepPrompt').style.display = 'block';
+    document.getElementById('interviewPrepLoading').style.display = 'none';
+    document.getElementById('interviewPrepResults').style.display = 'none';
+    document.getElementById('interviewPrepError').style.display = 'none';
+}
+
+function togglePrepSection(sectionId) {
+    var section = document.getElementById(sectionId);
+    if (section) {
+        section.classList.toggle('expanded');
+    }
+}
+
+function renderInterviewPrepResults(prep) {
+    var createdDate = prep.created_at ? new Date(prep.created_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) : '';
+
+    var html = '<div class="prep-header">' +
+        '<h3>Interview Prep for {{ details.job.title }}</h3>' +
+        '<span class="prep-date">Generated ' + createdDate + '</span>' +
+    '</div>';
+
+    // Questions section
+    var questions = prep.questions || [];
+    html += '<div class="prep-section expanded" id="prepQuestionsSection">' +
+        '<div class="prep-section-header" onclick="togglePrepSection(\'prepQuestionsSection\')">' +
+            '<h4><span>🎯</span> Likely Interview Questions <span class="count">' + questions.length + '</span></h4>' +
+            '<span class="prep-section-toggle">▼</span>' +
+        '</div>' +
+        '<div class="prep-section-content">';
+
+    questions.forEach(function(q, i) {
+        var category = q.category || 'general';
+        html += '<div class="prep-question-item">' +
+            '<span class="question-category ' + category + '">' + category + '</span>' +
+            '<div class="question-text">' + (i + 1) + '. ' + escapeHtml(q.question) + '</div>';
+        if (q.tip) {
+            html += '<div class="question-tip">' +
+                '<span class="tip-icon">💡</span>' +
+                '<span>' + escapeHtml(q.tip) + '</span>' +
+            '</div>';
+        }
+        html += '</div>';
+    });
+
+    html += '</div></div>';
+
+    // Talking Points section
+    var talkingPoints = prep.talking_points || [];
+    html += '<div class="prep-section" id="prepTalkingPointsSection">' +
+        '<div class="prep-section-header" onclick="togglePrepSection(\'prepTalkingPointsSection\')">' +
+            '<h4><span>💪</span> Your Key Talking Points <span class="count">' + talkingPoints.length + '</span></h4>' +
+            '<span class="prep-section-toggle">▼</span>' +
+        '</div>' +
+        '<div class="prep-section-content">';
+
+    talkingPoints.forEach(function(tp) {
+        html += '<div class="prep-talking-point">' +
+            '<div class="talking-point-text">• ' + escapeHtml(tp.point) + '</div>' +
+            '<div class="talking-point-relevance">' + escapeHtml(tp.relevance || '') + '</div>' +
+        '</div>';
+    });
+
+    html += '</div></div>';
+
+    // Questions to Ask section
+    var questionsToAsk = prep.questions_to_ask || [];
+    html += '<div class="prep-section" id="prepQuestionsToAskSection">' +
+        '<div class="prep-section-header" onclick="togglePrepSection(\'prepQuestionsToAskSection\')">' +
+            '<h4><span>🤔</span> Questions to Ask Them <span class="count">' + questionsToAsk.length + '</span></h4>' +
+            '<span class="prep-section-toggle">▼</span>' +
+        '</div>' +
+        '<div class="prep-section-content">';
+
+    questionsToAsk.forEach(function(q, i) {
+        html += '<div class="prep-ask-question">' +
+            '<span class="ask-question-number">' + (i + 1) + '</span>' +
+            '<span class="ask-question-text">' + escapeHtml(q) + '</span>' +
+        '</div>';
+    });
+
+    html += '</div></div>';
+
+    // Company Brief section
+    var brief = prep.company_brief || {};
+    if (brief.description || brief.focus_areas) {
+        html += '<div class="prep-section" id="prepCompanyBriefSection">' +
+            '<div class="prep-section-header" onclick="togglePrepSection(\'prepCompanyBriefSection\')">' +
+                '<h4><span>🏢</span> Company Quick Brief</h4>' +
+                '<span class="prep-section-toggle">▼</span>' +
+            '</div>' +
+            '<div class="prep-section-content">' +
+                '<dl class="company-brief-content">';
+
+        if (brief.description) {
+            html += '<div class="company-brief-item">' +
+                '<dt>About</dt>' +
+                '<dd>' + escapeHtml(brief.description) + '</dd>' +
+            '</div>';
+        }
+        if (brief.focus_areas) {
+            html += '<div class="company-brief-item">' +
+                '<dt>Focus</dt>' +
+                '<dd>' + escapeHtml(brief.focus_areas) + '</dd>' +
+            '</div>';
+        }
+
+        html += '</dl></div></div>';
+    }
+
+    // Actions
+    html += '<div class="prep-actions">' +
+        '<div class="prep-actions-left">' +
+            '<button type="button" class="btn btn-secondary btn-sm" onclick="copyAllPrep()">' +
+                '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">' +
+                    '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>' +
+                    '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>' +
+                '</svg>' +
+                'Copy All' +
+            '</button>' +
+            '<span class="copy-success" id="copySuccess">✓ Copied!</span>' +
+        '</div>' +
+        '<div class="prep-actions-right">' +
+            '<button type="button" class="btn btn-secondary btn-sm" onclick="generateInterviewPrep(true)">' +
+                '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">' +
+                    '<path d="M23 4v6h-6"/>' +
+                    '<path d="M1 20v-6h6"/>' +
+                    '<path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>' +
+                '</svg>' +
+                'Regenerate' +
+            '</button>' +
+        '</div>' +
+    '</div>';
+
+    document.getElementById('interviewPrepResults').innerHTML = html;
+}
+
+function copyAllPrep() {
+    if (!existingPrepData) return;
+
+    var text = 'INTERVIEW PREP\n';
+    text += '==============\n\n';
+
+    // Questions
+    text += 'LIKELY INTERVIEW QUESTIONS\n';
+    text += '--------------------------\n';
+    (existingPrepData.questions || []).forEach(function(q, i) {
+        text += (i + 1) + '. ' + q.question + '\n';
+        if (q.tip) {
+            text += '   💡 Tip: ' + q.tip + '\n';
+        }
+        text += '\n';
+    });
+
+    // Talking Points
+    text += '\nYOUR KEY TALKING POINTS\n';
+    text += '-----------------------\n';
+    (existingPrepData.talking_points || []).forEach(function(tp) {
+        text += '• ' + tp.point + '\n';
+        if (tp.relevance) {
+            text += '  → ' + tp.relevance + '\n';
+        }
+    });
+
+    // Questions to Ask
+    text += '\nQUESTIONS TO ASK THEM\n';
+    text += '---------------------\n';
+    (existingPrepData.questions_to_ask || []).forEach(function(q, i) {
+        text += (i + 1) + '. ' + q + '\n';
+    });
+
+    // Company Brief
+    var brief = existingPrepData.company_brief || {};
+    if (brief.description || brief.focus_areas) {
+        text += '\nCOMPANY QUICK BRIEF\n';
+        text += '-------------------\n';
+        if (brief.description) text += 'About: ' + brief.description + '\n';
+        if (brief.focus_areas) text += 'Focus: ' + brief.focus_areas + '\n';
+    }
+
+    navigator.clipboard.writeText(text).then(function() {
+        var successEl = document.getElementById('copySuccess');
+        successEl.classList.add('show');
+        setTimeout(function() {
+            successEl.classList.remove('show');
+        }, 2000);
+    }).catch(function(err) {
+        alert('Failed to copy: ' + err);
+    });
+}
 </script>
 {% endif %}
 {% endblock %}
