@@ -42,6 +42,9 @@
         {% if prefill and prefill.referral_contact_id %}
         <input type="hidden" name="referral_contact_id" value="{{ prefill.referral_contact_id }}">
         {% endif %}
+        <input type="hidden" id="description" name="description" value="">
+        <input type="hidden" id="requirements" name="requirements" value="">
+        <input type="hidden" id="resume_version_id" name="resume_version_id" value="">
 
         {% if prefill and prefill.referral_name %}
         <div class="referral-badge">
@@ -60,6 +63,18 @@
             <label for="title">Job Title *</label>
             <input type="text" id="title" name="title" required placeholder="e.g., Senior Software Engineer">
         </div>
+
+        {% if resume_version_objects %}
+        <div class="form-group">
+            <label for="resume_select">Resume Version</label>
+            <select id="resume_select" onchange="document.getElementById('resume_version_id').value=this.value; document.getElementById('resume_version').value=this.options[this.selectedIndex].text;">
+                <option value="">Select a resume...</option>
+                {% for rv in resume_version_objects %}
+                <option value="{{ rv.id }}">{{ rv.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
 
         <button type="button" class="details-toggle" onclick="toggleDetails()">
             <svg class="toggle-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
@@ -186,6 +201,10 @@ function parseJobDescription() {
     .then(function(result) {
         if (result.success) {
             fillFormFields(result.data);
+            // Fallback: if AI didn't extract a description, store the raw pasted text
+            if (!result.data.description) {
+                document.getElementById('description').value = text;
+            }
             status.textContent = 'Fields populated!';
             status.style.color = '#22c55e';
         } else {
@@ -261,6 +280,14 @@ function fillFormFields(data) {
                 }
             }
         }
+    }
+
+    // Populate description and requirements hidden fields
+    if (data.description) {
+        document.getElementById('description').value = data.description;
+    }
+    if (data.requirements) {
+        document.getElementById('requirements').value = data.requirements;
     }
 
     // Auto-expand details section if any detail fields were populated

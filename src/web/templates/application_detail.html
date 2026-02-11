@@ -4,6 +4,27 @@
 
 {% block content %}
 <div class="detail-page">
+    {% if is_new_lead %}
+    <div id="newLeadBanner" class="new-lead-banner">
+        {% if details.job.description and resume_versions %}
+        <div class="banner-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
+                <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+            </svg>
+        </div>
+        <span>Lead added! Analyzing resume fit...</span>
+        {% else %}
+        <div class="banner-icon banner-icon-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+        </div>
+        <span>Lead added!{% if not details.job.description %} Add a job description to enable AI features.{% endif %}</span>
+        {% endif %}
+    </div>
+    {% endif %}
+
     <header class="page-header">
         <div class="header-content">
             <a href="{{ url_for('dashboard.pipeline') }}" class="back-link">← Pipeline</a>
@@ -15,56 +36,124 @@
         </div>
     </header>
 
-    <div class="detail-grid">
-        <!-- Main Info -->
+    <!-- Compact Application Info Bar -->
+    <div class="app-info-bar">
+        <div class="app-info-items">
+            <div class="app-info-item">
+                <label>Status</label>
+                <form action="{{ url_for('applications.update_status', app_id=details.application.id) }}" method="post" class="inline-form">
+                    <select name="status" onchange="this.form.submit()" class="status-select-compact" title="Change application status">
+                        {% for s in ApplicationStatus %}
+                        <option value="{{ s.value }}" {% if s == details.application.status %}selected{% endif %}>
+                            {{ s.value|replace('_', ' ')|title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+
+            {% if details.application.date_applied %}
+            <div class="app-info-item">
+                <label>Applied</label>
+                <span>{{ details.application.date_applied.strftime('%b %d, %Y') }}</span>
+            </div>
+            {% elif details.application.created_at %}
+            <div class="app-info-item">
+                <label>Added</label>
+                <span>{{ details.application.created_at.strftime('%b %d, %Y') }}</span>
+            </div>
+            {% endif %}
+
+            {% if details.application.excitement_level %}
+            <div class="app-info-item">
+                <label>Excitement</label>
+                <span>{% for i in range(details.application.excitement_level) %}⭐{% endfor %}</span>
+            </div>
+            {% endif %}
+
+            {% if details.application.resume_version %}
+            <div class="app-info-item">
+                <label>Resume</label>
+                <span>{{ details.application.resume_version }}</span>
+            </div>
+            {% endif %}
+
+            {% if details.referral %}
+            <div class="app-info-item">
+                <label>Referral</label>
+                <span>{{ details.referral.name }}</span>
+            </div>
+            {% endif %}
+
+            {% if details.application.offered_salary %}
+            <div class="app-info-item">
+                <label>Offered</label>
+                <span>${{ "{:,}".format(details.application.offered_salary) }}</span>
+            </div>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('applications.edit_application', app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit Application</a>
+    </div>
+
+    <!-- Main Content: Job Details + AI Analyzer side by side -->
+    <div class="detail-grid-main">
+        <!-- Job Details -->
         <section class="card">
             <div class="card-header">
-                <h2>Application Details</h2>
-                <a href="{{ url_for('applications.edit_application', app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                <h2>Job Details</h2>
+                <a href="{{ url_for('jobs.edit_job', job_id=details.job.id, app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
             </div>
             <div class="card-body">
-                <dl class="detail-list">
-                    <dt>Status</dt>
-                    <dd>
-                        <form action="{{ url_for('applications.update_status', app_id=details.application.id) }}" method="post" class="inline-form">
-                            <select name="status" onchange="this.form.submit()" class="status-select" title="Change application status">
-                                {% for s in ApplicationStatus %}
-                                <option value="{{ s.value }}" {% if s == details.application.status %}selected{% endif %} title="{{ s.value|status_description }}">
-                                    {{ s.value|replace('_', ' ')|title }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </form>
-                    </dd>
-
-                    {% if details.application.date_applied %}
-                    <dt>Date Applied</dt>
-                    <dd>{{ details.application.date_applied.strftime('%B %d, %Y') }}</dd>
-                    {% elif details.application.created_at %}
-                    <dt>Date Added</dt>
-                    <dd>{{ details.application.created_at.strftime('%B %d, %Y') }}</dd>
+                <dl class="detail-list compact">
+                    {% if details.job.salary_min and details.job.salary_max %}
+                    <div class="detail-row">
+                        <dt>Salary</dt>
+                        <dd>${{ "{:,}".format(details.job.salary_min) }} - ${{ "{:,}".format(details.job.salary_max) }}</dd>
+                    </div>
                     {% endif %}
 
-                    {% if details.application.excitement_level %}
-                    <dt>Excitement</dt>
-                    <dd>{% for i in range(details.application.excitement_level) %}⭐{% endfor %}</dd>
+                    {% if details.job.remote_type %}
+                    <div class="detail-row">
+                        <dt>Work Type</dt>
+                        <dd>{{ details.job.remote_type|title }}</dd>
+                    </div>
                     {% endif %}
 
-                    {% if details.application.resume_version %}
-                    <dt>Resume Version</dt>
-                    <dd>{{ details.application.resume_version }}</dd>
+                    {% if details.job.location %}
+                    <div class="detail-row">
+                        <dt>Location</dt>
+                        <dd>{{ details.job.location }}</dd>
+                    </div>
                     {% endif %}
 
-                    {% if details.referral %}
-                    <dt>Referral</dt>
-                    <dd>{{ details.referral.name }}</dd>
+                    {% if details.job.source %}
+                    <div class="detail-row">
+                        <dt>Source</dt>
+                        <dd>{{ details.job.source }}</dd>
+                    </div>
                     {% endif %}
 
-                    {% if details.application.offered_salary %}
-                    <dt>Offered Salary</dt>
-                    <dd>${{ "{:,}".format(details.application.offered_salary) }}</dd>
+                    {% if details.job.job_url %}
+                    <div class="detail-row">
+                        <dt>Posting</dt>
+                        <dd><a href="{{ details.job.job_url }}" target="_blank">View Original →</a></dd>
+                    </div>
                     {% endif %}
                 </dl>
+
+                {% if details.job.description %}
+                <div class="detail-section">
+                    <h3>Description</h3>
+                    <div class="detail-text scrollable">{{ details.job.description }}</div>
+                </div>
+                {% endif %}
+
+                {% if details.job.requirements %}
+                <div class="detail-section">
+                    <h3>Requirements</h3>
+                    <div class="detail-text scrollable">{{ details.job.requirements }}</div>
+                </div>
+                {% endif %}
 
                 <div class="detail-section">
                     <h3>Cover Letter</h3>
@@ -122,16 +211,74 @@
                         <button type="button" class="btn btn-secondary btn-sm" onclick="resetCoverLetter()">Try Again</button>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                {% if details.application.lessons_learned %}
-                <div class="detail-section">
-                    <h3>Lessons Learned</h3>
-                    <div class="detail-text">{{ details.application.lessons_learned }}</div>
+        <!-- Resume Fit Analysis -->
+        <section class="card resume-fit-card">
+            <div class="card-header">
+                <h2>Resume Fit Analysis</h2>
+                <span class="badge badge-info">AI-Powered</span>
+            </div>
+            <div class="card-body">
+                {% if ai_parsing_enabled %}
+                <div id="resumeFitPrompt" class="resume-fit-prompt">
+                    <div class="ai-intro">
+                        <div class="ai-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                                <path d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
+                                <path d="M16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
+                            </svg>
+                        </div>
+                        <p>See how well your resume matches this job and get actionable suggestions to improve your fit.</p>
+                    </div>
+                    <div class="resume-fit-controls">
+                        {% if resume_versions %}
+                        <select id="resumeVersionSelect" class="resume-version-select">
+                            {% for version in resume_versions %}
+                            <option value="{{ version.id }}">{{ version.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="button" class="btn btn-primary analyze-btn" onclick="analyzeResumeFit()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                            </svg>
+                            Analyze Fit
+                        </button>
+                        {% else %}
+                        <p class="resume-fit-warning">
+                            <a href="{{ url_for('resumes.new_resume') }}" class="btn btn-primary">Add a Resume</a>
+                            <span>to use this feature</span>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div id="resumeFitLoading" class="resume-fit-loading" style="display:none;">
+                    <div class="loading-spinner"></div>
+                    <p>Analyzing your resume against this job...</p>
+                </div>
+
+                <div id="resumeFitResults" class="resume-fit-results" style="display:none;">
+                    <!-- Results populated by JavaScript -->
+                </div>
+
+                <div id="resumeFitError" class="resume-fit-error" style="display:none;">
+                    <p id="resumeFitErrorMessage"></p>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="resetResumeFit()">Try Again</button>
+                </div>
+                {% else %}
+                <div class="ai-disabled">
+                    <p>AI analysis requires an API key. Contact your administrator to enable this feature.</p>
                 </div>
                 {% endif %}
             </div>
         </section>
+    </div>
 
+    <!-- Secondary Content Grid -->
+    <div class="detail-grid">
         <!-- Prep Checklist -->
         {% if details.application.checklist_items %}
         <section class="card">
@@ -163,107 +310,6 @@
                     </li>
                     {% endfor %}
                 </ul>
-            </div>
-        </section>
-        {% endif %}
-
-        <!-- Job Info -->
-        <section class="card">
-            <div class="card-header">
-                <h2>Job Details</h2>
-                <a href="{{ url_for('jobs.edit_job', job_id=details.job.id, app_id=details.application.id) }}" class="btn btn-sm btn-secondary">Edit</a>
-            </div>
-            <div class="card-body">
-                <dl class="detail-list">
-                    <dt>Title</dt>
-                    <dd>{{ details.job.title }}</dd>
-
-                    {% if details.job.salary_min and details.job.salary_max %}
-                    <dt>Salary Range</dt>
-                    <dd>${{ "{:,}".format(details.job.salary_min) }} - ${{ "{:,}".format(details.job.salary_max) }}</dd>
-                    {% endif %}
-
-                    {% if details.job.remote_type %}
-                    <dt>Work Type</dt>
-                    <dd>{{ details.job.remote_type|title }}</dd>
-                    {% endif %}
-
-                    {% if details.job.location %}
-                    <dt>Location</dt>
-                    <dd>{{ details.job.location }}</dd>
-                    {% endif %}
-
-                    {% if details.job.source %}
-                    <dt>Source</dt>
-                    <dd>{{ details.job.source }}</dd>
-                    {% endif %}
-
-                    {% if details.job.job_url %}
-                    <dt>Job Posting</dt>
-                    <dd><a href="{{ details.job.job_url }}" target="_blank">View Original Posting →</a></dd>
-                    {% endif %}
-                </dl>
-
-                {% if details.job.description %}
-                <div class="detail-section">
-                    <h3>Description</h3>
-                    <div class="detail-text">{{ details.job.description }}</div>
-                </div>
-                {% endif %}
-
-                {% if details.job.requirements %}
-                <div class="detail-section">
-                    <h3>Requirements</h3>
-                    <div class="detail-text">{{ details.job.requirements }}</div>
-                </div>
-                {% endif %}
-            </div>
-        </section>
-
-        <!-- Resume Fit Analysis -->
-        {% if ai_parsing_enabled %}
-        <section class="card resume-fit-card">
-            <div class="card-header">
-                <h2>Resume Fit Analysis</h2>
-                <span class="badge badge-info">AI-Powered</span>
-            </div>
-            <div class="card-body">
-                <div id="resumeFitPrompt" class="resume-fit-prompt">
-                    <p>See how well your resume matches this job's requirements and get suggestions to improve your fit.</p>
-                    <div class="resume-fit-controls">
-                        <select id="resumeVersionSelect" class="resume-version-select">
-                            {% for version in resume_versions %}
-                            <option value="{{ version.id }}">{{ version.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <button type="button" class="btn btn-primary" onclick="analyzeResumeFit()">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
-                                <circle cx="11" cy="11" r="8"/>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                            </svg>
-                            Analyze Fit
-                        </button>
-                    </div>
-                    {% if not resume_versions %}
-                    <p class="resume-fit-warning">
-                        <a href="{{ url_for('resumes.new_resume') }}">Add a resume</a> first to use this feature.
-                    </p>
-                    {% endif %}
-                </div>
-
-                <div id="resumeFitLoading" class="resume-fit-loading" style="display:none;">
-                    <div class="loading-spinner"></div>
-                    <p>Analyzing your resume against this job...</p>
-                </div>
-
-                <div id="resumeFitResults" class="resume-fit-results" style="display:none;">
-                    <!-- Results will be populated by JavaScript -->
-                </div>
-
-                <div id="resumeFitError" class="resume-fit-error" style="display:none;">
-                    <p id="resumeFitErrorMessage"></p>
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="resetResumeFit()">Try Again</button>
-                </div>
             </div>
         </section>
         {% endif %}
@@ -353,13 +399,10 @@
                         </div>
                         {% if not event.completed %}
                         <form action="{{ url_for('schedule.complete_event', event_id=event.id) }}" method="post" class="timeline-action">
-                            <button type="submit" name="went_well" value="true" class="btn btn-sm btn-success" title="Went well">✓</button>
-                            <button type="submit" name="went_well" value="false" class="btn btn-sm btn-danger" title="Didn't go well">✗</button>
+                            <button type="submit" class="btn btn-sm btn-success" title="Mark as complete">✓</button>
                         </form>
                         {% else %}
-                        <span class="timeline-status {% if event.went_well %}success{% else %}danger{% endif %}">
-                            {% if event.went_well %}👍{% else %}👎{% endif %}
-                        </span>
+                        <span class="timeline-status success">✓</span>
                         {% endif %}
                     </li>
                     {% endfor %}
@@ -413,6 +456,30 @@
             </div>
         </section>
 
+        <!-- Cover Letter & Lessons (if any) -->
+        {% if details.application.cover_letter or details.application.lessons_learned %}
+        <section class="card">
+            <div class="card-header">
+                <h2>Application Notes</h2>
+            </div>
+            <div class="card-body">
+                {% if details.application.cover_letter %}
+                <div class="detail-section">
+                    <h3>Cover Letter</h3>
+                    <div class="detail-text">{{ details.application.cover_letter }}</div>
+                </div>
+                {% endif %}
+
+                {% if details.application.lessons_learned %}
+                <div class="detail-section">
+                    <h3>Lessons Learned</h3>
+                    <div class="detail-text">{{ details.application.lessons_learned }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+        {% endif %}
+
         <!-- Danger Zone -->
         <section class="card danger-zone">
             <div class="card-header">
@@ -457,8 +524,22 @@
     </div>
 </div>
 
-{% if ai_parsing_enabled %}
 <style>
+/* New Lead Banner */
+.new-lead-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    animation: bannerSlideIn 0.3s ease-out;
+}
+
 /* Cover Letter Styles */
 .cover-letter-prompt p {
     margin: 0 0 var(--space-4);
@@ -535,30 +616,201 @@
     font-size: 0.7rem;
 }
 
-.resume-fit-prompt p {
-    margin: 0 0 var(--space-4);
+.new-lead-banner .banner-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.2);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.new-lead-banner .banner-icon-info {
+    background: rgba(255,255,255,0.15);
+}
+
+@keyframes bannerSlideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Application Info Bar */
+.app-info-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-6);
+    flex-wrap: wrap;
+}
+
+.app-info-items {
+    display: flex;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+}
+
+.app-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.app-info-item label {
+    font-size: 0.6875rem;
+    font-weight: 600;
     color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.app-info-item span {
+    font-size: 0.875rem;
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.status-select-compact {
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: var(--color-bg);
+    cursor: pointer;
+}
+
+/* Main Grid - Job Details + AI Analyzer side by side */
+.detail-grid-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+.detail-grid-main .card {
+    height: fit-content;
+}
+
+/* Compact detail list */
+.detail-list.compact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    margin-bottom: var(--space-4);
+}
+
+.detail-list.compact .detail-row {
+    display: flex;
+    gap: var(--space-2);
+    align-items: baseline;
+}
+
+.detail-list.compact dt {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.detail-list.compact dd {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Scrollable text areas */
+.detail-text.scrollable {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: var(--space-2);
+}
+
+/* AI Intro styling */
+.ai-intro {
+    text-align: center;
+    padding: var(--space-4) 0;
+}
+
+.ai-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto var(--space-3);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.ai-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: white;
+}
+
+.ai-intro p {
+    color: var(--color-text-secondary);
+    margin: 0;
+    max-width: 280px;
+    margin: 0 auto;
+    line-height: 1.5;
+    font-size: 0.875rem;
 }
 
 .resume-fit-controls {
     display: flex;
+    flex-direction: column;
     gap: var(--space-3);
     align-items: center;
-    flex-wrap: wrap;
+    margin-top: var(--space-4);
 }
 
 .resume-version-select {
+    width: 100%;
+    max-width: 200px;
     padding: var(--space-2) var(--space-3);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     font-size: 0.875rem;
-    min-width: 150px;
+}
+
+.analyze-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    font-weight: 600;
+}
+
+.analyze-btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
 }
 
 .resume-fit-warning {
-    margin-top: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text-secondary);
     font-size: 0.875rem;
-    color: var(--color-warning);
+}
+
+.ai-disabled {
+    text-align: center;
+    padding: var(--space-6);
+    color: var(--color-text-secondary);
+}
+
+/* Resume Fit Styles */
+.resume-fit-card .badge {
+    font-size: 0.7rem;
 }
 
 .resume-fit-loading {
@@ -602,7 +854,7 @@
 .resume-fit-results {
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
+    gap: var(--space-4);
 }
 
 .fit-score-section {
@@ -613,10 +865,10 @@
 }
 
 .fit-score {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 700;
     line-height: 1;
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-1);
 }
 
 .fit-score.high { color: #16a34a; }
@@ -625,33 +877,33 @@
 .fit-score.poor { color: #dc2626; }
 
 .fit-score-label {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: var(--color-text-secondary);
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
 }
 
 .fit-summary {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     color: var(--color-text);
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
 .fit-section {
     border-top: 1px solid var(--color-border-light);
-    padding-top: var(--space-4);
+    padding-top: var(--space-3);
 }
 
 .fit-section h4 {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 600;
-    margin: 0 0 var(--space-3);
+    margin: 0 0 var(--space-2);
     display: flex;
     align-items: center;
     gap: var(--space-2);
 }
 
 .fit-section h4 .icon {
-    font-size: 1rem;
+    font-size: 0.875rem;
 }
 
 .fit-pills {
@@ -661,9 +913,9 @@
 }
 
 .fit-pill {
-    padding: var(--space-1) var(--space-3);
+    padding: 2px var(--space-2);
     border-radius: var(--radius-full);
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     font-weight: 500;
 }
 
@@ -688,24 +940,24 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--space-2);
 }
 
 .suggestion-item {
     display: flex;
-    gap: var(--space-3);
+    gap: var(--space-2);
     align-items: flex-start;
 }
 
 .suggestion-priority {
     flex-shrink: 0;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     font-weight: 700;
 }
 
@@ -726,19 +978,47 @@
 
 .suggestion-text {
     flex: 1;
-    font-size: 0.875rem;
-    line-height: 1.5;
+    font-size: 0.8125rem;
+    line-height: 1.4;
 }
 
 .fit-actions {
     display: flex;
     justify-content: center;
-    gap: var(--space-3);
-    padding-top: var(--space-4);
+    gap: var(--space-2);
+    padding-top: var(--space-3);
     border-top: 1px solid var(--color-border-light);
+    flex-wrap: wrap;
+}
+
+.fit-actions .btn {
+    font-size: 0.8125rem;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .detail-grid-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .app-info-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .app-info-items {
+        justify-content: space-between;
+    }
+
+    .app-info-bar .btn {
+        width: 100%;
+    }
 }
 </style>
 
+{% if ai_parsing_enabled %}
 <script>
 var applicationId = {{ details.application.id }};
 
@@ -853,8 +1133,8 @@ function renderResults(analysis) {
 
     // Actions
     html += '<div class="fit-actions">' +
-        '<button type="button" class="btn btn-secondary" onclick="resetResumeFit()">Analyze Different Resume</button>' +
-        '<a href="{{ url_for('resumes.resumes') }}" class="btn btn-primary">Edit Resumes</a>' +
+        '<button type="button" class="btn btn-secondary btn-sm" onclick="resetResumeFit()">Try Different Resume</button>' +
+        '<a href="{{ url_for('resumes.resumes') }}" class="btn btn-primary btn-sm">Edit Resumes</a>' +
     '</div>';
 
     document.getElementById('resumeFitResults').innerHTML = html;
@@ -912,7 +1192,7 @@ function regenerateCoverLetter() {
 function showCoverLetterGenerator() {
     var content = document.getElementById('coverLetterContent');
     if (content) content.style.display = 'none';
-    
+
     var prompt = document.getElementById('coverLetterPrompt');
     if (prompt) {
         prompt.style.display = 'block';
@@ -953,6 +1233,13 @@ function resetCoverLetter() {
     document.getElementById('coverLetterResult').style.display = 'none';
     document.getElementById('coverLetterError').style.display = 'none';
 }
+
+{% if is_new_lead and details.job.description and resume_versions %}
+// Auto-trigger resume fit analysis for newly added leads
+setTimeout(function() {
+    analyzeResumeFit();
+}, 500);
+{% endif %}
 </script>
 {% endif %}
 {% endblock %}

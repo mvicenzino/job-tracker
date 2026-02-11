@@ -4,6 +4,7 @@ from flask_login import login_required
 
 from ..helpers import get_service
 from ...models import ApplicationStatus, EventType
+from ...services.ai_parser import is_ai_parsing_available
 
 bp = Blueprint('applications', __name__)
 
@@ -104,6 +105,13 @@ def new_application():
                 job_extras['salary_currency'] = request.form['salary_currency']
 
             resume_version = request.form.get('resume_version', '').strip() or None
+            resume_version_id = request.form.get('resume_version_id', type=int)
+
+            # If resume_version_id is set but text name isn't, fill it from the version object
+            if resume_version_id and not resume_version:
+                rv_obj = service.resume_versions.get_by_id(resume_version_id)
+                if rv_obj:
+                    resume_version = rv_obj.name
 
             app = service.add_lead(
                 company_name=request.form['company'],
@@ -113,10 +121,11 @@ def new_application():
                 company_id=company_id,
                 referral_contact_id=referral_contact_id,
                 resume_version=resume_version,
+                resume_version_id=resume_version_id,
                 **job_extras
             )
             flash(f'Lead added for {app.job.title} at {app.job.company.name}!', 'success')
-            return redirect(url_for('dashboard.pipeline'))
+            return redirect(url_for('applications.application_detail', app_id=app.id, new=1))
         finally:
             session.close()
 
@@ -127,13 +136,16 @@ def new_application():
         'referral_contact_id': request.args.get('referral_contact_id', ''),
         'referral_name': request.args.get('referral_name', ''),
     }
-    # Get previously used resume versions for autocomplete
+    # Get previously used resume versions for autocomplete + version objects for dropdown
     service, session = get_service()
     try:
         resume_versions = service.applications.get_resume_versions()
+        resume_version_objects = service.resume_versions.get_all() if hasattr(service, 'resume_versions') else []
     finally:
         session.close()
-    return render_template('application_form.html', prefill=prefill, resume_versions=resume_versions)
+    return render_template('application_form.html', prefill=prefill,
+                           resume_versions=resume_versions,
+                           resume_version_objects=resume_version_objects)
 
 
 @bp.route('/applications/<int:app_id>/review')
@@ -218,6 +230,7 @@ def confirm_lead(app_id):
 @login_required
 def application_detail(app_id):
     """View application details."""
+    is_new_lead = request.args.get('new') == '1'
     service, session = get_service()
     try:
         details = service.get_application_details(app_id)
@@ -231,8 +244,10 @@ def application_detail(app_id):
         return render_template('application_detail.html',
                              details=details,
                              resume_versions=resume_versions,
+                             ai_parsing_enabled=is_ai_parsing_available(),
                              ApplicationStatus=ApplicationStatus,
-                             EventType=EventType)
+                             EventType=EventType,
+                             is_new_lead=is_new_lead)
     finally:
         session.close()
 

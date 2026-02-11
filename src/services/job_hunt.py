@@ -102,7 +102,8 @@ class JobHuntService:
                  description: str = None, requirements: str = None,
                  location: str = None, remote_type: str = None,
                  salary_min: int = None, salary_max: int = None,
-                 salary_currency: str = None, resume_version: str = None) -> Application:
+                 salary_currency: str = None, resume_version: str = None,
+                 resume_version_id: int = None) -> Application:
         """
         Add a new lead to the pipeline: creates company (if needed), job, and application.
         If company_id is provided, uses that company directly instead of searching by name.
@@ -150,6 +151,8 @@ class JobHuntService:
             create_kwargs['referral_contact_id'] = referral_contact_id
         if resume_version:
             create_kwargs['resume_version'] = resume_version
+        if resume_version_id:
+            create_kwargs['resume_version_id'] = resume_version_id
         app = self.applications.create(**create_kwargs)
 
         self.session.commit()
@@ -345,12 +348,18 @@ class JobHuntService:
         apps_last_week = len(last_week_apps)
         weekly_change = apps_this_week - apps_last_week
 
+        # Calculate total actually submitted (excludes interested, preparing, archived)
+        submitted_statuses = ['applied', 'screening', 'interviewing', 'final_round',
+                              'offer', 'negotiating', 'accepted', 'rejected', 'withdrawn', 'ghosted']
+        total_applied = sum(
+            app_stats['by_status'].get(status, 0) for status in submitted_statuses
+        )
+
         # Calculate interview rate (reached screening or beyond)
         interview_statuses = ['screening', 'interviewing', 'final_round', 'offer', 'negotiating', 'accepted']
         interviewed_count = sum(
             app_stats['by_status'].get(status, 0) for status in interview_statuses
         )
-        total_applied = app_stats['total']
         interview_rate = round((interviewed_count / total_applied * 100)) if total_applied > 0 else 0
 
         # Calculate response rate (any status change from applied)
@@ -363,7 +372,7 @@ class JobHuntService:
         return {
             'summary': {
                 'active_applications': len(active_apps),
-                'total_applications': app_stats['total'],
+                'total_applications': total_applied,
                 'events_today': len(today_events),
                 'total_contacts': len(all_contacts),
                 'contacts_need_followup': len(followups_needed),
