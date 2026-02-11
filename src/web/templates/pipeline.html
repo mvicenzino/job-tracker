@@ -165,7 +165,17 @@
             <div class="column-body">
                 {% for app in pipeline.get(status, []) %}
                 <div class="pipeline-card" data-app-id="{{ app.id }}">
-                    <div class="card-company">{{ app.job.company.name }}</div>
+                    <div class="card-top-row">
+                        <div class="card-company">{{ app.job.company.name }}</div>
+                        {% if app.fit_score is not none %}
+                        <div class="card-fit-score {% if app.fit_score >= 80 %}high{% elif app.fit_score >= 60 %}medium{% elif app.fit_score >= 40 %}low{% else %}poor{% endif %}" title="AI Resume Fit Score">
+                            <svg class="fit-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 3L10.5 9.5L4 11L10.5 12.5L12 19L13.5 12.5L20 11L13.5 9.5L12 3Z"/>
+                            </svg>
+                            {{ app.fit_score }}% fit
+                        </div>
+                        {% endif %}
+                    </div>
                     <div class="card-title">{{ app.job.title }}</div>
                     {% if app.date_applied %}
                     <div class="card-date">Applied {{ app.date_applied.strftime('%b %d') }}</div>
@@ -184,22 +194,7 @@
                     {% endif %}
                     <div class="card-actions">
                         <a href="{{ url_for('applications.application_detail', app_id=app.id) }}" class="btn btn-sm">View</a>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-secondary dropdown-toggle">Move</button>
-                            <div class="dropdown-menu">
-                                {% for s in ApplicationStatus %}
-                                {% if s.value != status %}
-                                <form action="{{ url_for('applications.update_status', app_id=app.id) }}" method="post">
-                                    <input type="hidden" name="status" value="{{ s.value }}">
-                                    <button type="submit" class="dropdown-item" title="{{ s.value|status_description }}">
-                                        <span class="status-dot" style="background-color: {{ s.value|status_color }}"></span>
-                                        {{ s.value|replace('_', ' ')|title }}
-                                    </button>
-                                </form>
-                                {% endif %}
-                                {% endfor %}
-                            </div>
-                        </div>
+                        <button type="button" class="btn btn-sm btn-secondary move-btn" data-app-id="{{ app.id }}" data-current="{{ status }}">Move ▾</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -243,6 +238,18 @@
     </div><!-- end board view -->
 </div>
 
+<!-- Shared Move Menu (appended to body-level, escapes all overflow) -->
+<div id="moveMenu" class="move-menu" style="display:none;">
+    {% for s in ApplicationStatus %}
+    <form action="/applications/0/status" method="post" class="move-menu-form" data-status="{{ s.value }}">
+        <input type="hidden" name="status" value="{{ s.value }}">
+        <button type="submit" class="move-menu-item">
+            <span class="status-dot" style="background-color: {{ s.value|status_color }}"></span>
+            {{ s.value|replace('_', ' ')|title }}
+        </button>
+    </form>
+    {% endfor %}
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -316,6 +323,54 @@
     document.addEventListener('click', function() {
         document.querySelectorAll('.status-dropdown.open').forEach(function(d) {
             d.classList.remove('open');
+        });
+        closeMoveMenu();
+    });
+
+    // === Shared Move Menu ===
+    var moveMenu = document.getElementById('moveMenu');
+    var activeMoveBtn = null;
+
+    function closeMoveMenu() {
+        moveMenu.style.display = 'none';
+        activeMoveBtn = null;
+    }
+
+    document.querySelectorAll('.move-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (activeMoveBtn === btn) { closeMoveMenu(); return; }
+            activeMoveBtn = btn;
+
+            var appId = btn.dataset.appId;
+            var current = btn.dataset.current;
+
+            // Update form actions and hide current status
+            moveMenu.querySelectorAll('.move-menu-form').forEach(function(form) {
+                form.action = '/applications/' + appId + '/status';
+                form.style.display = form.dataset.status === current ? 'none' : '';
+            });
+
+            // Position fixed next to the button
+            var rect = btn.getBoundingClientRect();
+            moveMenu.style.display = 'block';
+            var menuRect = moveMenu.getBoundingClientRect();
+            var spaceBelow = window.innerHeight - rect.bottom;
+
+            if (spaceBelow < menuRect.height && rect.top > spaceBelow) {
+                moveMenu.style.top = 'auto';
+                moveMenu.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+            } else {
+                moveMenu.style.top = (rect.bottom + 4) + 'px';
+                moveMenu.style.bottom = 'auto';
+            }
+
+            // Align right edge to button right edge
+            var rightEdge = rect.right;
+            var menuWidth = menuRect.width;
+            var left = rightEdge - menuWidth;
+            if (left < 8) left = 8;
+            moveMenu.style.left = left + 'px';
         });
     });
 })();
