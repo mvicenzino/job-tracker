@@ -335,7 +335,7 @@ def api_create_job():
             )
             session.add(application)
             session.commit()
-            review_url = f"/applications/{application.id}/review"
+            review_url = f"/applications/{application.id}?new=1"
         
         # Create notification for the new lead
         try:
@@ -458,6 +458,11 @@ def api_analyze_resume_fit():
             job_title=job.title,
             company_name=job.company.name if job.company else None
         )
+
+        # Save the fit score to the application
+        if app_id and result.get('match_score') is not None:
+            service.applications.update(app_id, fit_score=result['match_score'])
+            session.commit()
 
         return jsonify({'success': True, 'analysis': result})
 
@@ -591,14 +596,21 @@ def api_health():
         if db:
             result['checks']['database'] = 'connected'
 
-            # Check users table columns
             try:
                 inspector = inspect(db.engine)
+                # Check users table columns
                 if 'users' in inspector.get_table_names():
                     columns = [col['name'] for col in inspector.get_columns('users')]
                     result['checks']['users_columns'] = columns
                 else:
                     result['checks']['users_table'] = 'missing'
+
+                # Check applications table columns
+                if 'applications' in inspector.get_table_names():
+                    app_columns = [col['name'] for col in inspector.get_columns('applications')]
+                    result['checks']['applications_columns'] = app_columns
+                else:
+                    result['checks']['applications_table'] = 'missing'
             except Exception as e:
                 result['checks']['schema_check'] = str(e)
         else:
