@@ -321,6 +321,33 @@ def api_create_job():
             is_flagged=data.get('is_flagged', False)
         )
         
+        # Auto-score job if user has resume and AI is available
+        if is_ai_parsing_available() and user.resume_text and len(user.resume_text.strip()) > 100:
+            job_desc = job.description or ''
+            if job.requirements:
+                job_desc += '\n\nRequirements:\n' + job.requirements
+            
+            # Only score if we have meaningful job description
+            if len(job_desc.strip()) >= 50:
+                try:
+                    from datetime import datetime
+                    import json
+                    analysis = analyze_resume_job_fit(
+                        resume_text=user.resume_text,
+                        job_description=job_desc,
+                        job_title=job.title,
+                        company_name=job.company.name if job.company else None
+                    )
+                    job.fit_score = analysis.get('match_score')
+                    job.fit_analysis = json.dumps(analysis)
+                    job.scored_at = datetime.utcnow()
+                    # scored_with_resume_id would be set if resume_versions exist
+                    session.commit()
+                    logging.info(f"Auto-scored job {job.id}: {job.fit_score}%")
+                except Exception as score_error:
+                    # Don't fail job creation if scoring fails
+                    logging.warning(f"Auto-scoring failed for job {job.id}: {score_error}")
+        
         # Also create a lead (application in INTERESTED status) if requested
         application = None
         review_url = None
@@ -550,6 +577,78 @@ def api_generate_cover_letter():
             'company_name': job.company.name if job.company else None
         })
 
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        session.close()
+
+
+@bp.route('/api/jobs/score-batch', methods=['POST'])
+@login_required
+def api_score_batch():
+    """API: Score all unscored jobs for the current user."""
+    if not is_ai_parsing_available():
+        return jsonify({'success': False, 'error': 'AI scoring is not available. Please set ANTHROPIC_API_KEY.'}), 503
+    
+    service, session = get_service()
+    try:
+        # Check resume
+        if not current_user.resume_text or len(current_user.resume_text.strip()) < 100:
+            return jsonify({'success': False, 'error': 'No resume found. Please add a resume first.'}), 400
+        
+        # Get all jobs without scores
+        from ...models import Job
+        from datetime import datetime
+        import json
+        
+        unscored_jobs = session.query(Job).filter(
+            Job.user_id == current_user.id,
+            Job.fit_score.is_(None)
+        ).all()
+        
+        if not unscored_jobs:
+            return jsonify({'success': True, 'message': 'All jobs already scored', 'scored': 0})
+        
+        scored_count = 0
+        errors = []
+        
+        for job in unscored_jobs:
+            job_desc = job.description or ''
+            if job.requirements:
+                job_desc += '\n\nRequirements:\n' + job.requirements
+            
+            # Skip jobs with insufficient description
+            if len(job_desc.strip()) < 50:
+                errors.append(f"Job {job.id} ({job.title}): description too short")
+                continue
+            
+            try:
+                analysis = analyze_resume_job_fit(
+                    resume_text=current_user.resume_text,
+                    job_description=job_desc,
+                    job_title=job.title,
+                    company_name=job.company.name if job.company else None
+                )
+                job.fit_score = analysis.get('match_score')
+                job.fit_analysis = json.dumps(analysis)
+                job.scored_at = datetime.utcnow()
+                scored_count += 1
+            except Exception as e:
+                errors.append(f"Job {job.id} ({job.title}): {str(e)}")
+        
+        session.commit()
+        
+        result = {
+            'success': True,
+            'scored': scored_count,
+            'total': len(unscored_jobs)
+        }
+        
+        if errors:
+            result['errors'] = errors[:5]  # Limit error list
+        
+        return jsonify(result)
+        
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
     finally:

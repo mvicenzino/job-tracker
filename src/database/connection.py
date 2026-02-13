@@ -172,6 +172,45 @@ class DatabaseConnection:
                         except Exception as e:
                             print(f"[Migration] Failed to add resume_version_id: {e}")
 
+            # Check if jobs table needs fit scoring columns
+            if 'jobs' in inspector.get_table_names():
+                job_columns = [col['name'] for col in inspector.get_columns('jobs')]
+                with self.engine.connect() as conn:
+                    if 'fit_score' not in job_columns:
+                        try:
+                            conn.execute(text('ALTER TABLE jobs ADD COLUMN fit_score INTEGER'))
+                            conn.commit()
+                            print("[Migration] Added fit_score column to jobs")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add fit_score: {e}")
+                    
+                    if 'fit_analysis' not in job_columns:
+                        try:
+                            conn.execute(text('ALTER TABLE jobs ADD COLUMN fit_analysis TEXT'))
+                            conn.commit()
+                            print("[Migration] Added fit_analysis column to jobs")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add fit_analysis: {e}")
+                    
+                    if 'scored_at' not in job_columns:
+                        try:
+                            if is_postgres:
+                                conn.execute(text('ALTER TABLE jobs ADD COLUMN scored_at TIMESTAMP'))
+                            else:
+                                conn.execute(text('ALTER TABLE jobs ADD COLUMN scored_at DATETIME'))
+                            conn.commit()
+                            print("[Migration] Added scored_at column to jobs")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add scored_at: {e}")
+                    
+                    if 'scored_with_resume_id' not in job_columns:
+                        try:
+                            conn.execute(text('ALTER TABLE jobs ADD COLUMN scored_with_resume_id INTEGER'))
+                            conn.commit()
+                            print("[Migration] Added scored_with_resume_id column to jobs")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add scored_with_resume_id: {e}")
+
         except Exception as e:
             print(f"[Migration] Migration check failed: {e}")
 

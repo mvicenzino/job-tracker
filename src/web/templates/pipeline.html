@@ -167,12 +167,12 @@
                 <div class="pipeline-card" data-app-id="{{ app.id }}">
                     <div class="card-top-row">
                         <div class="card-company">{{ app.job.company.name }}</div>
-                        {% if app.fit_score is not none %}
-                        <div class="card-fit-score {% if app.fit_score >= 80 %}high{% elif app.fit_score >= 60 %}medium{% elif app.fit_score >= 40 %}low{% else %}poor{% endif %}" title="AI Resume Fit Score">
+                        {% if app.job.fit_score is not none %}
+                        <div class="card-fit-score {% if app.job.fit_score >= 80 %}high{% elif app.job.fit_score >= 60 %}medium{% elif app.job.fit_score >= 40 %}low{% else %}poor{% endif %}" title="AI Resume Fit Score">
                             <svg class="fit-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M12 3L10.5 9.5L4 11L10.5 12.5L12 19L13.5 12.5L20 11L13.5 9.5L12 3Z"/>
                             </svg>
-                            {{ app.fit_score }}% fit
+                            {{ app.job.fit_score }}% fit
                         </div>
                         {% endif %}
                     </div>

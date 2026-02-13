@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from .base import Base, TimestampMixin
 
@@ -22,6 +22,12 @@ class Job(Base, TimestampMixin):
     source = Column(String(100))  # Where you found it: LinkedIn, Indeed, referral, etc.
     is_active = Column(Boolean, default=True)  # Is the posting still open?
     is_flagged = Column(Boolean, default=False)  # Saved/bookmarked job
+    
+    # AI Fit Scoring
+    fit_score = Column(Integer)  # 0-100 match score
+    fit_analysis = Column(Text)  # JSON string with full analysis
+    scored_at = Column(DateTime)  # When the score was calculated
+    scored_with_resume_id = Column(Integer)  # Which resume version was used
 
     # Relationships
     user = relationship("User", backref="jobs")

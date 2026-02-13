@@ -32,7 +32,12 @@
             <div class="card-body">
                 <div class="job-card-header">
                     <div class="job-info">
-                        <span class="job-company">{{ job.company.name }}</span>
+                        <div class="job-company-row">
+                            <span class="job-company">{{ job.company.name }}</span>
+                            {% if job.fit_score %}
+                            <span class="fit-badge" data-score="{{ job.fit_score }}">{{ job.fit_score }}%</span>
+                            {% endif %}
+                        </div>
                         <h3 class="job-title">{{ job.title }}</h3>
                     </div>
                     <form action="{{ url_for('jobs.toggle_job_flag', job_id=job.id) }}" method="post" class="flag-form">

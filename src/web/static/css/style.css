@@ -3052,6 +3052,39 @@ a:hover {
     color: #991b1b;
 }
 
+/* General fit badge for jobs list and other views */
+.fit-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+}
+
+.fit-badge[data-score^="9"],
+.fit-badge[data-score^="8"] {
+    background: var(--color-success-light);
+    color: var(--color-success-dark);
+}
+
+.fit-badge[data-score^="7"],
+.fit-badge[data-score^="6"] {
+    background: var(--color-warning-light);
+    color: #b45309;  /* darker orange */
+}
+
+.fit-badge[data-score^="5"],
+.fit-badge[data-score^="4"],
+.fit-badge[data-score^="3"],
+.fit-badge[data-score^="2"],
+.fit-badge[data-score^="1"] {
+    background: var(--color-danger-light);
+    color: #b91c1c;  /* darker red */
+}
+
 .pipeline-card .card-title {
     font-weight: 600;
     color: var(--color-text);
@@ -4287,14 +4320,19 @@ a:hover {
     min-width: 0;
 }
 
+.job-company-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-1);
+}
+
 .job-company {
     font-size: 0.75rem;
     font-weight: 700;
     color: var(--color-primary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    display: block;
-    margin-bottom: var(--space-1);
 }
 
 .job-title {
