@@ -58,16 +58,54 @@ def demo():
             # Clear existing data for fresh demo using raw SQL to avoid ORM cascade issues
             from sqlalchemy import text
 
-            # Delete in correct order: children before parents
-            session.execute(text(f"DELETE FROM checklist_items WHERE application_id IN (SELECT id FROM applications WHERE user_id = {demo_user.id})"))
-            session.execute(text(f"DELETE FROM notes WHERE application_id IN (SELECT id FROM applications WHERE user_id = {demo_user.id})"))
+            # Delete in correct order respecting foreign key constraints:
+            # 1. Events (references contacts)
+            # 2. Contacts (references companies)
+            # 3. Notes/Checklist items (references applications)
+            # 4. Applications (references jobs)
+            # 5. Jobs (references companies)
+            # 6. Companies
+            # 7. Resume versions
+
+            # First: Delete all events for this user (events reference contacts)
             session.execute(text(f"DELETE FROM events WHERE user_id = {demo_user.id}"))
-            session.execute(text(f"DELETE FROM applications WHERE user_id = {demo_user.id}"))
-            session.execute(text(f"DELETE FROM jobs WHERE company_id IN (SELECT id FROM companies WHERE user_id = {demo_user.id})"))
+
+            # Second: Delete all contacts for this user (contacts reference companies)
             session.execute(text(f"DELETE FROM contacts WHERE user_id = {demo_user.id}"))
-            session.execute(text(f"DELETE FROM companies WHERE user_id = {demo_user.id}"))
+
+            # Get company IDs for this user
+            company_ids_result = session.execute(text(f"SELECT id FROM companies WHERE user_id = {demo_user.id}"))
+            company_ids = [row[0] for row in company_ids_result.fetchall()]
+
+            if company_ids:
+                company_ids_str = ','.join(str(cid) for cid in company_ids)
+
+                # Get job IDs that belong to these companies
+                job_ids_result = session.execute(text(f"SELECT id FROM jobs WHERE company_id IN ({company_ids_str})"))
+                job_ids = [row[0] for row in job_ids_result.fetchall()]
+
+                if job_ids:
+                    job_ids_str = ','.join(str(jid) for jid in job_ids)
+
+                    # Delete things that reference applications
+                    session.execute(text(f"DELETE FROM checklist_items WHERE application_id IN (SELECT id FROM applications WHERE job_id IN ({job_ids_str}))"))
+                    session.execute(text(f"DELETE FROM notes WHERE application_id IN (SELECT id FROM applications WHERE job_id IN ({job_ids_str}))"))
+
+                    # Delete applications
+                    session.execute(text(f"DELETE FROM applications WHERE job_id IN ({job_ids_str})"))
+
+                    # Delete jobs
+                    session.execute(text(f"DELETE FROM jobs WHERE id IN ({job_ids_str})"))
+
+                # Delete companies (now safe - no more references)
+                session.execute(text(f"DELETE FROM companies WHERE id IN ({company_ids_str})"))
+
+            # Delete resume versions
             session.execute(text(f"DELETE FROM resume_versions WHERE user_id = {demo_user.id}"))
             session.commit()
+
+            # Clear all cached objects from the session to avoid stale references
+            session.expire_all()
 
             # Refresh service after clearing data
             service = JobHuntService(session, user_id=demo_user.id)
@@ -285,26 +323,26 @@ Requirements:
             # Create applications with realistic pipeline distribution
             # Shows a healthy job search with activity at every stage
             application_configs = [
-                # OFFER stage - exciting!
-                {'job_idx': 0, 'status': ApplicationStatus.OFFER, 'days_ago': 25, 'excitement': 5},
+                # OFFER stage - exciting! (analyzed and great fit)
+                {'job_idx': 0, 'status': ApplicationStatus.OFFER, 'days_ago': 25, 'excitement': 5, 'fit_score': 92},
                 # NEGOTIATING - actively discussing terms
-                {'job_idx': 6, 'status': ApplicationStatus.NEGOTIATING, 'days_ago': 30, 'excitement': 5},
+                {'job_idx': 6, 'status': ApplicationStatus.NEGOTIATING, 'days_ago': 30, 'excitement': 5, 'fit_score': 87},
                 # FINAL_ROUND - close to finish line
-                {'job_idx': 1, 'status': ApplicationStatus.FINAL_ROUND, 'days_ago': 21, 'excitement': 4},
-                {'job_idx': 7, 'status': ApplicationStatus.FINAL_ROUND, 'days_ago': 18, 'excitement': 4},
+                {'job_idx': 1, 'status': ApplicationStatus.FINAL_ROUND, 'days_ago': 21, 'excitement': 4, 'fit_score': 78},
+                {'job_idx': 7, 'status': ApplicationStatus.FINAL_ROUND, 'days_ago': 18, 'excitement': 4, 'fit_score': 84},
                 # INTERVIEWING - in the thick of it
-                {'job_idx': 2, 'status': ApplicationStatus.INTERVIEWING, 'days_ago': 14, 'excitement': 4},
-                {'job_idx': 4, 'status': ApplicationStatus.INTERVIEWING, 'days_ago': 12, 'excitement': 5},
-                {'job_idx': 9, 'status': ApplicationStatus.INTERVIEWING, 'days_ago': 10, 'excitement': 3},
+                {'job_idx': 2, 'status': ApplicationStatus.INTERVIEWING, 'days_ago': 14, 'excitement': 4, 'fit_score': 72},
+                {'job_idx': 4, 'status': ApplicationStatus.INTERVIEWING, 'days_ago': 12, 'excitement': 5, 'fit_score': 85},
+                {'job_idx': 9, 'status': ApplicationStatus.INTERVIEWING, 'days_ago': 10, 'excitement': 3, 'fit_score': 68},
                 # SCREENING - early conversations
-                {'job_idx': 3, 'status': ApplicationStatus.SCREENING, 'days_ago': 8, 'excitement': 3},
-                {'job_idx': 5, 'status': ApplicationStatus.SCREENING, 'days_ago': 6, 'excitement': 4},
+                {'job_idx': 3, 'status': ApplicationStatus.SCREENING, 'days_ago': 8, 'excitement': 3, 'fit_score': 75},
+                {'job_idx': 5, 'status': ApplicationStatus.SCREENING, 'days_ago': 6, 'excitement': 4},  # Not yet analyzed
                 # APPLIED - waiting to hear back (some stale for "needs attention")
-                {'job_idx': 8, 'status': ApplicationStatus.APPLIED, 'days_ago': 18, 'excitement': 3},  # Stale - needs attention
+                {'job_idx': 8, 'status': ApplicationStatus.APPLIED, 'days_ago': 18, 'excitement': 3, 'fit_score': 58},  # Lower fit, stale
                 # PREPARING - working on application
-                {'job_idx': 10, 'status': ApplicationStatus.PREPARING, 'days_ago': 2, 'excitement': 4},
-                {'job_idx': 14, 'status': ApplicationStatus.PREPARING, 'days_ago': 1, 'excitement': 5},
-                # INTERESTED - saved for later
+                {'job_idx': 10, 'status': ApplicationStatus.PREPARING, 'days_ago': 2, 'excitement': 4},  # Not yet analyzed
+                {'job_idx': 14, 'status': ApplicationStatus.PREPARING, 'days_ago': 1, 'excitement': 5, 'fit_score': 81},
+                # INTERESTED - saved for later (mostly not analyzed yet)
                 {'job_idx': 11, 'status': ApplicationStatus.INTERESTED, 'days_ago': 5, 'excitement': 3},
                 {'job_idx': 12, 'status': ApplicationStatus.INTERESTED, 'days_ago': 3, 'excitement': 3},
                 {'job_idx': 13, 'status': ApplicationStatus.INTERESTED, 'days_ago': 1, 'excitement': 4},
@@ -317,6 +355,8 @@ Requirements:
                 service.update_application_status(app.id, config['status'])
                 app.date_applied = date.today() - timedelta(days=config['days_ago'])
                 app.excitement_level = config['excitement']
+                if config.get('fit_score'):
+                    app.fit_score = config['fit_score']
                 apps.append(app)
 
             # Set offer details on the offer

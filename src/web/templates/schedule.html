@@ -100,8 +100,7 @@
                         {{ cal_sync(event) }}
                         {% if not event.completed %}
                         <form action="{{ url_for('schedule.complete_event', event_id=event.id) }}" method="post">
-                            <button type="submit" name="went_well" value="true" class="btn btn-sm btn-success">👍 Done</button>
-                            <button type="submit" name="went_well" value="false" class="btn btn-sm btn-secondary">👎</button>
+                            <button type="submit" class="btn btn-sm btn-success">✓ Complete</button>
                         </form>
                         {% else %}
                         <span class="badge badge-success">Completed</span>

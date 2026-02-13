@@ -160,17 +160,25 @@ class DatabaseConnection:
                         except Exception as e:
                             print(f"[Migration] Failed to add display_name: {e}")
 
-            # Check if applications table needs resume_version_id column
+            # Check if applications table needs new columns
             if 'applications' in inspector.get_table_names():
                 app_columns = [col['name'] for col in inspector.get_columns('applications')]
-                if 'resume_version_id' not in app_columns:
-                    with self.engine.connect() as conn:
+                with self.engine.connect() as conn:
+                    if 'resume_version_id' not in app_columns:
                         try:
                             conn.execute(text('ALTER TABLE applications ADD COLUMN resume_version_id INTEGER'))
                             conn.commit()
                             print("[Migration] Added resume_version_id column to applications")
                         except Exception as e:
                             print(f"[Migration] Failed to add resume_version_id: {e}")
+
+                    if 'fit_score' not in app_columns:
+                        try:
+                            conn.execute(text('ALTER TABLE applications ADD COLUMN fit_score INTEGER'))
+                            conn.commit()
+                            print("[Migration] Added fit_score column to applications")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add fit_score: {e}")
 
             # Check if jobs table needs fit scoring columns
             if 'jobs' in inspector.get_table_names():
@@ -183,7 +191,7 @@ class DatabaseConnection:
                             print("[Migration] Added fit_score column to jobs")
                         except Exception as e:
                             print(f"[Migration] Failed to add fit_score: {e}")
-                    
+
                     if 'fit_analysis' not in job_columns:
                         try:
                             conn.execute(text('ALTER TABLE jobs ADD COLUMN fit_analysis TEXT'))
@@ -191,7 +199,7 @@ class DatabaseConnection:
                             print("[Migration] Added fit_analysis column to jobs")
                         except Exception as e:
                             print(f"[Migration] Failed to add fit_analysis: {e}")
-                    
+
                     if 'scored_at' not in job_columns:
                         try:
                             if is_postgres:
@@ -202,7 +210,7 @@ class DatabaseConnection:
                             print("[Migration] Added scored_at column to jobs")
                         except Exception as e:
                             print(f"[Migration] Failed to add scored_at: {e}")
-                    
+
                     if 'scored_with_resume_id' not in job_columns:
                         try:
                             conn.execute(text('ALTER TABLE jobs ADD COLUMN scored_with_resume_id INTEGER'))

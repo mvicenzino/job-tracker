@@ -21,6 +21,7 @@
             </a>
             <div class="landing-nav-links">
                 <a href="#features">Features</a>
+                <a href="#ai-feature">AI Analysis</a>
                 <a href="#how-it-works">How It Works</a>
                 <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Sign In</a>
                 <a href="{{ url_for('public.demo') }}" class="btn btn-primary">Try Demo</a>
@@ -36,6 +37,7 @@
     <!-- Mobile Menu -->
     <div class="landing-mobile-menu" id="mobileMenu">
         <a href="#features">Features</a>
+        <a href="#ai-feature">AI Analysis</a>
         <a href="#how-it-works">How It Works</a>
         <a href="{{ url_for('auth.login') }}">Sign In</a>
         <a href="{{ url_for('public.demo') }}" class="btn btn-primary">Try Demo</a>
@@ -312,6 +314,116 @@
                     <p>Stop guessing if you're a fit. Our AI reads the job description like a recruiter would—surfacing gaps, matching keywords, and generating cover letters that actually sound like you wrote them.</p>
                     <div class="feature-preview">
                         <img src="{{ url_for('static', filename='img/features/ai-analysis.png') }}" alt="AI Resume Analysis" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Feature Highlight -->
+    <section class="ai-feature-section" id="ai-feature">
+        <div class="section-container">
+            <div class="ai-feature-content">
+                <div class="ai-feature-text">
+                    <span class="section-tag ai-tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ai-sparkle">
+                            <path d="M12 2L9 12l-7 3 7 3 3 10 3-10 7-3-7-3-3-10z"/>
+                        </svg>
+                        AI-Powered
+                    </span>
+                    <h2 class="ai-feature-title">Know Exactly How You Stack Up</h2>
+                    <p class="ai-feature-subtitle">
+                        Stop guessing if your resume is a good fit. Our AI analyzes your resume against each job description
+                        and gives you actionable insights to improve your chances.
+                    </p>
+                    <ul class="ai-feature-list">
+                        <li>
+                            <div class="ai-feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 6v6l4 2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <strong>Match Score</strong>
+                                <span>See your fit percentage at a glance — know which roles are worth pursuing</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="ai-feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <strong>Skill Gap Analysis</strong>
+                                <span>Identify exactly what's missing from your resume for each role</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="ai-feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <strong>Keyword Optimization</strong>
+                                <span>Get the exact phrases to add so you pass ATS filters</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="ai-feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10 9 9 9 8 9"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <strong>Tailored Suggestions</strong>
+                                <span>Prioritized, actionable tips to strengthen your application</span>
+                            </div>
+                        </li>
+                    </ul>
+                    <a href="{{ url_for('public.demo') }}" class="btn btn-primary btn-lg ai-cta">
+                        See It In Action
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="ai-feature-visual">
+                    <div class="ai-preview-card">
+                        <div class="ai-preview-header">
+                            <span class="ai-preview-badge">Resume Fit Analysis</span>
+                        </div>
+                        <div class="ai-preview-score">
+                            <div class="score-circle">
+                                <svg viewBox="0 0 36 36" class="score-ring">
+                                    <path class="score-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    <path class="score-ring-fill" stroke-dasharray="78, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                </svg>
+                                <span class="score-value">78%</span>
+                            </div>
+                            <div class="score-label">Strong Match</div>
+                        </div>
+                        <div class="ai-preview-insights">
+                            <div class="insight-row match">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
+                                <span>React, TypeScript, Node.js</span>
+                            </div>
+                            <div class="insight-row gap">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
+                                <span>Add: Kubernetes experience</span>
+                            </div>
+                            <div class="insight-row keyword">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
+                                <span>Keywords: "CI/CD", "agile"</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

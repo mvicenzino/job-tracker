@@ -52,6 +52,9 @@ class Application(Base, TimestampMixin):
     lessons_learned = Column(Text)
     excitement_level = Column(Integer)  # 1-5 scale of how excited you are
 
+    # AI Analysis
+    fit_score = Column(Integer)  # 0-100 score from AI resume fit analysis
+
     # Relationships
     user = relationship("User", backref="applications")
     job = relationship("Job", back_populates="applications")

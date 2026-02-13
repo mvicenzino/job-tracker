@@ -888,9 +888,305 @@ def global_search():
             logging.error(f"Search companies error: {e}")
         
         return jsonify({'results': results[:10]})  # Max 10 total results
-        
+
     except Exception as e:
         logging.error(f"Global search error: {e}")
         return jsonify({'results': [], 'error': str(e)}), 500
+    finally:
+        session.close()
+
+
+# ── Langly Integration (API-key-authenticated GET endpoints) ──────────────────
+
+def _api_key_or_session_auth():
+    """Authenticate via API key or session. Returns (user, error_response)."""
+    api_key = request.headers.get('X-API-Key')
+    user = get_user_by_api_key(api_key) if api_key else None
+    if not user and current_user.is_authenticated:
+        user = current_user
+    if not user:
+        response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return None, (response, 401)
+    return user, None
+
+
+def _cors_response(data, status=200):
+    """Create a JSON response with CORS headers."""
+    response = jsonify(data)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response, status
+
+
+def _cors_options():
+    """Handle CORS preflight for GET endpoints."""
+    response = jsonify({'status': 'ok'})
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
+    return response
+
+
+@bp.route('/api/pipeline', methods=['GET', 'OPTIONS'])
+def api_pipeline():
+    """API: Get applications grouped by pipeline status."""
+    if request.method == 'OPTIONS':
+        return _cors_options()
+
+    user, err = _api_key_or_session_auth()
+    if err:
+        return err
+
+    service, session = get_service_for_user(user.id)
+    try:
+        pipeline = service.get_pipeline()
+        result = {}
+        for status_val, apps in pipeline.items():
+            result[status_val] = []
+            for app in apps:
+                result[status_val].append({
+                    'id': app.id,
+                    'status': app.status.value if app.status else status_val,
+                    'dateApplied': app.date_applied.isoformat() if app.date_applied else None,
+                    'excitementLevel': app.excitement_level,
+                    'jobTitle': app.job.title if app.job else None,
+                    'companyName': app.job.company.name if app.job and app.job.company else None,
+                    'location': app.job.location if app.job else None,
+                    'remoteType': app.job.remote_type if app.job else None,
+                    'salaryMin': app.job.salary_min if app.job else None,
+                    'salaryMax': app.job.salary_max if app.job else None,
+                })
+        return _cors_response({'success': True, 'pipeline': result})
+    except Exception as e:
+        return _cors_response({'success': False, 'error': str(e)}, 500)
+    finally:
+        session.close()
+
+
+@bp.route('/api/applications', methods=['GET', 'OPTIONS'])
+def api_get_applications():
+    """API: Get all applications, optionally filtered by status."""
+    if request.method == 'OPTIONS':
+        return _cors_options()
+
+    user, err = _api_key_or_session_auth()
+    if err:
+        return err
+
+    service, session = get_service_for_user(user.id)
+    try:
+        status_filter = request.args.get('status')
+        limit = request.args.get('limit', 20, type=int)
+
+        if status_filter:
+            try:
+                status_enum = ApplicationStatus(status_filter)
+                apps = service.applications.get_by_status(status_enum)
+            except ValueError:
+                return _cors_response({'success': False, 'error': f'Invalid status: {status_filter}'}, 400)
+        else:
+            rows = service.applications.get_with_company_info()
+            # Returns Row objects of (Application, Job, Company)
+            items = []
+            for row in rows[:limit]:
+                app, job, company = row[0], row[1], row[2]
+                items.append({
+                    'id': app.id,
+                    'status': app.status.value if app.status else None,
+                    'dateApplied': app.date_applied.isoformat() if app.date_applied else None,
+                    'excitementLevel': app.excitement_level,
+                    'fitScore': app.fit_score,
+                    'jobTitle': job.title,
+                    'companyName': company.name,
+                    'location': job.location,
+                    'remoteType': job.remote_type,
+                    'salaryMin': job.salary_min,
+                    'salaryMax': job.salary_max,
+                })
+            return _cors_response({'success': True, 'applications': items})
+
+        # Status-filtered path: apps are Application objects
+        items = []
+        for app in apps[:limit]:
+            items.append({
+                'id': app.id,
+                'status': app.status.value if app.status else None,
+                'dateApplied': app.date_applied.isoformat() if app.date_applied else None,
+                'excitementLevel': app.excitement_level,
+                'fitScore': app.fit_score,
+                'jobTitle': app.job.title if app.job else None,
+                'companyName': app.job.company.name if app.job and app.job.company else None,
+                'location': app.job.location if app.job else None,
+                'remoteType': app.job.remote_type if app.job else None,
+                'salaryMin': app.job.salary_min if app.job else None,
+                'salaryMax': app.job.salary_max if app.job else None,
+            })
+        return _cors_response({'success': True, 'applications': items})
+    except Exception as e:
+        return _cors_response({'success': False, 'error': str(e)}, 500)
+    finally:
+        session.close()
+
+
+@bp.route('/api/applications/<int:app_id>/detail', methods=['GET', 'OPTIONS'])
+def api_get_application_detail(app_id):
+    """API: Get full details for a single application."""
+    if request.method == 'OPTIONS':
+        return _cors_options()
+
+    user, err = _api_key_or_session_auth()
+    if err:
+        return err
+
+    service, session = get_service_for_user(user.id)
+    try:
+        details = service.get_application_details(app_id)
+        if not details:
+            return _cors_response({'success': False, 'error': 'Application not found'}, 404)
+
+        app = details['application']
+        job = details['job']
+        company = details['company']
+        events = details['events']
+        notes = details['notes']
+        referral = details['referral']
+
+        result = {
+            'id': app.id,
+            'status': app.status.value if app.status else None,
+            'dateApplied': app.date_applied.isoformat() if app.date_applied else None,
+            'dateResponse': app.date_response.isoformat() if app.date_response else None,
+            'dateClosed': app.date_closed.isoformat() if app.date_closed else None,
+            'excitementLevel': app.excitement_level,
+            'fitScore': app.fit_score,
+            'offeredSalary': app.offered_salary,
+            'offeredBonus': app.offered_bonus,
+            'offeredEquity': app.offered_equity,
+            'rejectionReason': app.rejection_reason,
+            'lessonsLearned': app.lessons_learned,
+            'job': {
+                'id': job.id,
+                'title': job.title,
+                'description': job.description,
+                'requirements': job.requirements,
+                'location': job.location,
+                'remoteType': job.remote_type,
+                'salaryMin': job.salary_min,
+                'salaryMax': job.salary_max,
+                'jobUrl': job.job_url,
+                'source': job.source,
+            } if job else None,
+            'company': {
+                'id': company.id,
+                'name': company.name,
+                'industry': company.industry if hasattr(company, 'industry') else None,
+                'location': company.location if hasattr(company, 'location') else None,
+                'website': company.website if hasattr(company, 'website') else None,
+            } if company else None,
+            'events': [
+                {
+                    'id': ev.id,
+                    'title': ev.title,
+                    'eventType': ev.event_type.value if ev.event_type else None,
+                    'startTime': ev.start_time.isoformat() if ev.start_time else None,
+                    'endTime': ev.end_time.isoformat() if ev.end_time else None,
+                    'location': ev.location,
+                    'meetingLink': ev.meeting_link,
+                    'completed': ev.completed,
+                }
+                for ev in (events or [])
+            ],
+            'notes': [
+                {
+                    'id': n.id,
+                    'content': n.content,
+                    'noteType': n.note_type if hasattr(n, 'note_type') else None,
+                    'createdAt': n.created_at.isoformat() if n.created_at else None,
+                }
+                for n in (notes or [])
+            ],
+            'referral': {
+                'id': referral.id,
+                'name': referral.name,
+                'company': referral.company.name if referral.company else None,
+            } if referral else None,
+        }
+        return _cors_response({'success': True, 'application': result})
+    except Exception as e:
+        return _cors_response({'success': False, 'error': str(e)}, 500)
+    finally:
+        session.close()
+
+
+@bp.route('/api/dashboard/stats', methods=['GET', 'OPTIONS'])
+def api_dashboard_stats():
+    """API: Get dashboard summary statistics."""
+    if request.method == 'OPTIONS':
+        return _cors_options()
+
+    user, err = _api_key_or_session_auth()
+    if err:
+        return err
+
+    service, session = get_service_for_user(user.id)
+    try:
+        dashboard = service.get_dashboard()
+        result = {
+            'activeApplications': dashboard['summary']['active_applications'],
+            'totalApplications': dashboard['summary']['total_applications'],
+            'eventsToday': dashboard['summary']['events_today'],
+            'interviewRate': dashboard['metrics']['interview_rate'],
+            'interviewedCount': dashboard['metrics']['interviewed_count'],
+            'responseRate': dashboard['metrics']['response_rate'],
+            'contactsNeedFollowup': dashboard['summary']['contacts_need_followup'],
+            'appsAwaitingResponse': dashboard['summary']['apps_awaiting_response'],
+            'staleLeads': dashboard['summary']['stale_leads'],
+            'appsThisWeek': dashboard['metrics']['apps_this_week'],
+            'weeklyChange': dashboard['metrics']['weekly_change'],
+            'byStatus': dashboard.get('stats', {}).get('by_status', {}),
+        }
+        return _cors_response({'success': True, 'stats': result})
+    except Exception as e:
+        return _cors_response({'success': False, 'error': str(e)}, 500)
+    finally:
+        session.close()
+
+
+@bp.route('/api/events/upcoming', methods=['GET', 'OPTIONS'])
+def api_upcoming_events():
+    """API: Get upcoming events (interviews, deadlines, etc.)."""
+    if request.method == 'OPTIONS':
+        return _cors_options()
+
+    user, err = _api_key_or_session_auth()
+    if err:
+        return err
+
+    service, session = get_service_for_user(user.id)
+    try:
+        days = request.args.get('days', 14, type=int)
+        events = service.events.get_upcoming(days=days)
+        items = []
+        for ev in events:
+            app_title = None
+            company_name = None
+            if ev.application and ev.application.job:
+                app_title = ev.application.job.title
+                if ev.application.job.company:
+                    company_name = ev.application.job.company.name
+            items.append({
+                'id': ev.id,
+                'title': ev.title,
+                'eventType': ev.event_type.value if ev.event_type else None,
+                'startTime': ev.start_time.isoformat() if ev.start_time else None,
+                'endTime': ev.end_time.isoformat() if ev.end_time else None,
+                'location': ev.location,
+                'meetingLink': ev.meeting_link,
+                'applicationTitle': app_title,
+                'companyName': company_name,
+            })
+        return _cors_response({'success': True, 'events': items})
+    except Exception as e:
+        return _cors_response({'success': False, 'error': str(e)}, 500)
     finally:
         session.close()
