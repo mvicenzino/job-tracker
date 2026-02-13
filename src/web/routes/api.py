@@ -183,6 +183,168 @@ def api_create_contact():
         session.close()
 
 
+@bp.route('/api/contacts', methods=['GET', 'OPTIONS'])
+def api_list_contacts():
+    """API: List all contacts with optional search/followup filter."""
+    if request.method == 'OPTIONS':
+        response = jsonify({'status': 'ok'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
+        return response
+
+    api_key = request.headers.get('X-API-Key')
+    user = get_user_by_api_key(api_key) if api_key else None
+    if not user and current_user.is_authenticated:
+        user = current_user
+    if not user:
+        response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 401
+
+    service, session = get_service_for_user(user.id)
+    try:
+        limit = request.args.get('limit', 100, type=int)
+        search = request.args.get('q', '').strip()
+        followup = request.args.get('followup')
+
+        if search:
+            contacts = service.contacts.search_by_name(search)[:limit]
+        elif followup:
+            contacts = service.contacts.get_needing_followup()[:limit]
+        else:
+            contacts = service.contacts.get_all(limit=limit)
+
+        response = jsonify({
+            'success': True,
+            'contacts': [
+                {
+                    'id': c.id,
+                    'name': c.name,
+                    'email': c.email,
+                    'phone': c.phone,
+                    'linkedinUrl': c.linkedin_url,
+                    'title': c.title,
+                    'contactType': c.contact_type.value if c.contact_type else None,
+                    'companyName': c.company.name if c.company else None,
+                    'relationshipStrength': c.relationship_strength,
+                    'lastContactDate': c.last_contact_date.isoformat() if c.last_contact_date else None,
+                    'nextFollowupDate': c.next_followup_date.isoformat() if c.next_followup_date else None,
+                    'notes': c.notes,
+                    'howWeMet': c.how_we_met,
+                    'createdAt': c.created_at.isoformat() if hasattr(c, 'created_at') and c.created_at else None,
+                }
+                for c in contacts
+            ]
+        })
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+    except Exception as e:
+        response = jsonify({'success': False, 'error': str(e)})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 500
+    finally:
+        session.close()
+
+
+@bp.route('/api/contacts/<int:contact_id>', methods=['GET', 'OPTIONS'])
+def api_get_contact(contact_id):
+    """API: Get a single contact by ID."""
+    if request.method == 'OPTIONS':
+        response = jsonify({'status': 'ok'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
+        return response
+
+    api_key = request.headers.get('X-API-Key')
+    user = get_user_by_api_key(api_key) if api_key else None
+    if not user and current_user.is_authenticated:
+        user = current_user
+    if not user:
+        response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 401
+
+    service, session = get_service_for_user(user.id)
+    try:
+        c = service.contacts.get_by_id(contact_id)
+        if not c:
+            response = jsonify({'success': False, 'error': 'Contact not found'})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 404
+
+        response = jsonify({
+            'success': True,
+            'contact': {
+                'id': c.id,
+                'name': c.name,
+                'email': c.email,
+                'phone': c.phone,
+                'linkedinUrl': c.linkedin_url,
+                'title': c.title,
+                'contactType': c.contact_type.value if c.contact_type else None,
+                'companyName': c.company.name if c.company else None,
+                'relationshipStrength': c.relationship_strength,
+                'lastContactDate': c.last_contact_date.isoformat() if c.last_contact_date else None,
+                'nextFollowupDate': c.next_followup_date.isoformat() if c.next_followup_date else None,
+                'notes': c.notes,
+                'howWeMet': c.how_we_met,
+                'createdAt': c.created_at.isoformat() if hasattr(c, 'created_at') and c.created_at else None,
+                'updatedAt': c.updated_at.isoformat() if hasattr(c, 'updated_at') and c.updated_at else None,
+            }
+        })
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+    except Exception as e:
+        response = jsonify({'success': False, 'error': str(e)})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 500
+    finally:
+        session.close()
+
+
+@bp.route('/api/contacts/<int:contact_id>', methods=['DELETE', 'OPTIONS'])
+def api_delete_contact(contact_id):
+    """API: Delete a contact by ID."""
+    if request.method == 'OPTIONS':
+        response = jsonify({'status': 'ok'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
+        return response
+
+    api_key = request.headers.get('X-API-Key')
+    user = get_user_by_api_key(api_key) if api_key else None
+    if not user and current_user.is_authenticated:
+        user = current_user
+    if not user:
+        response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 401
+
+    service, session = get_service_for_user(user.id)
+    try:
+        c = service.contacts.get_by_id(contact_id)
+        if not c:
+            response = jsonify({'success': False, 'error': 'Contact not found'})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 404
+
+        session.delete(c)
+        session.commit()
+        response = jsonify({'success': True, 'deleted': contact_id})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+    except Exception as e:
+        session.rollback()
+        response = jsonify({'success': False, 'error': str(e)})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 500
+    finally:
+        session.close()
+
+
 @bp.route('/api/companies', methods=['POST', 'OPTIONS'])
 def api_create_company():
     """API: Create a new company (for Chrome extension)."""
@@ -769,23 +931,36 @@ def api_interview_prep(app_id):
 
 
 @bp.route('/api/contacts/search')
-@login_required
 def api_contacts_search():
     """API: Search contacts by name for @mention autocomplete."""
-    service, session = get_service()
+    api_key = request.headers.get('X-API-Key')
+    user = get_user_by_api_key(api_key) if api_key else None
+    if not user and current_user.is_authenticated:
+        user = current_user
+    if not user:
+        response = jsonify({'success': False, 'error': 'Authentication required.'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 401
+
+    service, session = get_service_for_user(user.id)
     try:
         q = request.args.get('q', '').strip()
         if not q:
-            return jsonify([])
+            return jsonify({'success': True, 'contacts': []})
         contacts = service.contacts.search_by_name(q)
-        return jsonify([
-            {
-                'id': c.id,
-                'name': c.name,
-                'company': c.company.name if c.company else None
-            }
-            for c in contacts[:10]
-        ])
+        response = jsonify({
+            'success': True,
+            'contacts': [
+                {
+                    'id': c.id,
+                    'name': c.name,
+                    'companyName': c.company.name if c.company else None
+                }
+                for c in contacts[:10]
+            ]
+        })
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
     finally:
         session.close()
 
