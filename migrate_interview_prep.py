@@ -42,6 +42,8 @@ with engine.connect() as conn:
                 talking_points JSONB,
                 questions_to_ask JSONB,
                 company_brief JSONB,
+                red_flags JSONB,
+                closing_strategy JSONB,
                 created_at TIMESTAMP NOT NULL DEFAULT NOW(),
                 updated_at TIMESTAMP NOT NULL DEFAULT NOW()
             );
@@ -51,6 +53,17 @@ with engine.connect() as conn:
         print("interview_preps table created!")
     else:
         print("interview_preps table already exists.")
+        # Add new columns if they don't exist
+        for col in ('red_flags', 'closing_strategy'):
+            result = conn.execute(text("""
+                SELECT EXISTS (
+                    SELECT FROM information_schema.columns
+                    WHERE table_name = 'interview_preps' AND column_name = :col
+                );
+            """), {'col': col})
+            if not result.scalar():
+                conn.execute(text(f"ALTER TABLE interview_preps ADD COLUMN {col} JSONB"))
+                print(f"Added {col} column to interview_preps")
 
     conn.commit()
     print("\nMigration complete!")

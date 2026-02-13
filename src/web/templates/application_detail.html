@@ -449,7 +449,8 @@
 
                 <div id="interviewPrepLoading" class="interview-prep-loading" style="display:none;">
                     <div class="loading-spinner"></div>
-                    <p>Generating your interview prep materials...</p>
+                    <p>Analyzing your resume against the job description and generating personalized interview prep...</p>
+                    <p style="font-size: 0.75rem; color: var(--color-text-tertiary); margin-top: var(--space-2);">This uses advanced AI analysis and may take 15-30 seconds</p>
                 </div>
 
                 <div id="interviewPrepResults" class="interview-prep-results" style="display:none;">
@@ -1176,313 +1177,132 @@
 }
 
 /* Interview Prep Styles */
-.interview-prep-card .badge {
-    font-size: 0.7rem;
-}
+.interview-prep-card .badge { font-size: 0.7rem; }
+.interview-prep-prompt p { margin: 0 0 var(--space-4); color: var(--color-text-secondary); }
+.interview-prep-controls { display: flex; gap: var(--space-3); align-items: center; flex-wrap: wrap; }
+.interview-prep-warning { margin-top: var(--space-3); font-size: 0.875rem; color: var(--color-warning); }
+.interview-prep-loading { text-align: center; padding: var(--space-6); }
+.interview-prep-loading p { color: var(--color-text-secondary); margin: 0; }
+.interview-prep-error { background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius); padding: var(--space-4); text-align: center; }
+.interview-prep-error p { color: #dc2626; margin: 0 0 var(--space-3); }
+.interview-prep-results { display: flex; flex-direction: column; gap: var(--space-4); }
 
-.interview-prep-prompt p {
-    margin: 0 0 var(--space-4);
-    color: var(--color-text-secondary);
-}
+/* Prep Header */
+.prep-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-light); gap: var(--space-3); flex-wrap: wrap; }
+.prep-header h3 { margin: 0; font-size: 1.125rem; font-weight: 700; }
+.prep-date { font-size: 0.75rem; color: var(--color-text-tertiary); }
+.prep-actions-top { display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; }
+.copy-success { display: none; color: var(--color-success); font-size: 0.8125rem; font-weight: 500; }
+.copy-success.show { display: inline; }
 
-.interview-prep-controls {
-    display: flex;
-    gap: var(--space-3);
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.interview-prep-warning {
-    margin-top: var(--space-3);
-    font-size: 0.875rem;
-    color: var(--color-warning);
-}
-
-.interview-prep-loading {
-    text-align: center;
-    padding: var(--space-6);
-}
-
-.interview-prep-loading p {
-    color: var(--color-text-secondary);
-    margin: 0;
-}
-
-.interview-prep-error {
-    background: #fef2f2;
-    border: 1px solid #fecaca;
+/* Elevator Pitch */
+.prep-elevator-pitch {
+    background: linear-gradient(135deg, var(--color-primary-subtle), var(--color-accent-light));
+    border: 1px solid var(--color-primary-light);
     border-radius: var(--radius);
     padding: var(--space-4);
-    text-align: center;
 }
+.pitch-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-primary); margin-bottom: var(--space-2); }
+.pitch-text { font-size: 0.9375rem; line-height: 1.6; color: var(--color-text); }
 
-.interview-prep-error p {
-    color: #dc2626;
-    margin: 0 0 var(--space-3);
-}
+/* Collapsible Sections */
+.prep-section { border: 1px solid var(--color-border-light); border-radius: var(--radius); overflow: hidden; }
+.prep-section-header { display: flex; justify-content: space-between; align-items: center; padding: var(--space-3) var(--space-4); background: var(--color-bg-subtle); cursor: pointer; user-select: none; transition: background 0.15s; }
+.prep-section-header:hover { background: var(--color-border-light); }
+.prep-section-header h4 { margin: 0; font-size: 0.9375rem; font-weight: 600; display: flex; align-items: center; gap: var(--space-2); }
+.prep-section-header .count { font-size: 0.6875rem; color: var(--color-text-secondary); font-weight: 500; background: var(--color-bg); padding: 1px 8px; border-radius: var(--radius-full); }
+.prep-chevron { color: var(--color-text-tertiary); transition: transform 0.2s; flex-shrink: 0; }
+.prep-section.expanded .prep-chevron { transform: rotate(180deg); }
+.prep-section-content { display: none; padding: var(--space-4); }
+.prep-section.expanded .prep-section-content { display: block; }
 
-.interview-prep-results {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-}
+/* Question Cards */
+.prep-q-card { padding: var(--space-4); border: 1px solid var(--color-border-light); border-radius: var(--radius); margin-bottom: var(--space-3); transition: box-shadow 0.15s; }
+.prep-q-card:last-child { margin-bottom: 0; }
+.prep-q-card:hover { box-shadow: var(--shadow-sm); }
+.prep-q-top { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2); }
+.prep-q-num { flex-shrink: 0; width: 26px; height: 26px; background: var(--color-primary); color: white; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+.prep-q-badges { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.prep-badge { font-size: 0.6875rem; font-weight: 600; padding: 2px 8px; border-radius: var(--radius-full); text-transform: capitalize; white-space: nowrap; }
+.prep-badge.cat-behavioral { background: #dcfce7; color: #166534; }
+.prep-badge.cat-technical { background: #dbeafe; color: #1e40af; }
+.prep-badge.cat-system_design { background: #e0e7ff; color: #3730a3; }
+.prep-badge.cat-leadership { background: #fef3c7; color: #92400e; }
+.prep-badge.cat-culture_fit { background: #fce7f3; color: #9d174d; }
+.prep-badge.diff-warm_up { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.prep-badge.diff-standard { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+.prep-badge.diff-deep_dive { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.prep-q-text { font-size: 0.9375rem; font-weight: 600; line-height: 1.5; margin-bottom: var(--space-2); }
+.prep-q-why, .prep-q-strategy { font-size: 0.8125rem; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: var(--space-1); }
+.prep-q-strategy { color: var(--color-text); background: var(--color-bg-subtle); padding: var(--space-2) var(--space-3); border-radius: var(--radius); border-left: 3px solid var(--color-primary); }
 
-.prep-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--color-border-light);
-}
+/* Toggle Buttons */
+.prep-toggle-btn { font-size: 0.75rem; font-weight: 600; color: var(--color-primary); background: none; border: 1px solid var(--color-primary-light); border-radius: var(--radius); padding: 3px 10px; cursor: pointer; margin-top: var(--space-2); margin-right: var(--space-2); transition: all 0.15s; }
+.prep-toggle-btn:hover { background: var(--color-primary-subtle); }
 
-.prep-header h3 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-}
+/* STAR Framework */
+.prep-star, .prep-followups { display: none; margin-top: var(--space-2); }
+.prep-star.show, .prep-followups.show { display: block; }
+.star-row { display: flex; gap: var(--space-2); align-items: flex-start; padding: var(--space-2) 0; font-size: 0.8125rem; line-height: 1.5; }
+.star-letter { flex-shrink: 0; width: 22px; height: 22px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 0.6875rem; font-weight: 800; color: white; }
+.star-letter.s { background: #6366f1; }
+.star-letter.t { background: #8b5cf6; }
+.star-letter.a { background: #06b6d4; }
+.star-letter.r { background: #10b981; }
+.followup-item { font-size: 0.8125rem; color: var(--color-text-secondary); padding: var(--space-1) 0; padding-left: var(--space-4); border-left: 2px solid var(--color-border-light); margin-bottom: var(--space-1); }
 
-.prep-date {
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
-}
+/* Talking Points Cards */
+.prep-tp-card { padding: var(--space-3); border: 1px solid var(--color-border-light); border-radius: var(--radius); margin-bottom: var(--space-3); }
+.prep-tp-card:last-child { margin-bottom: 0; }
+.tp-point { font-size: 0.9375rem; font-weight: 600; margin-bottom: var(--space-2); }
+.tp-detail { font-size: 0.8125rem; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: var(--space-1); }
+.tp-label { font-weight: 600; color: var(--color-text-tertiary); }
+.tp-weave { background: var(--color-bg-subtle); padding: var(--space-2) var(--space-3); border-radius: var(--radius); border-left: 3px solid var(--color-accent); }
 
-.prep-section {
-    border: 1px solid var(--color-border-light);
-    border-radius: var(--radius);
-    overflow: hidden;
-}
+/* Questions to Ask */
+.prep-ask-card { display: flex; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--color-border-light); border-radius: var(--radius); margin-bottom: var(--space-3); }
+.prep-ask-card:last-child { margin-bottom: 0; }
+.ask-num { flex-shrink: 0; width: 24px; height: 24px; background: var(--color-accent); color: white; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+.ask-body { flex: 1; }
+.ask-text { font-size: 0.9375rem; font-weight: 500; line-height: 1.5; }
+.ask-cat { display: inline-block; font-size: 0.6875rem; font-weight: 600; text-transform: capitalize; color: var(--color-text-tertiary); background: var(--color-bg-subtle); padding: 1px 8px; border-radius: var(--radius-full); margin-top: var(--space-1); }
+.ask-why { font-size: 0.8125rem; color: var(--color-text-secondary); margin-top: var(--space-1); line-height: 1.4; }
 
-.prep-section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-3) var(--space-4);
-    background: var(--color-bg-subtle);
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.15s;
-}
+/* Company Brief */
+.prep-brief-grid { display: grid; gap: var(--space-3); }
+.brief-item { padding: var(--space-3); background: var(--color-bg-subtle); border-radius: var(--radius); }
+.brief-label { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-tertiary); margin-bottom: var(--space-1); }
+.brief-value { font-size: 0.875rem; line-height: 1.5; }
 
-.prep-section-header:hover {
-    background: var(--color-bg-hover);
-}
+/* Red Flags / Objection Handling */
+.prep-rf-card { padding: var(--space-3); border: 1px solid #fed7aa; border-radius: var(--radius); background: #fff7ed; margin-bottom: var(--space-3); }
+.prep-rf-card:last-child { margin-bottom: 0; }
+.rf-concern { font-size: 0.875rem; font-weight: 600; color: #9a3412; margin-bottom: var(--space-2); }
+.rf-icon { margin-right: var(--space-1); }
+.rf-reframe { font-size: 0.8125rem; color: var(--color-text-secondary); line-height: 1.5; background: white; padding: var(--space-2) var(--space-3); border-radius: var(--radius); border-left: 3px solid var(--color-success); }
 
-.prep-section-header h4 {
-    margin: 0;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-}
+/* Closing Strategy */
+.closing-statement { margin-bottom: var(--space-4); }
+.closing-label { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-tertiary); margin-bottom: var(--space-2); }
+.closing-text { font-size: 0.9375rem; line-height: 1.6; background: var(--color-bg-subtle); padding: var(--space-3); border-radius: var(--radius); }
+.closing-diffs { }
+.diff-item { display: flex; align-items: flex-start; gap: var(--space-2); font-size: 0.875rem; padding: var(--space-2) 0; border-bottom: 1px solid var(--color-border-light); line-height: 1.5; }
+.diff-item::before { content: ''; flex-shrink: 0; width: 6px; height: 6px; background: var(--color-primary); border-radius: 50%; margin-top: 7px; }
+.diff-item:last-child { border-bottom: none; }
 
-.prep-section-header .count {
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
-    font-weight: normal;
-    background: var(--color-bg);
-    padding: 2px 8px;
-    border-radius: var(--radius-full);
-}
-
-.prep-section-toggle {
-    font-size: 1.25rem;
-    color: var(--color-text-secondary);
-    transition: transform 0.2s;
-}
-
-.prep-section.expanded .prep-section-toggle {
-    transform: rotate(180deg);
-}
-
-.prep-section-content {
-    display: none;
-    padding: var(--space-4);
-}
-
-.prep-section.expanded .prep-section-content {
-    display: block;
-}
-
-.prep-question-item {
-    padding: var(--space-3) 0;
-    border-bottom: 1px solid var(--color-border-light);
-}
-
-.prep-question-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.prep-question-item:first-child {
-    padding-top: 0;
-}
-
-.question-category {
-    display: inline-block;
-    font-size: 0.6875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 2px 8px;
-    border-radius: var(--radius-full);
-    margin-bottom: var(--space-2);
-}
-
-.question-category.technical {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.question-category.behavioral {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.question-category.situational {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.question-text {
-    font-size: 0.9375rem;
-    font-weight: 500;
-    margin-bottom: var(--space-2);
-    line-height: 1.5;
-}
-
-.question-tip {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-2);
-    font-size: 0.8125rem;
-    color: var(--color-text-secondary);
-    background: var(--color-bg-subtle);
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius);
-    margin-top: var(--space-2);
-}
-
-.question-tip .tip-icon {
-    flex-shrink: 0;
-}
-
-.prep-talking-point {
-    padding: var(--space-3) 0;
-    border-bottom: 1px solid var(--color-border-light);
-}
-
-.prep-talking-point:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.prep-talking-point:first-child {
-    padding-top: 0;
-}
-
-.talking-point-text {
-    font-size: 0.9375rem;
-    font-weight: 500;
-    margin-bottom: var(--space-1);
-}
-
-.talking-point-relevance {
-    font-size: 0.8125rem;
-    color: var(--color-text-secondary);
-}
-
-.prep-ask-question {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-3);
-    padding: var(--space-3) 0;
-    border-bottom: 1px solid var(--color-border-light);
-}
-
-.prep-ask-question:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.prep-ask-question:first-child {
-    padding-top: 0;
-}
-
-.ask-question-number {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-    background: var(--color-primary);
-    color: white;
-    border-radius: var(--radius-full);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.ask-question-text {
-    font-size: 0.9375rem;
-    line-height: 1.5;
-}
-
-.company-brief-content {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-}
-
-.company-brief-item {
-    display: flex;
-    gap: var(--space-3);
-}
-
-.company-brief-item dt {
-    flex-shrink: 0;
-    width: 100px;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--color-text-secondary);
-}
-
-.company-brief-item dd {
-    margin: 0;
-    font-size: 0.9375rem;
-}
-
-.prep-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--color-border-light);
-    flex-wrap: wrap;
-    gap: var(--space-3);
-}
-
-.prep-actions-left {
-    display: flex;
-    gap: var(--space-2);
-}
-
-.prep-actions-right {
-    display: flex;
-    gap: var(--space-2);
-}
-
-.copy-success {
-    display: none;
-    color: var(--color-success);
-    font-size: 0.875rem;
-    align-items: center;
-    gap: var(--space-1);
-}
-
-.copy-success.show {
-    display: flex;
-}
+/* Dark mode overrides */
+:root:not([data-theme="light"]) .prep-rf-card { background: rgba(234, 88, 12, 0.08); border-color: rgba(234, 88, 12, 0.2); }
+:root:not([data-theme="light"]) .rf-concern { color: #fb923c; }
+:root:not([data-theme="light"]) .rf-reframe { background: rgba(0,0,0,0.15); }
+:root:not([data-theme="light"]) .prep-elevator-pitch { background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08)); border-color: rgba(99,102,241,0.2); }
+:root:not([data-theme="light"]) .prep-badge.diff-warm_up { background: rgba(22,163,74,0.1); border-color: rgba(22,163,74,0.25); color: #4ade80; }
+:root:not([data-theme="light"]) .prep-badge.diff-standard { background: rgba(14,165,233,0.1); border-color: rgba(14,165,233,0.25); color: #38bdf8; }
+:root:not([data-theme="light"]) .prep-badge.diff-deep_dive { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.25); color: #f87171; }
+:root:not([data-theme="light"]) .prep-badge.cat-behavioral { background: rgba(22,163,74,0.12); color: #4ade80; }
+:root:not([data-theme="light"]) .prep-badge.cat-technical { background: rgba(59,130,246,0.12); color: #60a5fa; }
+:root:not([data-theme="light"]) .prep-badge.cat-system_design { background: rgba(99,102,241,0.12); color: #818cf8; }
+:root:not([data-theme="light"]) .prep-badge.cat-leadership { background: rgba(245,158,11,0.12); color: #fbbf24; }
+:root:not([data-theme="light"]) .prep-badge.cat-culture_fit { background: rgba(236,72,153,0.12); color: #f472b6; }
 </style>
 
 {% if ai_parsing_enabled %}
@@ -1724,7 +1544,7 @@ function checkExistingPrep() {
                 existingPrepData = data.prep;
                 renderInterviewPrepResults(data.prep);
                 document.getElementById('interviewPrepPrompt').style.display = 'none';
-                document.getElementById('interviewPrepResults').style.display = 'flex';
+                document.getElementById('interviewPrepResults').style.display = 'block';
             }
         })
         .catch(function(err) {
@@ -1736,7 +1556,6 @@ function generateInterviewPrep(regenerate) {
     var select = document.getElementById('prepResumeVersionSelect');
     var resumeVersionId = select ? select.value : null;
 
-    // Show loading state
     document.getElementById('interviewPrepPrompt').style.display = 'none';
     document.getElementById('interviewPrepResults').style.display = 'none';
     document.getElementById('interviewPrepLoading').style.display = 'block';
@@ -1753,11 +1572,10 @@ function generateInterviewPrep(regenerate) {
     .then(function(resp) { return resp.json(); })
     .then(function(data) {
         document.getElementById('interviewPrepLoading').style.display = 'none';
-
         if (data.success) {
             existingPrepData = data.prep;
             renderInterviewPrepResults(data.prep);
-            document.getElementById('interviewPrepResults').style.display = 'flex';
+            document.getElementById('interviewPrepResults').style.display = 'block';
         } else {
             document.getElementById('interviewPrepErrorMessage').textContent = data.error || 'Generation failed';
             document.getElementById('interviewPrepError').style.display = 'block';
@@ -1779,183 +1597,307 @@ function resetInterviewPrep() {
 
 function togglePrepSection(sectionId) {
     var section = document.getElementById(sectionId);
-    if (section) {
-        section.classList.toggle('expanded');
-    }
+    if (section) section.classList.toggle('expanded');
 }
+
+function toggleStarExample(idx) {
+    var el = document.getElementById('star-' + idx);
+    if (el) el.classList.toggle('show');
+}
+
+function toggleFollowUps(idx) {
+    var el = document.getElementById('followups-' + idx);
+    if (el) el.classList.toggle('show');
+}
+
+var CATEGORY_ICONS = {behavioral:'🎭', technical:'⚙️', system_design:'🏗️', leadership:'👥', culture_fit:'🤝'};
+var CATEGORY_LABELS = {behavioral:'Behavioral', technical:'Technical', system_design:'System Design', leadership:'Leadership', culture_fit:'Culture Fit'};
+var DIFFICULTY_LABELS = {warm_up:'Warm-Up', standard:'Standard', deep_dive:'Deep Dive'};
 
 function renderInterviewPrepResults(prep) {
     var createdDate = prep.created_at ? new Date(prep.created_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) : '';
+    var html = '';
 
-    var html = '<div class="prep-header">' +
-        '<h3>Interview Prep for {{ details.job.title }}</h3>' +
-        '<span class="prep-date">Generated ' + createdDate + '</span>' +
+    // Header
+    html += '<div class="prep-header">' +
+        '<div><h3>Interview Prep</h3><span class="prep-date">Generated ' + createdDate + '</span></div>' +
+        '<div class="prep-actions-top">' +
+            '<button type="button" class="btn btn-secondary btn-sm" onclick="copyAllPrep()" title="Copy to clipboard">' +
+                '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy All' +
+            '</button>' +
+            '<button type="button" class="btn btn-secondary btn-sm" onclick="generateInterviewPrep(true)" title="Regenerate">' +
+                '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Regenerate' +
+            '</button>' +
+            '<span class="copy-success" id="copySuccess">Copied!</span>' +
+        '</div>' +
     '</div>';
 
-    // Questions section
+    // --- Closing Strategy: Elevator Pitch (top of prep) ---
+    var strategy = prep.closing_strategy || {};
+    if (strategy.elevator_pitch) {
+        html += '<div class="prep-elevator-pitch">' +
+            '<div class="pitch-label">Your "Tell Me About Yourself"</div>' +
+            '<div class="pitch-text">' + escapeHtml(strategy.elevator_pitch) + '</div>' +
+        '</div>';
+    }
+
+    // --- Questions Section ---
     var questions = prep.questions || [];
     html += '<div class="prep-section expanded" id="prepQuestionsSection">' +
         '<div class="prep-section-header" onclick="togglePrepSection(\'prepQuestionsSection\')">' +
-            '<h4><span>🎯</span> Likely Interview Questions <span class="count">' + questions.length + '</span></h4>' +
-            '<span class="prep-section-toggle">▼</span>' +
+            '<h4>Likely Interview Questions <span class="count">' + questions.length + '</span></h4>' +
+            '<svg class="prep-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
         '</div>' +
         '<div class="prep-section-content">';
 
     questions.forEach(function(q, i) {
-        var category = q.category || 'general';
-        html += '<div class="prep-question-item">' +
-            '<span class="question-category ' + category + '">' + category + '</span>' +
-            '<div class="question-text">' + (i + 1) + '. ' + escapeHtml(q.question) + '</div>';
-        if (q.tip) {
-            html += '<div class="question-tip">' +
-                '<span class="tip-icon">💡</span>' +
-                '<span>' + escapeHtml(q.tip) + '</span>' +
-            '</div>';
+        var cat = q.category || 'behavioral';
+        var diff = q.difficulty || 'standard';
+        var star = q.star_example || {};
+        var hasStar = star.situation || star.task || star.action || star.result;
+        var followUps = q.follow_ups || [];
+
+        html += '<div class="prep-q-card">' +
+            '<div class="prep-q-top">' +
+                '<span class="prep-q-num">' + (i + 1) + '</span>' +
+                '<div class="prep-q-badges">' +
+                    '<span class="prep-badge cat-' + cat + '">' + (CATEGORY_ICONS[cat] || '') + ' ' + (CATEGORY_LABELS[cat] || cat) + '</span>' +
+                    '<span class="prep-badge diff-' + diff + '">' + (DIFFICULTY_LABELS[diff] || diff) + '</span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="prep-q-text">' + escapeHtml(q.question) + '</div>';
+
+        if (q.why_asked) {
+            html += '<div class="prep-q-why"><strong>Why they ask:</strong> ' + escapeHtml(q.why_asked) + '</div>';
         }
+        if (q.answer_strategy) {
+            html += '<div class="prep-q-strategy"><strong>Your strategy:</strong> ' + escapeHtml(q.answer_strategy) + '</div>';
+        }
+
+        if (hasStar) {
+            html += '<button class="prep-toggle-btn" onclick="toggleStarExample(' + i + ')">STAR Example</button>' +
+                '<div class="prep-star" id="star-' + i + '">' +
+                    (star.situation ? '<div class="star-row"><span class="star-letter s">S</span><span>' + escapeHtml(star.situation) + '</span></div>' : '') +
+                    (star.task ? '<div class="star-row"><span class="star-letter t">T</span><span>' + escapeHtml(star.task) + '</span></div>' : '') +
+                    (star.action ? '<div class="star-row"><span class="star-letter a">A</span><span>' + escapeHtml(star.action) + '</span></div>' : '') +
+                    (star.result ? '<div class="star-row"><span class="star-letter r">R</span><span>' + escapeHtml(star.result) + '</span></div>' : '') +
+                '</div>';
+        }
+
+        if (followUps.length) {
+            html += '<button class="prep-toggle-btn" onclick="toggleFollowUps(' + i + ')">Follow-ups (' + followUps.length + ')</button>' +
+                '<div class="prep-followups" id="followups-' + i + '">';
+            followUps.forEach(function(fu) {
+                html += '<div class="followup-item">' + escapeHtml(fu) + '</div>';
+            });
+            html += '</div>';
+        }
+
         html += '</div>';
     });
-
     html += '</div></div>';
 
-    // Talking Points section
+    // --- Talking Points ---
     var talkingPoints = prep.talking_points || [];
-    html += '<div class="prep-section" id="prepTalkingPointsSection">' +
+    html += '<div class="prep-section expanded" id="prepTalkingPointsSection">' +
         '<div class="prep-section-header" onclick="togglePrepSection(\'prepTalkingPointsSection\')">' +
-            '<h4><span>💪</span> Your Key Talking Points <span class="count">' + talkingPoints.length + '</span></h4>' +
-            '<span class="prep-section-toggle">▼</span>' +
+            '<h4>Your Key Talking Points <span class="count">' + talkingPoints.length + '</span></h4>' +
+            '<svg class="prep-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
         '</div>' +
         '<div class="prep-section-content">';
 
     talkingPoints.forEach(function(tp) {
-        html += '<div class="prep-talking-point">' +
-            '<div class="talking-point-text">• ' + escapeHtml(tp.point) + '</div>' +
-            '<div class="talking-point-relevance">' + escapeHtml(tp.relevance || '') + '</div>' +
-        '</div>';
+        html += '<div class="prep-tp-card">' +
+            '<div class="tp-point">' + escapeHtml(tp.point) + '</div>';
+        if (tp.evidence) {
+            html += '<div class="tp-detail"><span class="tp-label">Evidence:</span> ' + escapeHtml(tp.evidence) + '</div>';
+        }
+        if (tp.relevance) {
+            html += '<div class="tp-detail"><span class="tp-label">Why it matters:</span> ' + escapeHtml(tp.relevance) + '</div>';
+        }
+        if (tp.how_to_weave_in) {
+            html += '<div class="tp-detail tp-weave"><span class="tp-label">How to bring it up:</span> ' + escapeHtml(tp.how_to_weave_in) + '</div>';
+        }
+        html += '</div>';
     });
-
     html += '</div></div>';
 
-    // Questions to Ask section
+    // --- Questions to Ask ---
     var questionsToAsk = prep.questions_to_ask || [];
-    html += '<div class="prep-section" id="prepQuestionsToAskSection">' +
+    html += '<div class="prep-section expanded" id="prepQuestionsToAskSection">' +
         '<div class="prep-section-header" onclick="togglePrepSection(\'prepQuestionsToAskSection\')">' +
-            '<h4><span>🤔</span> Questions to Ask Them <span class="count">' + questionsToAsk.length + '</span></h4>' +
-            '<span class="prep-section-toggle">▼</span>' +
+            '<h4>Questions to Ask Them <span class="count">' + questionsToAsk.length + '</span></h4>' +
+            '<svg class="prep-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
         '</div>' +
         '<div class="prep-section-content">';
 
     questionsToAsk.forEach(function(q, i) {
-        html += '<div class="prep-ask-question">' +
-            '<span class="ask-question-number">' + (i + 1) + '</span>' +
-            '<span class="ask-question-text">' + escapeHtml(q) + '</span>' +
-        '</div>';
+        var isObj = typeof q === 'object';
+        var qText = isObj ? (q.question || q) : q;
+        var qCat = isObj ? q.category : '';
+        var qWhy = isObj ? q.why_it_impresses : '';
+        html += '<div class="prep-ask-card">' +
+            '<span class="ask-num">' + (i + 1) + '</span>' +
+            '<div class="ask-body">' +
+                '<div class="ask-text">' + escapeHtml(qText) + '</div>';
+        if (qCat) html += '<span class="ask-cat">' + escapeHtml(qCat) + '</span>';
+        if (qWhy) html += '<div class="ask-why">' + escapeHtml(qWhy) + '</div>';
+        html += '</div></div>';
     });
-
     html += '</div></div>';
 
-    // Company Brief section
+    // --- Company Brief ---
     var brief = prep.company_brief || {};
-    if (brief.description || brief.focus_areas) {
+    if (brief.description || brief.focus_areas || brief.culture_signals) {
         html += '<div class="prep-section" id="prepCompanyBriefSection">' +
             '<div class="prep-section-header" onclick="togglePrepSection(\'prepCompanyBriefSection\')">' +
-                '<h4><span>🏢</span> Company Quick Brief</h4>' +
-                '<span class="prep-section-toggle">▼</span>' +
+                '<h4>Company Intel</h4>' +
+                '<svg class="prep-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
             '</div>' +
-            '<div class="prep-section-content">' +
-                '<dl class="company-brief-content">';
-
+            '<div class="prep-section-content"><div class="prep-brief-grid">';
         if (brief.description) {
-            html += '<div class="company-brief-item">' +
-                '<dt>About</dt>' +
-                '<dd>' + escapeHtml(brief.description) + '</dd>' +
-            '</div>';
+            html += '<div class="brief-item"><div class="brief-label">About</div><div class="brief-value">' + escapeHtml(brief.description) + '</div></div>';
         }
         if (brief.focus_areas) {
-            html += '<div class="company-brief-item">' +
-                '<dt>Focus</dt>' +
-                '<dd>' + escapeHtml(brief.focus_areas) + '</dd>' +
-            '</div>';
+            html += '<div class="brief-item"><div class="brief-label">Focus Areas</div><div class="brief-value">' + escapeHtml(brief.focus_areas) + '</div></div>';
         }
-
-        html += '</dl></div></div>';
+        if (brief.culture_signals) {
+            html += '<div class="brief-item"><div class="brief-label">Culture Signals</div><div class="brief-value">' + escapeHtml(brief.culture_signals) + '</div></div>';
+        }
+        if (brief.recent_context) {
+            html += '<div class="brief-item"><div class="brief-label">Current Context</div><div class="brief-value">' + escapeHtml(brief.recent_context) + '</div></div>';
+        }
+        html += '</div></div></div>';
     }
 
-    // Actions
-    html += '<div class="prep-actions">' +
-        '<div class="prep-actions-left">' +
-            '<button type="button" class="btn btn-secondary btn-sm" onclick="copyAllPrep()">' +
-                '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">' +
-                    '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>' +
-                    '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>' +
-                '</svg>' +
-                'Copy All' +
-            '</button>' +
-            '<span class="copy-success" id="copySuccess">✓ Copied!</span>' +
-        '</div>' +
-        '<div class="prep-actions-right">' +
-            '<button type="button" class="btn btn-secondary btn-sm" onclick="generateInterviewPrep(true)">' +
-                '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">' +
-                    '<path d="M23 4v6h-6"/>' +
-                    '<path d="M1 20v-6h6"/>' +
-                    '<path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>' +
-                '</svg>' +
-                'Regenerate' +
-            '</button>' +
-        '</div>' +
-    '</div>';
+    // --- Red Flags / Objection Handling ---
+    var redFlags = prep.red_flags || [];
+    if (redFlags.length) {
+        html += '<div class="prep-section" id="prepRedFlagsSection">' +
+            '<div class="prep-section-header" onclick="togglePrepSection(\'prepRedFlagsSection\')">' +
+                '<h4>Objection Handling <span class="count">' + redFlags.length + '</span></h4>' +
+                '<svg class="prep-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
+            '</div>' +
+            '<div class="prep-section-content">';
+        redFlags.forEach(function(rf) {
+            html += '<div class="prep-rf-card">' +
+                '<div class="rf-concern"><span class="rf-icon">&#9888;</span> ' + escapeHtml(rf.concern) + '</div>' +
+                '<div class="rf-reframe"><strong>Reframe:</strong> ' + escapeHtml(rf.reframe) + '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+    }
+
+    // --- Closing Strategy ---
+    if (strategy.closing_statement || (strategy.differentiators && strategy.differentiators.length)) {
+        html += '<div class="prep-section" id="prepClosingSection">' +
+            '<div class="prep-section-header" onclick="togglePrepSection(\'prepClosingSection\')">' +
+                '<h4>Closing Strategy</h4>' +
+                '<svg class="prep-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
+            '</div>' +
+            '<div class="prep-section-content">';
+        if (strategy.closing_statement) {
+            html += '<div class="closing-statement"><div class="closing-label">Your Closing Statement</div>' +
+                '<div class="closing-text">' + escapeHtml(strategy.closing_statement) + '</div></div>';
+        }
+        if (strategy.differentiators && strategy.differentiators.length) {
+            html += '<div class="closing-diffs"><div class="closing-label">What Sets You Apart</div>';
+            strategy.differentiators.forEach(function(d) {
+                html += '<div class="diff-item">' + escapeHtml(d) + '</div>';
+            });
+            html += '</div>';
+        }
+        html += '</div></div>';
+    }
 
     document.getElementById('interviewPrepResults').innerHTML = html;
 }
 
 function copyAllPrep() {
     if (!existingPrepData) return;
+    var p = existingPrepData;
+    var t = '';
 
-    var text = 'INTERVIEW PREP\n';
-    text += '==============\n\n';
+    // Elevator pitch
+    var strategy = p.closing_strategy || {};
+    if (strategy.elevator_pitch) {
+        t += '"TELL ME ABOUT YOURSELF"\n' + strategy.elevator_pitch + '\n\n';
+    }
 
     // Questions
-    text += 'LIKELY INTERVIEW QUESTIONS\n';
-    text += '--------------------------\n';
-    (existingPrepData.questions || []).forEach(function(q, i) {
-        text += (i + 1) + '. ' + q.question + '\n';
-        if (q.tip) {
-            text += '   💡 Tip: ' + q.tip + '\n';
+    t += 'INTERVIEW QUESTIONS\n' + '='.repeat(40) + '\n\n';
+    (p.questions || []).forEach(function(q, i) {
+        var cat = q.category ? ' [' + q.category + ']' : '';
+        var diff = q.difficulty ? ' (' + q.difficulty + ')' : '';
+        t += (i + 1) + '.' + cat + diff + ' ' + q.question + '\n';
+        if (q.why_asked) t += '   Why: ' + q.why_asked + '\n';
+        if (q.answer_strategy) t += '   Strategy: ' + q.answer_strategy + '\n';
+        var star = q.star_example || {};
+        if (star.situation) {
+            t += '   [S] ' + star.situation + '\n';
+            if (star.task) t += '   [T] ' + star.task + '\n';
+            if (star.action) t += '   [A] ' + star.action + '\n';
+            if (star.result) t += '   [R] ' + star.result + '\n';
         }
-        text += '\n';
+        if (q.follow_ups && q.follow_ups.length) {
+            q.follow_ups.forEach(function(fu) { t += '   > Follow-up: ' + fu + '\n'; });
+        }
+        t += '\n';
     });
 
     // Talking Points
-    text += '\nYOUR KEY TALKING POINTS\n';
-    text += '-----------------------\n';
-    (existingPrepData.talking_points || []).forEach(function(tp) {
-        text += '• ' + tp.point + '\n';
-        if (tp.relevance) {
-            text += '  → ' + tp.relevance + '\n';
-        }
+    t += 'KEY TALKING POINTS\n' + '='.repeat(40) + '\n\n';
+    (p.talking_points || []).forEach(function(tp) {
+        t += '* ' + tp.point + '\n';
+        if (tp.evidence) t += '  Evidence: ' + tp.evidence + '\n';
+        if (tp.relevance) t += '  Why: ' + tp.relevance + '\n';
+        if (tp.how_to_weave_in) t += '  Delivery: ' + tp.how_to_weave_in + '\n';
+        t += '\n';
     });
 
     // Questions to Ask
-    text += '\nQUESTIONS TO ASK THEM\n';
-    text += '---------------------\n';
-    (existingPrepData.questions_to_ask || []).forEach(function(q, i) {
-        text += (i + 1) + '. ' + q + '\n';
+    t += 'QUESTIONS TO ASK\n' + '='.repeat(40) + '\n\n';
+    (p.questions_to_ask || []).forEach(function(q, i) {
+        var isObj = typeof q === 'object';
+        t += (i + 1) + '. ' + (isObj ? q.question : q) + '\n';
+        if (isObj && q.why_it_impresses) t += '   Impact: ' + q.why_it_impresses + '\n';
+        t += '\n';
     });
 
     // Company Brief
-    var brief = existingPrepData.company_brief || {};
+    var brief = p.company_brief || {};
     if (brief.description || brief.focus_areas) {
-        text += '\nCOMPANY QUICK BRIEF\n';
-        text += '-------------------\n';
-        if (brief.description) text += 'About: ' + brief.description + '\n';
-        if (brief.focus_areas) text += 'Focus: ' + brief.focus_areas + '\n';
+        t += 'COMPANY INTEL\n' + '='.repeat(40) + '\n\n';
+        if (brief.description) t += 'About: ' + brief.description + '\n';
+        if (brief.focus_areas) t += 'Focus: ' + brief.focus_areas + '\n';
+        if (brief.culture_signals) t += 'Culture: ' + brief.culture_signals + '\n';
+        if (brief.recent_context) t += 'Context: ' + brief.recent_context + '\n';
+        t += '\n';
     }
 
-    navigator.clipboard.writeText(text).then(function() {
-        var successEl = document.getElementById('copySuccess');
-        successEl.classList.add('show');
-        setTimeout(function() {
-            successEl.classList.remove('show');
-        }, 2000);
+    // Red Flags
+    var rfs = p.red_flags || [];
+    if (rfs.length) {
+        t += 'OBJECTION HANDLING\n' + '='.repeat(40) + '\n\n';
+        rfs.forEach(function(rf) {
+            t += '! ' + rf.concern + '\n';
+            t += '  -> ' + rf.reframe + '\n\n';
+        });
+    }
+
+    // Closing
+    if (strategy.closing_statement) {
+        t += 'CLOSING STATEMENT\n' + '='.repeat(40) + '\n' + strategy.closing_statement + '\n\n';
+    }
+    if (strategy.differentiators && strategy.differentiators.length) {
+        t += 'DIFFERENTIATORS\n';
+        strategy.differentiators.forEach(function(d) { t += '  * ' + d + '\n'; });
+    }
+
+    navigator.clipboard.writeText(t).then(function() {
+        var el = document.getElementById('copySuccess');
+        el.classList.add('show');
+        setTimeout(function() { el.classList.remove('show'); }, 2000);
     }).catch(function(err) {
         alert('Failed to copy: ' + err);
     });

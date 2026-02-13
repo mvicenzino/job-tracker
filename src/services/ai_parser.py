@@ -190,45 +190,87 @@ Write a compelling cover letter that highlights the candidate's most relevant qu
     return message.content[0].text.strip()
 
 
-INTERVIEW_PREP_PROMPT = """You are an expert interview coach. Generate comprehensive interview preparation materials based on the job description and candidate's resume.
+INTERVIEW_PREP_PROMPT = """You are a world-class interview coach who has prepared thousands of candidates for roles at top companies. You combine deep technical knowledge with behavioral interview expertise and the STAR method.
 
-Return a JSON object with exactly this structure:
+Your task: Generate the most comprehensive, personalized interview preparation package possible. Every piece of advice must be grounded in the SPECIFIC details from the candidate's resume and the SPECIFIC requirements from the job description. Never give generic advice.
+
+Return a JSON object with EXACTLY this structure:
 
 {
   "questions": [
     {
-      "question": "The interview question they might ask",
-      "category": "technical|behavioral|situational",
-      "tip": "A specific tip connecting this question to something on the candidate's resume"
+      "question": "The exact question an interviewer would ask",
+      "category": "behavioral|technical|system_design|leadership|culture_fit",
+      "difficulty": "warm_up|standard|deep_dive",
+      "why_asked": "What the interviewer is really evaluating with this question",
+      "answer_strategy": "Concise coaching on how to answer using candidate's specific experience",
+      "star_example": {
+        "situation": "Reference a specific role/project/context from the resume",
+        "task": "What challenge or responsibility they faced",
+        "action": "Specific actions they took (from resume details)",
+        "result": "Quantifiable outcome to highlight"
+      },
+      "follow_ups": ["Likely follow-up question 1", "Likely follow-up question 2"]
     }
   ],
   "talking_points": [
     {
-      "point": "A key strength or experience to highlight",
-      "relevance": "Why this matters for this specific role"
+      "point": "A key strength or differentiator",
+      "evidence": "Specific resume item that proves this (company, project, metric)",
+      "relevance": "Why this matters for this specific role's requirements",
+      "how_to_weave_in": "Natural way to bring this up during the interview"
     }
   ],
   "questions_to_ask": [
-    "A thoughtful question to ask the interviewer"
+    {
+      "question": "A thoughtful, specific question",
+      "category": "role|team|culture|growth|technical",
+      "why_it_impresses": "Why this question signals you're a strong candidate"
+    }
   ],
   "company_brief": {
-    "description": "1-2 sentence summary of what the company does",
-    "focus_areas": "Key areas the company seems to focus on based on the job description"
+    "description": "What the company does and their market position",
+    "culture_signals": "What the job description reveals about company culture and values",
+    "focus_areas": "Current business priorities and strategic direction evident from the JD",
+    "recent_context": "Any hints about current challenges, growth, or initiatives"
+  },
+  "red_flags": [
+    {
+      "concern": "A potential gap or objection a hiring manager might raise",
+      "reframe": "How to proactively address this and turn it into a positive"
+    }
+  ],
+  "closing_strategy": {
+    "elevator_pitch": "A compelling 30-second 'Tell me about yourself' answer tailored to this role",
+    "closing_statement": "A strong closing statement for the end of the interview",
+    "differentiators": ["3 things that set this candidate apart for THIS specific role"]
   }
 }
 
-Guidelines:
-- Generate 5-7 interview questions (mix of technical and behavioral)
-- For each question, include a specific tip that references the candidate's actual experience from their resume
-- Generate 4-5 talking points that match resume experience to job requirements
-- Generate 3 insightful questions to ask the interviewer, based on the job posting
-- Keep the company brief concise and focused on what's in the job description
-- Be specific - reference actual skills, projects, and experiences from the resume
+REQUIREMENTS:
+- Generate 8-10 interview questions with this mix:
+  * 2-3 behavioral (past experience using STAR)
+  * 2-3 technical (role-specific knowledge/skills)
+  * 1-2 system design or problem-solving (if technical role)
+  * 1-2 leadership/collaboration
+  * 1 culture fit
+- Every question MUST have a complete star_example using ACTUAL details from the resume
+- Include 2 follow-up questions per main question
+- difficulty should progress: start with warm_up, mostly standard, end with deep_dive
+- Generate 5-6 talking points, each backed by specific resume evidence
+- Generate 5 questions to ask, covering different categories
+- Identify 3-4 potential red flags/gaps and how to address each
+- The elevator_pitch must reference the candidate's top 2-3 relevant achievements
+- The closing_statement should tie the candidate's experience to the company's needs
+- Be HYPER-SPECIFIC: use real company names, project names, technologies, and metrics from the resume
 - Return ONLY valid JSON, no markdown fences or extra text"""
 
 
 def generate_interview_prep(resume_text: str, job_description: str, job_title: str = None, company_name: str = None) -> dict:
-    """Generate interview preparation materials based on resume and job description.
+    """Generate comprehensive interview preparation materials using AI.
+
+    Uses Claude Sonnet for deep analysis of resume-to-job alignment, producing
+    STAR-framework answers, objection handling, and closing strategy.
 
     Args:
         resume_text: The candidate's resume content
@@ -237,14 +279,14 @@ def generate_interview_prep(resume_text: str, job_description: str, job_title: s
         company_name: Optional company name for context
 
     Returns:
-        A dict with interview prep materials (questions, talking_points, questions_to_ask, company_brief)
+        A dict with comprehensive interview prep materials
 
     Raises:
         RuntimeError: If the API call fails or response can't be parsed
     """
     import anthropic
 
-    # Build context
+    # Build context header
     context_parts = []
     if job_title:
         context_parts.append(f"Job Title: {job_title}")
@@ -252,11 +294,11 @@ def generate_interview_prep(resume_text: str, job_description: str, job_title: s
         context_parts.append(f"Company: {company_name}")
     context = "\n".join(context_parts) if context_parts else ""
 
-    # Truncate inputs to stay within limits
-    resume_text = resume_text[:6000] if resume_text else ""
-    job_description = job_description[:6000] if job_description else ""
+    # Allow more text for deeper analysis
+    resume_text = resume_text[:8000] if resume_text else ""
+    job_description = job_description[:8000] if job_description else ""
 
-    user_message = f"""Generate interview preparation materials for this candidate and role:
+    user_message = f"""Generate a comprehensive interview preparation package for this candidate and role.
 
 {context}
 
@@ -266,13 +308,13 @@ def generate_interview_prep(resume_text: str, job_description: str, job_title: s
 === CANDIDATE RESUME ===
 {resume_text}
 
-Generate comprehensive interview prep including likely questions, talking points, and questions to ask."""
+Analyze the alignment deeply. For every question, map it to specific resume experience. For every talking point, cite specific evidence. Make the prep so personalized that the candidate feels like they have an unfair advantage."""
 
     client = anthropic.Anthropic()
     message = client.messages.create(
-        model="claude-3-5-haiku-20241022",
-        max_tokens=2048,
-        temperature=0.3,  # Slightly creative for better variety
+        model="claude-sonnet-4-5-20250929",
+        max_tokens=4096,
+        temperature=0.3,
         system=INTERVIEW_PREP_PROMPT,
         messages=[
             {"role": "user", "content": user_message}
@@ -291,7 +333,7 @@ Generate comprehensive interview prep including likely questions, talking points
     except json.JSONDecodeError as e:
         raise RuntimeError(f"Failed to parse AI response as JSON: {e}")
 
-    # Validate and ensure required fields exist
+    # Validate and ensure required fields exist with proper types
     if not isinstance(data.get("questions"), list):
         data["questions"] = []
     if not isinstance(data.get("talking_points"), list):
@@ -300,6 +342,21 @@ Generate comprehensive interview prep including likely questions, talking points
         data["questions_to_ask"] = []
     if not isinstance(data.get("company_brief"), dict):
         data["company_brief"] = {}
+    if not isinstance(data.get("red_flags"), list):
+        data["red_flags"] = []
+    if not isinstance(data.get("closing_strategy"), dict):
+        data["closing_strategy"] = {}
+
+    # Ensure question objects have required sub-fields
+    for q in data["questions"]:
+        if not isinstance(q.get("star_example"), dict):
+            q["star_example"] = {}
+        if not isinstance(q.get("follow_ups"), list):
+            q["follow_ups"] = []
+        if not q.get("difficulty"):
+            q["difficulty"] = "standard"
+        if not q.get("category"):
+            q["category"] = "behavioral"
 
     return data
 

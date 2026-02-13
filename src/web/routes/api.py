@@ -749,7 +749,9 @@ def api_interview_prep(app_id):
             questions=prep_data.get('questions', []),
             talking_points=prep_data.get('talking_points', []),
             questions_to_ask=prep_data.get('questions_to_ask', []),
-            company_brief=prep_data.get('company_brief', {})
+            company_brief=prep_data.get('company_brief', {}),
+            red_flags=prep_data.get('red_flags', []),
+            closing_strategy=prep_data.get('closing_strategy', {})
         )
         session.add(interview_prep)
         session.commit()

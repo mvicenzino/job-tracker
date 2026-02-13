@@ -247,6 +247,22 @@ class DatabaseConnection:
                     except Exception as e:
                         print(f"[Migration] Failed to create note_mentions table: {e}")
 
+            # Add new columns to interview_preps if they exist
+            if 'interview_preps' in inspector.get_table_names():
+                prep_columns = [col['name'] for col in inspector.get_columns('interview_preps')]
+                with self.engine.connect() as conn:
+                    for col_name in ('red_flags', 'closing_strategy'):
+                        if col_name not in prep_columns:
+                            try:
+                                if is_postgres:
+                                    conn.execute(text(f'ALTER TABLE interview_preps ADD COLUMN {col_name} JSONB'))
+                                else:
+                                    conn.execute(text(f'ALTER TABLE interview_preps ADD COLUMN {col_name} JSON'))
+                                conn.commit()
+                                print(f"[Migration] Added {col_name} column to interview_preps")
+                            except Exception as e:
+                                print(f"[Migration] Failed to add {col_name}: {e}")
+
         except Exception as e:
             print(f"[Migration] Migration check failed: {e}")
 
