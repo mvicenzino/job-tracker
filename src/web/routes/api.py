@@ -1237,6 +1237,113 @@ def _cors_options():
     return response
 
 
+@bp.route('/api/contacts', methods=['GET', 'OPTIONS'])
+def api_list_contacts():
+    """API: Get all contacts with company info."""
+    if request.method == 'OPTIONS':
+        return _cors_options()
+
+    user, err = _api_key_or_session_auth()
+    if err:
+        return err
+
+    service, session = get_service_for_user(user.id)
+    try:
+        limit = request.args.get('limit', 100, type=int)
+        contacts = service.contacts.get_all(limit=limit)
+        items = []
+        for c in contacts:
+            items.append({
+                'id': c.id,
+                'name': c.name,
+                'email': c.email,
+                'phone': c.phone,
+                'linkedinUrl': c.linkedin_url,
+                'title': c.title,
+                'contactType': c.contact_type.value if c.contact_type else None,
+                'companyName': c.company.name if c.company else None,
+                'relationshipStrength': c.relationship_strength,
+                'lastContactDate': c.last_contact_date.isoformat() if c.last_contact_date else None,
+                'nextFollowupDate': c.next_followup_date.isoformat() if c.next_followup_date else None,
+                'notes': c.notes,
+                'howWeMet': c.how_we_met,
+                'createdAt': c.created_at.isoformat() if c.created_at else None,
+            })
+        return _cors_response({'success': True, 'contacts': items})
+    except Exception as e:
+        return _cors_response({'success': False, 'error': str(e)}, 500)
+    finally:
+        session.close()
+
+
+@bp.route('/api/contacts/<int:contact_id>', methods=['GET', 'OPTIONS'])
+def api_get_contact_detail(contact_id):
+    """API: Get a single contact with full detail."""
+    if request.method == 'OPTIONS':
+        return _cors_options()
+
+    user, err = _api_key_or_session_auth()
+    if err:
+        return err
+
+    service, session = get_service_for_user(user.id)
+    try:
+        c = service.contacts.get_by_id(contact_id)
+        if not c:
+            return _cors_response({'success': False, 'error': 'Contact not found'}, 404)
+        result = {
+            'id': c.id,
+            'name': c.name,
+            'email': c.email,
+            'phone': c.phone,
+            'linkedinUrl': c.linkedin_url,
+            'title': c.title,
+            'contactType': c.contact_type.value if c.contact_type else None,
+            'companyName': c.company.name if c.company else None,
+            'relationshipStrength': c.relationship_strength,
+            'lastContactDate': c.last_contact_date.isoformat() if c.last_contact_date else None,
+            'nextFollowupDate': c.next_followup_date.isoformat() if c.next_followup_date else None,
+            'notes': c.notes,
+            'howWeMet': c.how_we_met,
+            'createdAt': c.created_at.isoformat() if c.created_at else None,
+            'updatedAt': c.updated_at.isoformat() if c.updated_at else None,
+        }
+        return _cors_response({'success': True, 'contact': result})
+    except Exception as e:
+        return _cors_response({'success': False, 'error': str(e)}, 500)
+    finally:
+        session.close()
+
+
+@bp.route('/api/contacts/search', methods=['GET', 'OPTIONS'])
+def api_search_contacts():
+    """API: Search contacts by name."""
+    if request.method == 'OPTIONS':
+        return _cors_options()
+
+    user, err = _api_key_or_session_auth()
+    if err:
+        return err
+
+    service, session = get_service_for_user(user.id)
+    try:
+        q = request.args.get('q', '')
+        if not q:
+            return _cors_response({'success': True, 'contacts': []})
+        matches = service.contacts.search_by_name(q)[:10]
+        items = [{
+            'id': c.id,
+            'name': c.name,
+            'companyName': c.company.name if c.company else None,
+            'title': c.title,
+        } for c in matches]
+        return _cors_response({'success': True, 'contacts': items})
+    except Exception as e:
+        return _cors_response({'success': False, 'error': str(e)}, 500)
+    finally:
+        session.close()
+
+
 @bp.route('/api/pipeline', methods=['GET', 'OPTIONS'])
 def api_pipeline():
     """API: Get applications grouped by pipeline status."""
