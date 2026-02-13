@@ -44,6 +44,28 @@
         </div>
     </header>
 
+    <!-- Status Filter Tabs — visible on ALL devices -->
+    {% set active_statuses = ['interested', 'preparing', 'applied', 'screening', 'interviewing', 'final_round', 'offer', 'negotiating'] %}
+    {% set total_active = namespace(count=0) %}
+    {% for status in active_statuses %}
+        {% set total_active.count = total_active.count + pipeline.get(status, [])|length %}
+    {% endfor %}
+    <div class="pipeline-status-tabs" id="pipelineTabs">
+        <button type="button" class="pipeline-tab active" data-status="all" style="--tab-color: var(--color-primary)">
+            <span class="tab-count">{{ total_active.count }}</span>
+            <span class="tab-name">All</span>
+        </button>
+        {% for status in active_statuses %}
+        <button type="button"
+                class="pipeline-tab"
+                data-status="{{ status }}"
+                style="--tab-color: {{ status|status_color }}">
+            <span class="tab-count">{{ pipeline.get(status, [])|length }}</span>
+            <span class="tab-name">{{ status|replace('_', ' ')|title }}</span>
+        </button>
+        {% endfor %}
+    </div>
+
     <!-- List View -->
     <div class="pipeline-list-view" id="pipelineListView" style="display: none;">
         <div class="list-view-table-wrapper">
@@ -137,20 +159,6 @@
 
     <!-- Board View -->
     <div class="pipeline-board-view" id="pipelineBoardView">
-        <!-- Mobile Status Tabs -->
-        <div class="mobile-pipeline-tabs" id="pipelineTabs">
-            {% set active_statuses = ['interested', 'preparing', 'applied', 'screening', 'interviewing', 'final_round', 'offer', 'negotiating'] %}
-            {% for status in active_statuses %}
-            <button type="button" 
-                    class="pipeline-tab {% if loop.first %}active{% endif %}" 
-                    data-status="{{ status }}"
-                    style="--tab-color: {{ status|status_color }}">
-                <span class="tab-count">{{ pipeline.get(status, [])|length }}</span>
-                <span class="tab-name">{{ status|replace('_', ' ')|title }}</span>
-            </button>
-            {% endfor %}
-        </div>
-
         <div class="pipeline-board">
         {% set active_statuses = ['interested', 'preparing', 'applied', 'screening', 'interviewing', 'final_round', 'offer', 'negotiating'] %}
         {% for status in active_statuses %}
@@ -260,14 +268,19 @@
     var boardView = document.getElementById('pipelineBoardView');
     var listView = document.getElementById('pipelineListView');
     var toggleBtns = viewToggle ? viewToggle.querySelectorAll('.view-toggle-btn') : [];
+    var currentView = 'board';
 
     function switchView(view) {
+        currentView = view;
         toggleBtns.forEach(function(btn) {
             btn.classList.toggle('active', btn.dataset.view === view);
         });
         if (boardView) boardView.style.display = view === 'board' ? 'block' : 'none';
         if (listView) listView.style.display = view === 'list' ? 'block' : 'none';
         localStorage.setItem('stride-pipeline-view', view);
+        // Re-apply current filter to new view
+        var activeTab = document.querySelector('.pipeline-tab.active');
+        if (activeTab) applyFilter(activeTab.dataset.status);
     }
 
     toggleBtns.forEach(function(btn) {
@@ -280,38 +293,61 @@
     var savedView = localStorage.getItem('stride-pipeline-view') || 'board';
     switchView(savedView);
 
-    // === Mobile Tabs ===
+    // === Status Filter Tabs (all devices) ===
     var tabs = document.querySelectorAll('.pipeline-tab');
     var columns = document.querySelectorAll('.pipeline-column');
-    
+    var listRows = document.querySelectorAll('.list-view-row');
+
+    function applyFilter(status) {
+        // Board view: show/hide columns
+        columns.forEach(function(col) {
+            if (status === 'all') {
+                col.classList.add('tab-visible');
+                col.classList.remove('tab-hidden');
+            } else {
+                var match = col.dataset.status === status;
+                col.classList.toggle('tab-visible', match);
+                col.classList.toggle('tab-hidden', !match);
+            }
+        });
+
+        // List view: show/hide rows
+        listRows.forEach(function(row) {
+            if (status === 'all') {
+                row.style.display = '';
+            } else {
+                row.style.display = row.dataset.status === status ? '' : 'none';
+            }
+        });
+
+        // Save filter
+        localStorage.setItem('stride-pipeline-filter', status);
+    }
+
     function switchTab(status) {
         tabs.forEach(function(tab) {
             tab.classList.toggle('active', tab.dataset.status === status);
         });
-        columns.forEach(function(col) {
-            col.classList.toggle('mobile-visible', col.dataset.status === status);
-        });
+        applyFilter(status);
     }
-    
+
     tabs.forEach(function(tab) {
         tab.addEventListener('click', function() {
             switchTab(this.dataset.status);
             this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         });
     });
-    
-    if (columns.length > 0) {
-        columns[0].classList.add('mobile-visible');
-    }
+
+    // Restore saved filter, default to "all"
+    var savedFilter = localStorage.getItem('stride-pipeline-filter') || 'all';
+    switchTab(savedFilter);
 
     // === Status Dropdowns (List View) ===
     document.querySelectorAll('.status-dropdown').forEach(function(dropdown) {
         var btn = dropdown.querySelector('.status-badge-btn');
-        var menu = dropdown.querySelector('.status-dropdown-menu');
-        
+
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            // Close other dropdowns
             document.querySelectorAll('.status-dropdown.open').forEach(function(d) {
                 if (d !== dropdown) d.classList.remove('open');
             });
@@ -345,13 +381,11 @@
             var appId = btn.dataset.appId;
             var current = btn.dataset.current;
 
-            // Update form actions and hide current status
             moveMenu.querySelectorAll('.move-menu-form').forEach(function(form) {
                 form.action = '/applications/' + appId + '/status';
                 form.style.display = form.dataset.status === current ? 'none' : '';
             });
 
-            // Position fixed next to the button
             var rect = btn.getBoundingClientRect();
             moveMenu.style.display = 'block';
             var menuRect = moveMenu.getBoundingClientRect();
@@ -365,7 +399,6 @@
                 moveMenu.style.bottom = 'auto';
             }
 
-            // Align right edge to button right edge
             var rightEdge = rect.right;
             var menuWidth = menuRect.width;
             var left = rightEdge - menuWidth;
