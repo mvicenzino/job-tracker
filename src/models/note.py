@@ -1,6 +1,24 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 from .base import Base, TimestampMixin
+
+
+class NoteMention(Base, TimestampMixin):
+    """Tracks @contact mentions within notes (many-to-many)."""
+    __tablename__ = 'note_mentions'
+    __table_args__ = (
+        UniqueConstraint('note_id', 'contact_id', name='uq_note_mention'),
+    )
+
+    id = Column(Integer, primary_key=True)
+    note_id = Column(Integer, ForeignKey('notes.id', ondelete='CASCADE'), nullable=False, index=True)
+    contact_id = Column(Integer, ForeignKey('contacts.id', ondelete='CASCADE'), nullable=False, index=True)
+
+    note = relationship("Note", back_populates="mentioned_contacts")
+    contact = relationship("Contact", back_populates="mentioned_in_notes")
+
+    def __repr__(self):
+        return f"<NoteMention(note_id={self.note_id}, contact_id={self.contact_id})>"
 
 
 class Note(Base, TimestampMixin):
@@ -27,6 +45,7 @@ class Note(Base, TimestampMixin):
     application = relationship("Application", back_populates="notes", foreign_keys=[application_id])
     contact = relationship("Contact", back_populates="contact_notes", foreign_keys=[contact_id])
     event = relationship("Event", back_populates="notes", foreign_keys=[event_id])
+    mentioned_contacts = relationship("NoteMention", back_populates="note", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Note(id={self.id}, title='{self.title}')>"

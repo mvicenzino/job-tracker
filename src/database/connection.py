@@ -219,6 +219,34 @@ class DatabaseConnection:
                         except Exception as e:
                             print(f"[Migration] Failed to add scored_with_resume_id: {e}")
 
+            # Create note_mentions table if it doesn't exist
+            if 'note_mentions' not in inspector.get_table_names():
+                with self.engine.connect() as conn:
+                    try:
+                        conn.execute(text("""
+                            CREATE TABLE note_mentions (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                note_id INTEGER NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+                                contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                UNIQUE(note_id, contact_id)
+                            )
+                        """) if not is_postgres else text("""
+                            CREATE TABLE note_mentions (
+                                id SERIAL PRIMARY KEY,
+                                note_id INTEGER NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+                                contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+                                created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+                                updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
+                                UNIQUE(note_id, contact_id)
+                            )
+                        """))
+                        conn.commit()
+                        print("[Migration] Created note_mentions table")
+                    except Exception as e:
+                        print(f"[Migration] Failed to create note_mentions table: {e}")
+
         except Exception as e:
             print(f"[Migration] Migration check failed: {e}")
 

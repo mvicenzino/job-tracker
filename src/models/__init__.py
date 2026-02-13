@@ -5,7 +5,7 @@ from .job import Job
 from .application import Application, ApplicationStatus
 from .contact import Contact, ContactType
 from .event import Event, EventType
-from .note import Note
+from .note import Note, NoteMention
 from .tag import Tag, entity_tags
 from .feedback import Feedback
 from .checklist import ChecklistItem
@@ -26,6 +26,7 @@ __all__ = [
     'Event',
     'EventType',
     'Note',
+    'NoteMention',
     'Tag',
     'entity_tags',
     'Feedback',

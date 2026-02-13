@@ -1,8 +1,10 @@
 """Interview prep model for storing AI-generated interview preparation materials."""
-from sqlalchemy import Column, Integer, ForeignKey, DateTime
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Column, Integer, ForeignKey, DateTime, JSON
 from sqlalchemy.orm import relationship
 from .base import Base, TimestampMixin
+
+# Use JSON which works on both SQLite and PostgreSQL
+JSONB = JSON
 
 
 class InterviewPrep(Base, TimestampMixin):

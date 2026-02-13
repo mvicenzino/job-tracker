@@ -574,8 +574,9 @@
                     <div class="form-group">
                         <input type="text" name="title" placeholder="Note title (optional)" class="note-title-input">
                     </div>
-                    <div class="form-group">
-                        <textarea name="content" required placeholder="Add a note..." rows="3" class="note-content-input"></textarea>
+                    <div class="form-group" style="position: relative;">
+                        <textarea name="content" required placeholder="Add a note... Type @ to mention a contact" rows="3" class="note-content-input" id="note-content-input"></textarea>
+                        <div id="mention-dropdown" class="mention-dropdown" style="display:none;"></div>
                     </div>
                     <div class="form-row-inline">
                         <select name="note_type" class="note-type-select">
@@ -597,7 +598,14 @@
                             {% if note.title %}<strong>{{ note.title }}</strong>{% endif %}
                             <span class="note-type-badge">{{ note.note_type or 'general' }}</span>
                         </div>
-                        <p>{{ note.content }}</p>
+                        <p class="note-content-rendered">{{ note.content }}</p>
+                        {% if note.mentioned_contacts %}
+                        <div class="note-mentions">
+                            {% for m in note.mentioned_contacts %}
+                            <a href="{{ url_for('contacts.edit_contact', contact_id=m.contact.id) }}" class="mention-badge">@{{ m.contact.name }}</a>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                         <span class="note-date">{{ note.created_at.strftime('%b %d, %Y at %-I:%M %p') }}</span>
                     </li>
                     {% endfor %}
@@ -1954,4 +1962,117 @@ function copyAllPrep() {
 }
 </script>
 {% endif %}
+
+<!-- @mention autocomplete + styled rendering -->
+<style>
+.mention-dropdown {
+    position: absolute; left: 0; right: 0; z-index: 100;
+    background: var(--bg-card, #1a1a2e); border: 1px solid var(--border, #333);
+    border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.3); max-height: 200px; overflow-y: auto;
+}
+.mention-dropdown .mention-item {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer;
+    border-bottom: 1px solid var(--border, #222);
+}
+.mention-dropdown .mention-item:hover, .mention-dropdown .mention-item.active {
+    background: var(--accent-bg, rgba(99,102,241,.15));
+}
+.mention-dropdown .mention-item .mention-avatar {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--accent, #6366f1);
+    display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #fff; flex-shrink: 0;
+}
+.mention-dropdown .mention-item .mention-name { font-size: 13px; }
+.mention-dropdown .mention-item .mention-company { font-size: 11px; color: var(--text-muted, #888); margin-left: auto; }
+.mention-badge {
+    display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 12px;
+    background: rgba(99,102,241,.12); color: var(--accent, #6366f1); border: 1px solid rgba(99,102,241,.25);
+    text-decoration: none; margin-right: 4px; margin-top: 4px;
+}
+.mention-badge:hover { background: rgba(99,102,241,.22); text-decoration: none; }
+.note-mentions { margin-top: 4px; }
+.note-content-rendered .inline-mention {
+    background: rgba(99,102,241,.12); color: var(--accent, #6366f1); padding: 0 3px;
+    border-radius: 3px; border: 1px solid rgba(99,102,241,.2);
+}
+</style>
+<script>
+(function() {
+    var textarea = document.getElementById('note-content-input');
+    var dropdown = document.getElementById('mention-dropdown');
+    if (!textarea || !dropdown) return;
+
+    var results = [], selectedIdx = 0, mentionStart = -1, debounceTimer = null;
+
+    textarea.addEventListener('input', function() {
+        var val = this.value, pos = this.selectionStart;
+        var before = val.slice(0, pos);
+        var match = before.match(/@([A-Za-z ]*)$/);
+        if (match) {
+            mentionStart = pos - match[1].length - 1;
+            var q = match[1].trim();
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function() { fetchContacts(q); }, 150);
+        } else {
+            hideDropdown();
+        }
+    });
+
+    textarea.addEventListener('keydown', function(e) {
+        if (dropdown.style.display === 'none' || !results.length) return;
+        if (e.key === 'ArrowDown') { e.preventDefault(); selectedIdx = Math.min(selectedIdx + 1, results.length - 1); renderDropdown(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); selectedIdx = Math.max(selectedIdx - 1, 0); renderDropdown(); }
+        else if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); insertMention(results[selectedIdx]); }
+        else if (e.key === 'Escape') { hideDropdown(); }
+    });
+
+    textarea.addEventListener('blur', function() { setTimeout(hideDropdown, 200); });
+
+    function fetchContacts(q) {
+        if (!q) { hideDropdown(); return; }
+        fetch('/api/contacts/search?q=' + encodeURIComponent(q))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                results = data; selectedIdx = 0;
+                if (results.length) renderDropdown(); else hideDropdown();
+            }).catch(function() { hideDropdown(); });
+    }
+
+    function renderDropdown() {
+        dropdown.innerHTML = results.map(function(c, i) {
+            return '<div class="mention-item' + (i === selectedIdx ? ' active' : '') + '" data-idx="' + i + '">'
+                + '<span class="mention-avatar">' + c.name.charAt(0) + '</span>'
+                + '<span class="mention-name">' + escHtml(c.name) + '</span>'
+                + (c.company ? '<span class="mention-company">' + escHtml(c.company) + '</span>' : '')
+                + '</div>';
+        }).join('');
+        dropdown.style.display = 'block';
+        dropdown.querySelectorAll('.mention-item').forEach(function(el) {
+            el.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                insertMention(results[parseInt(el.dataset.idx)]);
+            });
+        });
+    }
+
+    function insertMention(contact) {
+        var before = textarea.value.slice(0, mentionStart);
+        var after = textarea.value.slice(textarea.selectionStart);
+        var mention = '@' + contact.name;
+        textarea.value = before + mention + ' ' + after;
+        hideDropdown();
+        var pos = before.length + mention.length + 1;
+        textarea.focus();
+        textarea.setSelectionRange(pos, pos);
+    }
+
+    function hideDropdown() { dropdown.style.display = 'none'; results = []; }
+    function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    // Render @mentions in existing notes as styled spans
+    document.querySelectorAll('.note-content-rendered').forEach(function(el) {
+        el.innerHTML = el.textContent.replace(/@([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g,
+            '<span class="inline-mention">@$1</span>');
+    });
+})();
+</script>
 {% endblock %}

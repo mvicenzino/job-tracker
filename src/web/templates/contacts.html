@@ -2,6 +2,13 @@
 
 {% block title %}Contacts - Stride{% endblock %}
 
+<style>
+.mention-count-badge {
+    display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 11px;
+    background: rgba(99,102,241,.12); color: var(--accent, #6366f1); border: 1px solid rgba(99,102,241,.2);
+    margin-top: 2px;
+}
+</style>
 {% block content %}
 <div class="list-page">
     <header class="page-header">
@@ -63,7 +70,7 @@
                     <th>Company</th>
                     <th>Title</th>
                     <th>Type</th>
-                    <th>Notes</th>
+                    <th>Notes / Mentions</th>
                     <th>Last Contact</th>
                     <th>Next Follow-up</th>
                     <th>Actions</th>
@@ -90,6 +97,9 @@
                         {{ contact.notes[:50] }}{% if contact.notes|length > 50 %}...{% endif %}
                         {% else %}
                         -
+                        {% endif %}
+                        {% if mention_counts.get(contact.id, 0) > 0 %}
+                        <br><span class="mention-count-badge" title="Mentioned in {{ mention_counts[contact.id] }} note{{ 's' if mention_counts[contact.id] != 1 }}">@ {{ mention_counts[contact.id] }} mention{{ 's' if mention_counts[contact.id] != 1 }}</span>
                         {% endif %}
                     </td>
                     <td>{{ contact.last_contact_date.strftime('%b %d') if contact.last_contact_date else '-' }}</td>

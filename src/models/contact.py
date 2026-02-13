@@ -53,6 +53,7 @@ class Contact(Base, TimestampMixin):
                          foreign_keys="Event.contact_id")
     contact_notes = relationship("Note", back_populates="contact", cascade="all, delete-orphan",
                                 foreign_keys="Note.contact_id")
+    mentioned_in_notes = relationship("NoteMention", back_populates="contact", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Contact(id={self.id}, name='{self.name}')>"

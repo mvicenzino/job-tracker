@@ -1,13 +1,17 @@
 """High-level service for job hunt operations."""
+import re
 from datetime import date, datetime, timedelta
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 
 from ..models import (
     Company, Job, Application, ApplicationStatus,
-    Contact, ContactType, Event, EventType, Note, Tag,
+    Contact, ContactType, Event, EventType, Note, NoteMention, Tag,
     ChecklistItem, ResumeVersion
 )
+
+# Match @FirstName LastName (capitalized words) or @FirstName
+_MENTION_RE = re.compile(r"@([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)")
 from ..repositories import (
     CompanyRepository, JobRepository, ApplicationRepository,
     ContactRepository, EventRepository, NoteRepository, TagRepository,
@@ -445,7 +449,7 @@ class JobHuntService:
                 company_id: int = None, job_id: int = None,
                 application_id: int = None, contact_id: int = None,
                 event_id: int = None, note_type: str = "general") -> Note:
-        """Add a note to any entity."""
+        """Add a note to any entity. Parses @Name mentions and links contacts."""
         note = self.notes.create(
             content=content,
             title=title,
@@ -456,8 +460,32 @@ class JobHuntService:
             event_id=event_id,
             note_type=note_type
         )
+        self.session.flush()  # Get note.id before creating mentions
+        self._sync_mentions(note)
         self.session.commit()
         return note
+
+    def _sync_mentions(self, note: Note):
+        """Parse @Name mentions from note content and sync NoteMention records."""
+        # Clear existing mentions
+        for m in list(note.mentioned_contacts):
+            self.session.delete(m)
+
+        # Parse mentioned names from content
+        mentioned_names = _MENTION_RE.findall(note.content or "")
+        if not mentioned_names:
+            return
+
+        # Match each name against user's contacts
+        seen_ids = set()
+        for name in mentioned_names:
+            matches = self.contacts.search_by_name(name)
+            # Use exact match (case-insensitive) if available
+            for match in matches:
+                if match.name.lower() == name.lower() and match.id not in seen_ids:
+                    self.session.add(NoteMention(note_id=note.id, contact_id=match.id))
+                    seen_ids.add(match.id)
+                    break
 
     def search_notes(self, query: str) -> List[Note]:
         """Search all notes."""

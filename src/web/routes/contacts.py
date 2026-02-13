@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required
 
 from ..helpers import get_service
-from ...models import ContactType
+from ...models import ContactType, NoteMention
 
 bp = Blueprint('contacts', __name__)
 
@@ -25,8 +25,17 @@ def contacts():
             contacts = service.contacts.get_needing_followup()
         else:
             contacts = service.contacts.get_all()
+
+        # Build mention counts for each contact
+        mention_counts = {}
+        for contact in contacts:
+            mention_counts[contact.id] = session.query(NoteMention).filter(
+                NoteMention.contact_id == contact.id
+            ).count()
+
         return render_template('contacts.html',
                              contacts=contacts,
+                             mention_counts=mention_counts,
                              search=search,
                              followup=followup,
                              today=date.today())
