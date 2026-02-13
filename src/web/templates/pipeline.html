@@ -263,43 +263,18 @@
 {% block scripts %}
 <script>
 (function() {
-    // === View Toggle ===
+    // === DOM References (must be assigned before any function calls) ===
     var viewToggle = document.getElementById('viewToggle');
     var boardView = document.getElementById('pipelineBoardView');
     var listView = document.getElementById('pipelineListView');
     var toggleBtns = viewToggle ? viewToggle.querySelectorAll('.view-toggle-btn') : [];
-    var currentView = 'board';
-
-    function switchView(view) {
-        currentView = view;
-        toggleBtns.forEach(function(btn) {
-            btn.classList.toggle('active', btn.dataset.view === view);
-        });
-        if (boardView) boardView.style.display = view === 'board' ? 'block' : 'none';
-        if (listView) listView.style.display = view === 'list' ? 'block' : 'none';
-        localStorage.setItem('stride-pipeline-view', view);
-        // Re-apply current filter to new view
-        var activeTab = document.querySelector('.pipeline-tab.active');
-        if (activeTab) applyFilter(activeTab.dataset.status);
-    }
-
-    toggleBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            switchView(this.dataset.view);
-        });
-    });
-
-    // Restore saved view preference
-    var savedView = localStorage.getItem('stride-pipeline-view') || 'board';
-    switchView(savedView);
-
-    // === Status Filter Tabs (all devices) ===
     var tabs = document.querySelectorAll('.pipeline-tab');
     var columns = document.querySelectorAll('.pipeline-column');
     var listRows = document.querySelectorAll('.list-view-row');
+    var currentView = 'board';
 
+    // === Filter Logic ===
     function applyFilter(status) {
-        // Board view: show/hide columns
         columns.forEach(function(col) {
             if (status === 'all') {
                 col.classList.add('tab-visible');
@@ -311,7 +286,6 @@
             }
         });
 
-        // List view: show/hide rows
         listRows.forEach(function(row) {
             if (status === 'all') {
                 row.style.display = '';
@@ -320,7 +294,6 @@
             }
         });
 
-        // Save filter
         localStorage.setItem('stride-pipeline-filter', status);
     }
 
@@ -331,6 +304,26 @@
         applyFilter(status);
     }
 
+    // === View Toggle ===
+    function switchView(view) {
+        currentView = view;
+        toggleBtns.forEach(function(btn) {
+            btn.classList.toggle('active', btn.dataset.view === view);
+        });
+        if (boardView) boardView.style.display = view === 'board' ? 'block' : 'none';
+        if (listView) listView.style.display = view === 'list' ? 'block' : 'none';
+        localStorage.setItem('stride-pipeline-view', view);
+        var activeTab = document.querySelector('.pipeline-tab.active');
+        if (activeTab) applyFilter(activeTab.dataset.status);
+    }
+
+    toggleBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            switchView(this.dataset.view);
+        });
+    });
+
+    // === Tab Click Handlers ===
     tabs.forEach(function(tab) {
         tab.addEventListener('click', function() {
             switchTab(this.dataset.status);
@@ -338,9 +331,12 @@
         });
     });
 
-    // Restore saved filter, default to "all"
+    // === Initialize: restore saved preferences ===
     var savedFilter = localStorage.getItem('stride-pipeline-filter') || 'all';
     switchTab(savedFilter);
+
+    var savedView = localStorage.getItem('stride-pipeline-view') || 'board';
+    switchView(savedView);
 
     // === Status Dropdowns (List View) ===
     document.querySelectorAll('.status-dropdown').forEach(function(dropdown) {
