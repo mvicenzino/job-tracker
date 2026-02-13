@@ -1071,6 +1071,109 @@ def cron_generate_notifications():
         }), 500
 
 
+@bp.route('/api/cron/fit-scores', methods=['POST'])
+def cron_score_fit():
+    """
+    Cron endpoint: Auto-score unscored jobs for all active users.
+
+    Runs daily via Vercel Cron. For each user with a resume, finds jobs
+    that have descriptions but no fit score, and scores them.
+    Secured by CRON_SECRET environment variable.
+    """
+    import os
+    import json
+    from datetime import datetime
+    from flask import current_app
+    from ...models import User, ResumeVersion
+
+    # Verify cron secret (optional but recommended)
+    cron_secret = os.environ.get('CRON_SECRET')
+    provided_secret = request.headers.get('X-Cron-Secret') or request.args.get('secret')
+
+    if cron_secret and provided_secret != cron_secret:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    if not is_ai_parsing_available():
+        return jsonify({'success': False, 'error': 'AI scoring not available'}), 503
+
+    try:
+        db = current_app.extensions['db']
+        session = db.get_session()
+
+        try:
+            users = session.query(User).filter(User.is_active == True).all()
+
+            summary = {
+                'users_processed': 0,
+                'jobs_scored': 0,
+                'errors': []
+            }
+
+            for user in users:
+                # Determine resume text: prefer user.resume_text, fall back to latest ResumeVersion
+                resume_text = None
+                resume_version_id = None
+
+                if user.resume_text and len(user.resume_text.strip()) >= 100:
+                    resume_text = user.resume_text
+                else:
+                    latest_rv = session.query(ResumeVersion).filter(
+                        ResumeVersion.user_id == user.id
+                    ).order_by(ResumeVersion.updated_at.desc()).first()
+                    if latest_rv and latest_rv.content and len(latest_rv.content.strip()) >= 100:
+                        resume_text = latest_rv.content
+                        resume_version_id = latest_rv.id
+
+                if not resume_text:
+                    continue
+
+                # Get unscored jobs with sufficient descriptions
+                unscored_jobs = session.query(Job).filter(
+                    Job.user_id == user.id,
+                    Job.fit_score.is_(None)
+                ).limit(10).all()
+
+                scored_for_user = 0
+                for job in unscored_jobs:
+                    job_desc = job.description or ''
+                    if job.requirements:
+                        job_desc += '\n\nRequirements:\n' + job.requirements
+
+                    if len(job_desc.strip()) < 50:
+                        continue
+
+                    try:
+                        analysis = analyze_resume_job_fit(
+                            resume_text=resume_text,
+                            job_description=job_desc,
+                            job_title=job.title,
+                            company_name=job.company.name if job.company else None
+                        )
+                        job.fit_score = analysis.get('match_score')
+                        job.fit_analysis = json.dumps(analysis)
+                        job.scored_at = datetime.utcnow()
+                        if resume_version_id:
+                            job.scored_with_resume_id = resume_version_id
+                        scored_for_user += 1
+                    except Exception as e:
+                        summary['errors'].append(f"Job {job.id}: {str(e)}")
+
+                if scored_for_user > 0:
+                    session.commit()
+                    summary['users_processed'] += 1
+                    summary['jobs_scored'] += scored_for_user
+
+            # Trim errors for response size
+            summary['errors'] = summary['errors'][:10]
+
+            return jsonify({'success': True, **summary})
+        finally:
+            session.close()
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @bp.route('/api/notifications/generate', methods=['POST'])
 @login_required
 def generate_my_notifications():
