@@ -26,7 +26,7 @@
         // Default to light mode unless user explicitly chose dark
         if (saved === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
-            document.getElementById('theme-color-meta').content = '#1e293b';
+            document.getElementById('theme-color-meta').content = '#0c1222';
         } else {
             document.documentElement.setAttribute('data-theme', 'light');
         }
@@ -35,7 +35,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260213b">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260213c">
     {% block head %}{% endblock %}
 </head>
 <body class="{% if current_user.is_authenticated %}has-sidebar{% endif %}{% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %} demo-active{% endif %}">
