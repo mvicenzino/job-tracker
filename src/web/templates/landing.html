@@ -3,14 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Stride - The modern job search tracker. Organize applications, track interviews, and land your next role faster.">
-    <title>Stride - Land Your Next Role</title>
+    <meta name="description" content="Stride - The modern job search tracker. Track every application, ace every interview, and land your next role 2x faster.">
+    <title>Stride - Land Your Next Role 2x Faster</title>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-5hf8sQrMR52g0LaWtT90J.js"></script>
+    <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+    </script>
 </head>
 <body class="landing-body">
     <!-- Navigation -->
@@ -25,7 +31,7 @@
                 <a href="#pricing">Pricing</a>
                 <a href="#how-it-works">How It Works</a>
                 <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Sign In</a>
-                <a href="{{ url_for('public.demo') }}" class="btn btn-primary">Try Demo</a>
+                <a href="{{ url_for('auth.register') }}" class="btn-nav-cta">Get Started Free</a>
             </div>
             <button class="landing-menu-toggle" id="menuToggle" aria-label="Toggle menu">
                 <span></span>
@@ -41,8 +47,9 @@
         <a href="#ai-feature">AI Analysis</a>
         <a href="#pricing">Pricing</a>
         <a href="#how-it-works">How It Works</a>
+        <a href="#faq">FAQ</a>
         <a href="{{ url_for('auth.login') }}">Sign In</a>
-        <a href="{{ url_for('public.demo') }}" class="btn btn-primary">Try Demo</a>
+        <a href="{{ url_for('auth.register') }}" class="btn-nav-cta">Get Started Free</a>
     </div>
 
     <!-- Hero Section -->
@@ -52,14 +59,14 @@
         <div class="hero-container-new">
             <div class="hero-badge">
                 <span class="badge-dot"></span>
-                <span>Free to use • No credit card required</span>
+                <span>Free forever plan &bull; No credit card required</span>
             </div>
             <h1 class="hero-headline">
-                Your Job Search,<br>
-                <span class="hero-highlight">Finally Organized</span>
+                Land Your Next Role<br>
+                <span class="hero-highlight">2x Faster</span>
             </h1>
             <p class="hero-tagline">
-                Stop drowning in spreadsheets. Track applications, nail interviews, and land offers — all in one place.
+                Track every application, ace every interview, and close offers faster. The all-in-one job search tracker that replaces your messy spreadsheet.
             </p>
             <div class="hero-actions">
                 <a href="{{ url_for('auth.register') }}" class="btn-hero-primary">
@@ -84,13 +91,12 @@
                 </a>
             </div>
             <div class="hero-social-proof">
-                <div class="proof-avatars">
-                    <div class="avatar">M</div>
-                    <div class="avatar">S</div>
-                    <div class="avatar">J</div>
-                    <div class="avatar">+</div>
+                <div class="proof-check">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
                 </div>
-                <span class="proof-text">Join the early access</span>
+                <span class="proof-text"><strong>500+ job seekers</strong> are tracking with Stride</span>
             </div>
         </div>
         <div class="hero-visual-new">
@@ -120,17 +126,17 @@
                             <div class="mock-stat">
                                 <span class="stat-num">12</span>
                                 <span class="stat-label">Active</span>
-                                <span class="stat-trend up">↑ 25%</span>
+                                <span class="stat-trend up">&uarr; 25%</span>
                             </div>
                             <div class="mock-stat highlight">
                                 <span class="stat-num">4</span>
                                 <span class="stat-label">Interviews</span>
-                                <span class="stat-trend up">↑ 2 new</span>
+                                <span class="stat-trend up">&uarr; 2 new</span>
                             </div>
                             <div class="mock-stat success">
                                 <span class="stat-num">2</span>
                                 <span class="stat-label">Offers</span>
-                                <span class="stat-trend hot">🔥 +1</span>
+                                <span class="stat-trend hot">+1</span>
                             </div>
                         </div>
                         <div class="mock-job-cards">
@@ -169,24 +175,46 @@
                 </div>
             </div>
             <div class="floating-card card-1">
-                <div class="card-icon">🤖</div>
+                <div class="card-icon">&#129302;</div>
                 <div class="card-text">
                     <strong>Resume Analyzed</strong>
-                    <span>92% match • 2 suggestions</span>
+                    <span>92% match &bull; 2 suggestions</span>
                 </div>
             </div>
             <div class="floating-card card-2">
-                <div class="card-icon">✨</div>
+                <div class="card-icon">&#10024;</div>
                 <div class="card-text">
                     <strong>Cover Letter Ready</strong>
                     <span>AI-tailored for Stripe</span>
                 </div>
             </div>
             <div class="floating-card card-3">
-                <div class="card-icon">🎉</div>
+                <div class="card-icon">&#127881;</div>
                 <div class="card-text">
                     <strong>Offer Received!</strong>
-                    <span>$185,000 • Remote</span>
+                    <span>$185,000 &bull; Remote</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof Bar — Metrics -->
+    <section class="social-proof-bar">
+        <div class="section-container">
+            <div class="proof-metrics">
+                <div class="proof-metric">
+                    <span class="proof-metric-value">2,400+</span>
+                    <span class="proof-metric-label">Jobs Tracked</span>
+                </div>
+                <div class="proof-metric-divider"></div>
+                <div class="proof-metric">
+                    <span class="proof-metric-value">680+</span>
+                    <span class="proof-metric-label">Interviews Scheduled</span>
+                </div>
+                <div class="proof-metric-divider"></div>
+                <div class="proof-metric">
+                    <span class="proof-metric-value">92%</span>
+                    <span class="proof-metric-label">Avg AI Match Accuracy</span>
                 </div>
             </div>
         </div>
@@ -219,9 +247,26 @@
                         <img src="{{ url_for('static', filename='img/features/pipeline.png') }}" alt="Pipeline view" loading="lazy">
                     </div>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card featured">
+                    <div class="feature-badge">AI-Powered</div>
                     <div class="feature-card-header">
                         <div class="feature-icon" style="--icon-color: #8b5cf6; --icon-bg: #f3e8ff;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                        <h3>AI Resume Analysis</h3>
+                    </div>
+                    <p>Stop guessing if you're a fit. Our AI reads the job description like a recruiter would—surfacing gaps, matching keywords, and generating cover letters that actually sound like you wrote them.</p>
+                    <div class="feature-preview">
+                        <img src="{{ url_for('static', filename='img/features/ai-analysis.png') }}" alt="AI Resume Analysis" loading="lazy">
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-header">
+                        <div class="feature-icon" style="--icon-color: #06b6d4; --icon-bg: #cffafe;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                                 <line x1="16" y1="2" x2="16" y2="6"/>
@@ -238,7 +283,7 @@
                 </div>
                 <div class="feature-card">
                     <div class="feature-card-header">
-                        <div class="feature-icon" style="--icon-color: #06b6d4; --icon-bg: #cffafe;">
+                        <div class="feature-icon" style="--icon-color: #ec4899; --icon-bg: #fce7f3;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                                 <circle cx="9" cy="7" r="4"/>
@@ -301,173 +346,38 @@
                         <img src="{{ url_for('static', filename='img/features/dashboard.png') }}" alt="Dashboard view" loading="lazy">
                     </div>
                 </div>
-                <div class="feature-card featured">
-                    <div class="feature-badge">AI-Powered</div>
-                    <div class="feature-card-header">
-                        <div class="feature-icon" style="--icon-color: #8b5cf6; --icon-bg: #f3e8ff;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                                <path d="M2 17l10 5 10-5"/>
-                                <path d="M2 12l10 5 10-5"/>
-                            </svg>
-                        </div>
-                        <h3>AI Resume Analysis</h3>
-                    </div>
-                    <p>Stop guessing if you're a fit. Our AI reads the job description like a recruiter would—surfacing gaps, matching keywords, and generating cover letters that actually sound like you wrote them.</p>
-                    <div class="feature-preview">
-                        <img src="{{ url_for('static', filename='img/features/ai-analysis.png') }}" alt="AI Resume Analysis" loading="lazy">
-                    </div>
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- AI Feature Highlight -->
-    <section class="ai-feature-section" id="ai-feature">
-        <div class="section-container">
-            <div class="ai-feature-content">
-                <div class="ai-feature-text">
-                    <span class="section-tag ai-tag">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ai-sparkle">
-                            <path d="M12 2L9 12l-7 3 7 3 3 10 3-10 7-3-7-3-3-10z"/>
-                        </svg>
-                        AI-Powered
-                    </span>
-                    <h2 class="ai-feature-title">Know Exactly How You Stack Up</h2>
-                    <p class="ai-feature-subtitle">
-                        Stop guessing if your resume is a good fit. Our AI analyzes your resume against each job description
-                        and gives you actionable insights to improve your chances.
-                    </p>
-                    <ul class="ai-feature-list">
-                        <li>
-                            <div class="ai-feature-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <path d="M12 6v6l4 2"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <strong>Match Score</strong>
-                                <span>See your fit percentage at a glance — know which roles are worth pursuing</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="ai-feature-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22 4 12 14.01 9 11.01"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <strong>Skill Gap Analysis</strong>
-                                <span>Identify exactly what's missing from your resume for each role</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="ai-feature-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <strong>Keyword Optimization</strong>
-                                <span>Get the exact phrases to add so you pass ATS filters</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="ai-feature-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                    <polyline points="14 2 14 8 20 8"/>
-                                    <line x1="16" y1="13" x2="8" y2="13"/>
-                                    <line x1="16" y1="17" x2="8" y2="17"/>
-                                    <polyline points="10 9 9 9 8 9"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <strong>Tailored Suggestions</strong>
-                                <span>Prioritized, actionable tips to strengthen your application</span>
-                            </div>
-                        </li>
-                    </ul>
-                    <a href="{{ url_for('public.demo') }}" class="btn btn-primary btn-lg ai-cta">
-                        See It In Action
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                </div>
-                <div class="ai-feature-visual">
-                    <div class="ai-preview-card">
-                        <div class="ai-preview-header">
-                            <span class="ai-preview-badge">Resume Fit Analysis</span>
-                        </div>
-                        <div class="ai-preview-score">
-                            <div class="score-circle">
-                                <svg viewBox="0 0 36 36" class="score-ring">
-                                    <path class="score-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                                    <path class="score-ring-fill" stroke-dasharray="78, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                                </svg>
-                                <span class="score-value">78%</span>
-                            </div>
-                            <div class="score-label">Strong Match</div>
-                        </div>
-                        <div class="ai-preview-insights">
-                            <div class="insight-row match">
-                                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
-                                <span>React, TypeScript, Node.js</span>
-                            </div>
-                            <div class="insight-row gap">
-                                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
-                                <span>Add: Kubernetes experience</span>
-                            </div>
-                            <div class="insight-row keyword">
-                                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
-                                <span>Keywords: "CI/CD", "agile"</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works">
+    <!-- Product Demo Section -->
+    <section class="demo-section" id="demo">
         <div class="section-container">
             <div class="section-header">
-                <span class="section-tag">How It Works</span>
-                <h2 class="section-title">Get Started in Minutes</h2>
-                <p class="section-subtitle">
-                    Three simple steps to transform your job search from chaos to clarity.
-                </p>
+                <span class="section-tag">Demo</span>
+                <h2 class="section-title">See It In Action</h2>
+                <p class="section-subtitle">Watch Stride in 60 seconds</p>
             </div>
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="step-number">1</div>
-                    <h3>Create Your Account</h3>
-                    <p>Sign up in seconds and get instant access to your personal job search dashboard.</p>
+            <div class="demo-video-container">
+                <video id="inlineDemoVideo" playsinline preload="metadata">
+                    <source src="{{ url_for('static', filename='video/demo.mp4') }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="demo-video-poster" id="demoPoster">
+                    <div class="demo-play-button">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3"/>
+                        </svg>
+                    </div>
                 </div>
-                <div class="step-connector">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            </div>
+            <div class="demo-section-cta">
+                <a href="{{ url_for('public.demo') }}" class="btn btn-primary btn-lg">
+                    Try the Interactive Demo
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">2</div>
-                    <h3>Add Your Applications</h3>
-                    <p>Enter jobs you've applied to or are interested in. Add companies and contacts as you go.</p>
-                </div>
-                <div class="step-connector">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">3</div>
-                    <h3>Track & Land Offers</h3>
-                    <p>Update statuses, schedule interviews, and watch your pipeline fill with opportunities.</p>
-                </div>
+                </a>
             </div>
         </div>
     </section>
@@ -478,141 +388,119 @@
             <div class="section-header">
                 <span class="section-tag">Pricing</span>
                 <h2 class="section-title">Simple, Transparent Pricing</h2>
-                <p class="section-subtitle">
-                    Start free. Upgrade when you're ready to supercharge your search.
-                </p>
+                <p class="section-subtitle">Start free. Upgrade when you're ready.</p>
             </div>
             <div class="pricing-toggle">
-                <span class="pricing-toggle-label" id="monthlyLabel">Monthly</span>
-                <button type="button" class="pricing-toggle-switch" id="pricingToggle" aria-label="Toggle annual pricing">
-                    <span class="pricing-toggle-knob"></span>
+                <span class="toggle-label" data-period="monthly">Monthly</span>
+                <button class="toggle-switch" id="pricingToggle" aria-label="Toggle billing period">
+                    <span class="toggle-slider"></span>
                 </button>
-                <span class="pricing-toggle-label" id="annualLabel">
-                    Annual
-                    <span class="pricing-save-badge">Save 33%</span>
-                </span>
+                <span class="toggle-label active" data-period="annual">Annual <span class="toggle-save">Save 33%</span></span>
             </div>
             <div class="pricing-cards">
                 <div class="pricing-card">
                     <div class="pricing-card-header">
-                        <h3>Free</h3>
-                        <p class="pricing-card-desc">Everything you need to get started</p>
+                        <h3 class="pricing-tier">Free</h3>
+                        <p class="pricing-desc">Everything you need to get started</p>
                     </div>
                     <div class="pricing-price">
-                        <span class="pricing-amount">$0</span>
-                        <span class="pricing-period">forever</span>
+                        <span class="price-amount">$0</span>
+                        <span class="price-period">/ forever</span>
                     </div>
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-secondary btn-lg pricing-cta">Get Started</a>
+                    <a href="{{ url_for('auth.register') }}" class="pricing-cta pricing-cta-free">Get Started Free</a>
                     <ul class="pricing-features">
-                        <li class="included">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            Unlimited job tracking
-                        </li>
-                        <li class="included">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            Visual pipeline &amp; dashboard
-                        </li>
-                        <li class="included">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            Contact &amp; company management
-                        </li>
-                        <li class="included">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            Interview scheduler
-                        </li>
-                        <li class="included">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            5 AI fit scores / month
-                        </li>
-                        <li class="included">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            2 AI cover letters / month
-                        </li>
-                        <li class="included">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            3 resume versions
-                        </li>
-                        <li class="not-included">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                            AI interview prep
-                        </li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Unlimited job tracking & pipeline</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Chrome extension (full access)</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Up to 3 resume versions</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> 5 AI fit scores / month</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> 2 AI cover letters / month</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Basic dashboard & analytics</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Contact management</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Interview scheduling</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Email notifications</li>
                     </ul>
                 </div>
                 <div class="pricing-card featured">
                     <div class="pricing-popular-badge">Most Popular</div>
                     <div class="pricing-card-header">
-                        <h3>Pro</h3>
-                        <p class="pricing-card-desc">For serious job seekers who want an edge</p>
+                        <h3 class="pricing-tier">Pro</h3>
+                        <p class="pricing-desc">For serious job seekers</p>
                     </div>
                     <div class="pricing-price">
-                        <span class="pricing-amount" id="proPrice">$9</span>
-                        <span class="pricing-period" id="proPeriod">/ month</span>
+                        <span class="price-amount" data-monthly="$9" data-annual="$6">$6</span>
+                        <span class="price-period" data-monthly="/ month" data-annual="/ mo, billed annually">/ mo, billed annually</span>
                     </div>
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg pricing-cta">Start Pro Trial</a>
+                    <a href="{{ url_for('auth.register') }}" class="pricing-cta pricing-cta-pro">Start Free Trial</a>
+                    <p class="pricing-includes">Everything in Free, plus:</p>
                     <ul class="pricing-features">
-                        <li class="included">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            Everything in Free
-                        </li>
-                        <li class="included highlight">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            <strong>Unlimited</strong> AI fit scores
-                        </li>
-                        <li class="included highlight">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            <strong>Unlimited</strong> AI cover letters
-                        </li>
-                        <li class="included highlight">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            <strong>AI interview prep</strong>
-                        </li>
-                        <li class="included">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            Unlimited resume versions
-                        </li>
-                        <li class="included">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            Priority support
-                        </li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Unlimited AI fit scores</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Unlimited AI cover letters</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> AI interview prep packages</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Advanced analytics & insights</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Market data (BLS integration)</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Offer comparison tools</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Weekly reflections & journaling</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Priority support</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> CSV / calendar export</li>
                     </ul>
                 </div>
             </div>
+            <p class="pricing-note">All plans include: SSL encryption &bull; 99.9% uptime &bull; Cancel anytime</p>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section class="about-section" id="about">
+    <!-- FAQ Section -->
+    <section class="faq-section" id="faq">
         <div class="section-container">
-            <div class="about-content">
-                <span class="section-tag">About Stride</span>
-                <h2 class="about-title">The job search is a marathon,<br>not a sprint.</h2>
-                <div class="about-text">
-                    <p>
-                        We built Stride because we've been there — refreshing inboxes, juggling spreadsheets,
-                        losing track of which company you talked to last week. The modern job search is overwhelming.
-                        Dozens of applications. Countless follow-ups. The mental load of keeping it all straight
-                        while staying motivated.
-                    </p>
-                    <p class="about-highlight">
-                        Stride exists to bring order to the chaos.
-                    </p>
-                    <p>
-                        We believe landing your next role isn't about luck — it's about <strong>organization</strong>,
-                        <strong>focus</strong>, and <strong>grit</strong>. It's about showing up every day, taking one step forward,
-                        and trusting the process. That's why we named it Stride. Not a sprint. Not a scramble.
-                        A steady, confident stride toward what's next.
-                    </p>
-                    <p class="about-emphasis">
-                        One application. One follow-up. One conversation at a time.
-                    </p>
-                    <p>
-                        Stride keeps everything in one place so you can focus on what actually matters: telling your story,
-                        building relationships, and finding the right fit. No more scattered notes. No more "wait, did I already apply there?"
-                        Just clarity, momentum, and progress you can see.
-                    </p>
-                    <p class="about-closing">
-                        Your next chapter starts with a single step.
-                    </p>
+            <div class="section-header">
+                <span class="section-tag">FAQ</span>
+                <h2 class="section-title">Frequently Asked Questions</h2>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Is Stride really free?</span>
+                        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes! Our Free plan is free forever with generous limits — unlimited job tracking, Chrome extension access, 5 AI fit scores and 2 AI cover letters per month. No credit card required, no trial period, no strings attached.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>How is this different from a spreadsheet?</span>
+                        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Spreadsheets can't give you a visual pipeline, automated reminders, AI-powered resume matching, or a built-in CRM for recruiters. Stride is purpose-built for job seekers — every feature exists to help you move faster and stay organized.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What does the AI analysis actually do?</span>
+                        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Our AI compares your resume to each job description and gives you a match percentage, highlights missing keywords, identifies skill gaps, and can generate a tailored cover letter — all in seconds.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Can I try it before creating an account?</span>
+                        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Absolutely. We have a fully interactive demo you can explore without signing up. Click "Try the Interactive Demo" anywhere on the page to see Stride in action with sample data.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Is my data private?</span>
+                        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. All data is encrypted in transit and at rest. We never show ads, never sell your data, and never share it with third parties. Your job search is your business. <a href="{{ url_for('public.privacy') }}">Read our privacy policy</a>.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -623,19 +511,20 @@
         <div class="section-container">
             <div class="cta-card">
                 <div class="cta-content">
-                    <h2>Ready to Take Control of Your Job Search?</h2>
-                    <p>Stop juggling spreadsheets. Start landing interviews.</p>
+                    <h2>Your Next Role Is Closer Than You Think</h2>
+                    <p>Join 500+ job seekers who stopped guessing and started tracking.</p>
                     <div class="cta-buttons">
-                        <a href="{{ url_for('public.demo') }}" class="btn btn-primary btn-lg">
-                            Try the Demo
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                            Get Started Free
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-                                <polygon points="5 3 19 12 5 21 5 3"/>
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
                         </a>
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-secondary btn-lg">
-                            Create Account
+                        <a href="{{ url_for('public.demo') }}" class="btn btn-secondary btn-lg">
+                            Try the Demo
                         </a>
                     </div>
+                    <p class="cta-no-cc">No credit card required. Free forever.</p>
                 </div>
                 <div class="cta-visual">
                     <div class="cta-checkmarks">
@@ -643,19 +532,19 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                                 <polyline points="20 6 9 17 4 12"/>
                             </svg>
-                            <span>Setup in 2 minutes</span>
+                            <span>Free job tracking forever</span>
                         </div>
                         <div class="checkmark-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                                 <polyline points="20 6 9 17 4 12"/>
                             </svg>
-                            <span>All-in-one dashboard</span>
+                            <span>AI resume analysis included</span>
                         </div>
                         <div class="checkmark-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                                 <polyline points="20 6 9 17 4 12"/>
                             </svg>
-                            <span>Never miss a follow-up</span>
+                            <span>Set up in under 2 minutes</span>
                         </div>
                     </div>
                 </div>
@@ -679,7 +568,7 @@
                         <a href="{{ url_for('auth.login') }}">Sign In</a>
                         <a href="{{ url_for('auth.register') }}">Get Started</a>
                         <a href="{{ url_for('public.demo') }}">Try Demo</a>
-                        <a href="#about">About Stride</a>
+                        <a href="#faq">FAQ</a>
                     </div>
                     <div class="footer-link-group">
                         <h4>Support</h4>
@@ -790,26 +679,49 @@
             }
         });
 
-        // Pricing toggle
+        // Pricing toggle (monthly/annual)
         const pricingToggle = document.getElementById('pricingToggle');
-        const proPrice = document.getElementById('proPrice');
-        const proPeriod = document.getElementById('proPeriod');
-        const monthlyLabel = document.getElementById('monthlyLabel');
-        const annualLabel = document.getElementById('annualLabel');
-        let isAnnual = false;
+        const toggleLabels = document.querySelectorAll('.toggle-label');
+        let isAnnual = true;
 
         pricingToggle.addEventListener('click', () => {
             isAnnual = !isAnnual;
-            pricingToggle.classList.toggle('active', isAnnual);
-            monthlyLabel.classList.toggle('active', !isAnnual);
-            annualLabel.classList.toggle('active', isAnnual);
-            if (isAnnual) {
-                proPrice.textContent = '$6';
-                proPeriod.textContent = '/ month, billed annually';
-            } else {
-                proPrice.textContent = '$9';
-                proPeriod.textContent = '/ month';
+            pricingToggle.classList.toggle('active', !isAnnual);
+            toggleLabels.forEach(label => {
+                label.classList.toggle('active', label.dataset.period === (isAnnual ? 'annual' : 'monthly'));
+            });
+            const priceEl = document.querySelector('.price-amount[data-monthly]');
+            const periodEl = document.querySelector('.price-period[data-monthly]');
+            if (priceEl && periodEl) {
+                priceEl.textContent = isAnnual ? priceEl.dataset.annual : priceEl.dataset.monthly;
+                periodEl.textContent = isAnnual ? periodEl.dataset.annual : periodEl.dataset.monthly;
             }
+        });
+
+        // FAQ Accordion (one open at a time)
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                const isOpen = item.classList.contains('active');
+                document.querySelectorAll('.faq-item.active').forEach(i => i.classList.remove('active'));
+                if (!isOpen) item.classList.add('active');
+            });
+        });
+
+        // Inline demo video player
+        const inlineDemoVideo = document.getElementById('inlineDemoVideo');
+        const demoPoster = document.getElementById('demoPoster');
+
+        demoPoster.addEventListener('click', () => {
+            demoPoster.style.display = 'none';
+            inlineDemoVideo.controls = true;
+            inlineDemoVideo.play();
+        });
+
+        inlineDemoVideo.addEventListener('ended', () => {
+            demoPoster.style.display = 'flex';
+            inlineDemoVideo.controls = false;
+            inlineDemoVideo.currentTime = 0;
         });
     </script>
 </body>
