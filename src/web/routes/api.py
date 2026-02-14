@@ -6,6 +6,7 @@ from flask_login import login_required, current_user
 from ..helpers import get_service, get_service_for_user, get_user_by_api_key
 from ...models import ApplicationStatus, ContactType, Application, Job, Company, Contact, InterviewPrep
 from ...services.ai_parser import is_ai_parsing_available, parse_job_description, analyze_resume_job_fit, generate_cover_letter, generate_interview_prep
+from ...services.usage_tracker import UsageTracker
 
 bp = Blueprint('api', __name__)
 
@@ -483,8 +484,18 @@ def api_create_job():
             is_flagged=data.get('is_flagged', False)
         )
         
-        # Auto-score job if user has resume and AI is available
-        if is_ai_parsing_available() and user.resume_text and len(user.resume_text.strip()) > 100:
+        # Auto-score job if user has resume, AI is available, and usage allows it
+        auto_score_allowed = True
+        try:
+            from ...models import User as UserModel
+            user_for_usage = session.query(UserModel).get(user.id)
+            auto_tracker = UsageTracker(user_for_usage, session)
+            auto_allowed, _ = auto_tracker.can_use_ai_score()
+            auto_score_allowed = auto_allowed
+        except Exception:
+            pass
+
+        if auto_score_allowed and is_ai_parsing_available() and user.resume_text and len(user.resume_text.strip()) > 100:
             job_desc = job.description or ''
             if job.requirements:
                 job_desc += '\n\nRequirements:\n' + job.requirements
@@ -504,6 +515,7 @@ def api_create_job():
                     job.fit_analysis = json.dumps(analysis)
                     job.scored_at = datetime.utcnow()
                     # scored_with_resume_id would be set if resume_versions exist
+                    auto_tracker.record_ai_score()
                     session.commit()
                     logging.info(f"Auto-scored job {job.id}: {job.fit_score}%")
                 except Exception as score_error:
@@ -600,6 +612,15 @@ def api_analyze_resume_fit():
 
     service, session = get_service()
     try:
+        # Check usage limits
+        from ...models import User
+        user = session.query(User).get(current_user.id)
+        tracker = UsageTracker(user, session)
+        allowed, limit_info = tracker.can_use_ai_score()
+        if not allowed:
+            session.commit()
+            return jsonify({'success': False, 'upgrade_required': True, 'error': limit_info['message'], 'message': limit_info['message']}), 403
+
         # Get job info
         job_id = data.get('job_id')
         app_id = data.get('application_id')
@@ -648,10 +669,11 @@ def api_analyze_resume_fit():
             company_name=job.company.name if job.company else None
         )
 
-        # Save the fit score to the application
+        # Record usage and save the fit score
+        tracker.record_ai_score()
         if app_id and result.get('match_score') is not None:
             service.applications.update(app_id, fit_score=result['match_score'])
-            session.commit()
+        session.commit()
 
         return jsonify({'success': True, 'analysis': result})
 
@@ -674,6 +696,15 @@ def api_generate_cover_letter():
 
     service, session = get_service()
     try:
+        # Check usage limits
+        from ...models import User
+        user = session.query(User).get(current_user.id)
+        tracker = UsageTracker(user, session)
+        allowed, limit_info = tracker.can_use_cover_letter()
+        if not allowed:
+            session.commit()
+            return jsonify({'success': False, 'upgrade_required': True, 'error': limit_info['message'], 'message': limit_info['message']}), 403
+
         # Get job info
         app_id = data.get('application_id')
         job_id = data.get('job_id')
@@ -727,10 +758,13 @@ def api_generate_cover_letter():
             company_name=job.company.name if job.company else None
         )
 
+        # Record usage
+        tracker.record_cover_letter()
+
         # Optionally save to application
         if app_id and data.get('save', False):
             service.applications.update(app_id, cover_letter=cover_letter)
-            session.commit()
+        session.commit()
 
         return jsonify({
             'success': True,
@@ -754,6 +788,15 @@ def api_score_batch():
 
     service, session = get_service()
     try:
+        # Check usage limits
+        from ...models import User as UserModel
+        user = session.query(UserModel).get(current_user.id)
+        tracker = UsageTracker(user, session)
+        allowed, limit_info = tracker.can_use_ai_score()
+        if not allowed:
+            session.commit()
+            return jsonify({'success': False, 'upgrade_required': True, 'error': limit_info['message'], 'message': limit_info['message']}), 403
+
         # Check resume
         if not current_user.resume_text or len(current_user.resume_text.strip()) < 100:
             return jsonify({'success': False, 'error': 'No resume found. Please add a resume first.'}), 400
@@ -770,6 +813,11 @@ def api_score_batch():
 
         if not unscored_jobs:
             return jsonify({'success': True, 'message': 'All jobs already scored', 'scored': 0})
+
+        # Cap batch to remaining free scores
+        remaining = tracker.remaining_scores()
+        if remaining is not None:
+            unscored_jobs = unscored_jobs[:remaining]
 
         scored_count = 0
         errors = []
@@ -794,6 +842,7 @@ def api_score_batch():
                 job.fit_score = analysis.get('match_score')
                 job.fit_analysis = json.dumps(analysis)
                 job.scored_at = datetime.utcnow()
+                tracker.record_ai_score()
                 scored_count += 1
             except Exception as e:
                 errors.append(f"Job {job.id} ({job.title}): {str(e)}")
@@ -849,6 +898,15 @@ def api_interview_prep(app_id):
         # POST: Generate new prep
         if not is_ai_parsing_available():
             return jsonify({'success': False, 'error': 'AI is not available. Please set ANTHROPIC_API_KEY.'}), 503
+
+        # Check usage limits (interview prep is Pro only)
+        from ...models import User as UserModel
+        user_obj = session.query(UserModel).get(current_user.id)
+        tracker = UsageTracker(user_obj, session)
+        allowed, limit_info = tracker.can_use_interview_prep()
+        if not allowed:
+            session.commit()
+            return jsonify({'success': False, 'upgrade_required': True, 'error': limit_info['message'], 'message': limit_info['message']}), 403
 
         data = request.get_json() or {}
 
@@ -916,6 +974,7 @@ def api_interview_prep(app_id):
             closing_strategy=prep_data.get('closing_strategy', {})
         )
         session.add(interview_prep)
+        tracker.record_interview_prep()
         session.commit()
 
         return jsonify({
@@ -1338,45 +1397,6 @@ def _cors_options():
     response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
     return response
-
-
-@bp.route('/api/contacts', methods=['GET', 'OPTIONS'])
-def api_list_contacts():
-    """API: Get all contacts with company info."""
-    if request.method == 'OPTIONS':
-        return _cors_options()
-
-    user, err = _api_key_or_session_auth()
-    if err:
-        return err
-
-    service, session = get_service_for_user(user.id)
-    try:
-        limit = request.args.get('limit', 100, type=int)
-        contacts = service.contacts.get_all(limit=limit)
-        items = []
-        for c in contacts:
-            items.append({
-                'id': c.id,
-                'name': c.name,
-                'email': c.email,
-                'phone': c.phone,
-                'linkedinUrl': c.linkedin_url,
-                'title': c.title,
-                'contactType': c.contact_type.value if c.contact_type else None,
-                'companyName': c.company.name if c.company else None,
-                'relationshipStrength': c.relationship_strength,
-                'lastContactDate': c.last_contact_date.isoformat() if c.last_contact_date else None,
-                'nextFollowupDate': c.next_followup_date.isoformat() if c.next_followup_date else None,
-                'notes': c.notes,
-                'howWeMet': c.how_we_met,
-                'createdAt': c.created_at.isoformat() if c.created_at else None,
-            })
-        return _cors_response({'success': True, 'contacts': items})
-    except Exception as e:
-        return _cors_response({'success': False, 'error': str(e)}, 500)
-    finally:
-        session.close()
 
 
 @bp.route('/api/contacts/<int:contact_id>', methods=['GET', 'OPTIONS'])

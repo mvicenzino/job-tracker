@@ -22,6 +22,7 @@
             <div class="landing-nav-links">
                 <a href="#features">Features</a>
                 <a href="#ai-feature">AI Analysis</a>
+                <a href="#pricing">Pricing</a>
                 <a href="#how-it-works">How It Works</a>
                 <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Sign In</a>
                 <a href="{{ url_for('public.demo') }}" class="btn btn-primary">Try Demo</a>
@@ -38,6 +39,7 @@
     <div class="landing-mobile-menu" id="mobileMenu">
         <a href="#features">Features</a>
         <a href="#ai-feature">AI Analysis</a>
+        <a href="#pricing">Pricing</a>
         <a href="#how-it-works">How It Works</a>
         <a href="{{ url_for('auth.login') }}">Sign In</a>
         <a href="{{ url_for('public.demo') }}" class="btn btn-primary">Try Demo</a>
@@ -470,6 +472,114 @@
         </div>
     </section>
 
+    <!-- Pricing Section -->
+    <section class="pricing-section" id="pricing">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-tag">Pricing</span>
+                <h2 class="section-title">Simple, Transparent Pricing</h2>
+                <p class="section-subtitle">
+                    Start free. Upgrade when you're ready to supercharge your search.
+                </p>
+            </div>
+            <div class="pricing-toggle">
+                <span class="pricing-toggle-label" id="monthlyLabel">Monthly</span>
+                <button type="button" class="pricing-toggle-switch" id="pricingToggle" aria-label="Toggle annual pricing">
+                    <span class="pricing-toggle-knob"></span>
+                </button>
+                <span class="pricing-toggle-label" id="annualLabel">
+                    Annual
+                    <span class="pricing-save-badge">Save 33%</span>
+                </span>
+            </div>
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <div class="pricing-card-header">
+                        <h3>Free</h3>
+                        <p class="pricing-card-desc">Everything you need to get started</p>
+                    </div>
+                    <div class="pricing-price">
+                        <span class="pricing-amount">$0</span>
+                        <span class="pricing-period">forever</span>
+                    </div>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-secondary btn-lg pricing-cta">Get Started</a>
+                    <ul class="pricing-features">
+                        <li class="included">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            Unlimited job tracking
+                        </li>
+                        <li class="included">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            Visual pipeline &amp; dashboard
+                        </li>
+                        <li class="included">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            Contact &amp; company management
+                        </li>
+                        <li class="included">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            Interview scheduler
+                        </li>
+                        <li class="included">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            5 AI fit scores / month
+                        </li>
+                        <li class="included">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            2 AI cover letters / month
+                        </li>
+                        <li class="included">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            3 resume versions
+                        </li>
+                        <li class="not-included">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            AI interview prep
+                        </li>
+                    </ul>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="pricing-popular-badge">Most Popular</div>
+                    <div class="pricing-card-header">
+                        <h3>Pro</h3>
+                        <p class="pricing-card-desc">For serious job seekers who want an edge</p>
+                    </div>
+                    <div class="pricing-price">
+                        <span class="pricing-amount" id="proPrice">$9</span>
+                        <span class="pricing-period" id="proPeriod">/ month</span>
+                    </div>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg pricing-cta">Start Pro Trial</a>
+                    <ul class="pricing-features">
+                        <li class="included">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            Everything in Free
+                        </li>
+                        <li class="included highlight">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            <strong>Unlimited</strong> AI fit scores
+                        </li>
+                        <li class="included highlight">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            <strong>Unlimited</strong> AI cover letters
+                        </li>
+                        <li class="included highlight">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            <strong>AI interview prep</strong>
+                        </li>
+                        <li class="included">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            Unlimited resume versions
+                        </li>
+                        <li class="included">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            Priority support
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- About Section -->
     <section class="about-section" id="about">
         <div class="section-container">
@@ -677,6 +787,28 @@
                 document.body.style.overflow = '';
                 demoVideo.pause();
                 demoVideo.currentTime = 0;
+            }
+        });
+
+        // Pricing toggle
+        const pricingToggle = document.getElementById('pricingToggle');
+        const proPrice = document.getElementById('proPrice');
+        const proPeriod = document.getElementById('proPeriod');
+        const monthlyLabel = document.getElementById('monthlyLabel');
+        const annualLabel = document.getElementById('annualLabel');
+        let isAnnual = false;
+
+        pricingToggle.addEventListener('click', () => {
+            isAnnual = !isAnnual;
+            pricingToggle.classList.toggle('active', isAnnual);
+            monthlyLabel.classList.toggle('active', !isAnnual);
+            annualLabel.classList.toggle('active', isAnnual);
+            if (isAnnual) {
+                proPrice.textContent = '$6';
+                proPeriod.textContent = '/ month, billed annually';
+            } else {
+                proPrice.textContent = '$9';
+                proPeriod.textContent = '/ month';
             }
         });
     </script>

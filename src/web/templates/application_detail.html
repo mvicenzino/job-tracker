@@ -420,7 +420,11 @@
         <section class="card interview-prep-card">
             <div class="card-header">
                 <h2>Interview Prep</h2>
+                {% if not is_pro %}
+                <span class="pro-badge-inline">PRO</span>
+                {% else %}
                 <span class="badge badge-info">AI-Powered</span>
+                {% endif %}
             </div>
             <div class="card-body">
                 <div id="interviewPrepPrompt" class="interview-prep-prompt">
@@ -1339,6 +1343,9 @@ function analyzeResumeFit() {
         if (data.success) {
             renderResults(data.analysis);
             document.getElementById('resumeFitResults').style.display = 'flex';
+        } else if (data.upgrade_required && typeof showUpgradeModal === 'function') {
+            document.getElementById('resumeFitPrompt').style.display = 'block';
+            showUpgradeModal('AI Fit Score Limit Reached', data.message || data.error);
         } else {
             document.getElementById('resumeFitErrorMessage').textContent = data.error || 'Analysis failed';
             document.getElementById('resumeFitError').style.display = 'block';
@@ -1460,6 +1467,10 @@ function generateCoverLetter() {
         if (data.success) {
             document.getElementById('coverLetterTextarea').value = data.cover_letter;
             document.getElementById('coverLetterResult').style.display = 'block';
+        } else if (data.upgrade_required && typeof showUpgradeModal === 'function') {
+            var prompt = document.getElementById('coverLetterPrompt');
+            if (prompt) prompt.style.display = 'block';
+            showUpgradeModal('Cover Letter Limit Reached', data.message || data.error);
         } else {
             document.getElementById('coverLetterErrorMessage').textContent = data.error || 'Generation failed';
             document.getElementById('coverLetterError').style.display = 'block';
@@ -1576,6 +1587,9 @@ function generateInterviewPrep(regenerate) {
             existingPrepData = data.prep;
             renderInterviewPrepResults(data.prep);
             document.getElementById('interviewPrepResults').style.display = 'block';
+        } else if (data.upgrade_required && typeof showUpgradeModal === 'function') {
+            document.getElementById('interviewPrepPrompt').style.display = 'block';
+            showUpgradeModal('Pro Feature', data.message || data.error);
         } else {
             document.getElementById('interviewPrepErrorMessage').textContent = data.error || 'Generation failed';
             document.getElementById('interviewPrepError').style.display = 'block';

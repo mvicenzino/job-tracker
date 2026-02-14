@@ -8,6 +8,69 @@
 </div>
 
 <div class="settings-grid">
+    <!-- Subscription Section -->
+    <div class="card" id="subscription">
+        <div class="card-header">
+            <h2>Subscription</h2>
+            {% if is_pro %}
+            <span class="plan-badge pro">Pro</span>
+            {% else %}
+            <span class="plan-badge free">Free</span>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            {% if is_pro %}
+            <div class="subscription-info">
+                <div class="subscription-status">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#22c55e" stroke-width="2" style="margin-right:8px;">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    <span>You're on <strong>Stride Pro</strong></span>
+                </div>
+                {% if current_user.subscription_started_at %}
+                <p class="text-muted" style="margin-top: var(--space-2);">Pro since {{ current_user.subscription_started_at.strftime('%B %d, %Y') }}</p>
+                {% endif %}
+                <p class="text-muted" style="margin-top: var(--space-2);">Unlimited AI fit scores, cover letters, interview prep, and resume versions.</p>
+            </div>
+            {% else %}
+            <div class="subscription-info">
+                <p class="text-secondary" style="margin-bottom: var(--space-4);">
+                    You're on the <strong>Free plan</strong>. Upgrade to Pro for unlimited AI features.
+                </p>
+                {% if usage_data %}
+                <div class="usage-summary-settings">
+                    <div class="usage-summary-row">
+                        <span>AI Fit Scores</span>
+                        <span>{{ usage_data.scores_used }} / {{ usage_data.scores_limit }} used</span>
+                    </div>
+                    <div class="usage-summary-row">
+                        <span>AI Cover Letters</span>
+                        <span>{{ usage_data.letters_used }} / {{ usage_data.letters_limit }} used</span>
+                    </div>
+                    <div class="usage-summary-row">
+                        <span>Interview Prep</span>
+                        <span class="usage-pro-badge">PRO ONLY</span>
+                    </div>
+                    <div class="usage-summary-row">
+                        <span>Resume Versions</span>
+                        <span>{{ usage_data.resume_limit }} max</span>
+                    </div>
+                </div>
+                {% endif %}
+                <form method="POST" action="{{ url_for('settings.upgrade') }}" style="margin-top: var(--space-4);">
+                    <button type="submit" class="btn btn-primary">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                        Upgrade to Pro
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
     <!-- Appearance Section -->
     <div class="card" id="appearance">
         <div class="card-header">

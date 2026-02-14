@@ -6,6 +6,8 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text
 from sqlalchemy.orm import relationship
 from .base import Base, TimestampMixin
 
+DEMO_EMAIL = 'demo@stride-jobs.com'
+
 
 class User(Base, TimestampMixin, UserMixin):
     """Represents a user account for authentication."""
@@ -35,6 +37,14 @@ class User(Base, TimestampMixin, UserMixin):
     avatar_url = Column(String(500), nullable=True)  # URL to user's profile photo
     display_name = Column(String(100), nullable=True)  # Optional display name
 
+    # Subscription & Usage
+    subscription_tier = Column(String(20), default='free', nullable=True)  # 'free' or 'pro'
+    subscription_started_at = Column(DateTime, nullable=True)
+    usage_reset_month = Column(String(7), nullable=True)  # e.g. '2026-02'
+    ai_scores_used = Column(Integer, default=0, nullable=True)
+    ai_cover_letters_used = Column(Integer, default=0, nullable=True)
+    ai_interview_preps_used = Column(Integer, default=0, nullable=True)
+
     # Relationships
     companies = relationship("Company", back_populates="user", cascade="all, delete-orphan")
     contacts = relationship("Contact", back_populates="user", cascade="all, delete-orphan")
@@ -52,6 +62,27 @@ class User(Base, TimestampMixin, UserMixin):
         """Generate a new API key for the user."""
         self.api_key = secrets.token_hex(32)
         return self.api_key
+
+    @property
+    def is_pro(self) -> bool:
+        """Check if user has Pro subscription (demo users are always Pro)."""
+        if self.email == DEMO_EMAIL:
+            return True
+        return self.subscription_tier == 'pro'
+
+    @property
+    def current_month(self) -> str:
+        """Get current month string like '2026-02'."""
+        return datetime.utcnow().strftime('%Y-%m')
+
+    def ensure_usage_month_current(self):
+        """Reset usage counters if the month has changed."""
+        current = self.current_month
+        if self.usage_reset_month != current:
+            self.usage_reset_month = current
+            self.ai_scores_used = 0
+            self.ai_cover_letters_used = 0
+            self.ai_interview_preps_used = 0
 
     @property
     def first_name(self) -> str:

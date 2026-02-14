@@ -97,7 +97,7 @@ def create_app(db_path: str = None, database_url: str = None):
                 # Eagerly load all attributes to avoid issues with detached session
                 session.expire_on_commit = False
                 # Access key attributes to ensure they're loaded
-                _ = user.id, user.email, user.is_active
+                _ = user.id, user.email, user.is_active, user.subscription_tier, user.subscription_started_at
             return user
         except Exception as e:
             # Log error but don't crash - user will be redirected to login
@@ -185,6 +185,33 @@ def create_app(db_path: str = None, database_url: str = None):
             'other': '📌'
         }
         return icons.get(event_type, '📌')
+
+    @app.context_processor
+    def inject_usage_data():
+        """Inject subscription tier and usage data for all templates."""
+        from flask_login import current_user
+        try:
+            if current_user.is_authenticated:
+                from ..services.usage_tracker import UsageTracker
+                session = db.get_session()
+                try:
+                    from ..models import User
+                    user = session.query(User).get(current_user.id)
+                    if user:
+                        tracker = UsageTracker(user, session)
+                        usage = tracker.get_usage_summary()
+                        is_pro = user.is_pro
+                        session.commit()  # persist any month-reset changes
+                        return {
+                            'user_tier': user.subscription_tier or 'free',
+                            'is_pro': is_pro,
+                            'usage_data': usage,
+                        }
+                finally:
+                    session.close()
+        except Exception:
+            pass
+        return {'user_tier': 'free', 'is_pro': False, 'usage_data': {}}
 
     @app.context_processor
     def inject_notification_count():

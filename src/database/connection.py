@@ -160,6 +160,58 @@ class DatabaseConnection:
                         except Exception as e:
                             print(f"[Migration] Failed to add display_name: {e}")
 
+                    # Subscription & usage tracking
+                    if 'subscription_tier' not in columns:
+                        try:
+                            conn.execute(text("ALTER TABLE users ADD COLUMN subscription_tier VARCHAR(20) DEFAULT 'free'"))
+                            conn.commit()
+                            print("[Migration] Added subscription_tier column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add subscription_tier: {e}")
+
+                    if 'subscription_started_at' not in columns:
+                        try:
+                            if is_postgres:
+                                conn.execute(text('ALTER TABLE users ADD COLUMN subscription_started_at TIMESTAMP'))
+                            else:
+                                conn.execute(text('ALTER TABLE users ADD COLUMN subscription_started_at DATETIME'))
+                            conn.commit()
+                            print("[Migration] Added subscription_started_at column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add subscription_started_at: {e}")
+
+                    if 'usage_reset_month' not in columns:
+                        try:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN usage_reset_month VARCHAR(7)'))
+                            conn.commit()
+                            print("[Migration] Added usage_reset_month column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add usage_reset_month: {e}")
+
+                    if 'ai_scores_used' not in columns:
+                        try:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN ai_scores_used INTEGER DEFAULT 0'))
+                            conn.commit()
+                            print("[Migration] Added ai_scores_used column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add ai_scores_used: {e}")
+
+                    if 'ai_cover_letters_used' not in columns:
+                        try:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN ai_cover_letters_used INTEGER DEFAULT 0'))
+                            conn.commit()
+                            print("[Migration] Added ai_cover_letters_used column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add ai_cover_letters_used: {e}")
+
+                    if 'ai_interview_preps_used' not in columns:
+                        try:
+                            conn.execute(text('ALTER TABLE users ADD COLUMN ai_interview_preps_used INTEGER DEFAULT 0'))
+                            conn.commit()
+                            print("[Migration] Added ai_interview_preps_used column")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add ai_interview_preps_used: {e}")
+
             # Check if applications table needs new columns
             if 'applications' in inspector.get_table_names():
                 app_columns = [col['name'] for col in inspector.get_columns('applications')]

@@ -35,7 +35,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260213c">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260213d">
     {% block head %}{% endblock %}
 </head>
 <body class="{% if current_user.is_authenticated %}has-sidebar{% endif %}{% if current_user.is_authenticated and current_user.email == 'demo@stride-jobs.com' %} demo-active{% endif %}">
@@ -839,6 +839,53 @@
         }
     })();
     </script>
+
+    <!-- Upgrade Modal -->
+    {% if current_user.is_authenticated and not is_pro %}
+    <div class="confirm-modal-overlay" id="upgradeModal">
+        <div class="confirm-modal upgrade-modal">
+            <div class="upgrade-modal-icon">
+                <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#f59e0b" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+            </div>
+            <h3 id="upgradeModalTitle">Upgrade to Pro</h3>
+            <p id="upgradeModalMessage">Unlock unlimited AI features and take your job search to the next level.</p>
+            <ul class="upgrade-features">
+                <li>Unlimited AI fit scores</li>
+                <li>Unlimited AI cover letters</li>
+                <li>AI interview prep materials</li>
+                <li>Unlimited resume versions</li>
+            </ul>
+            <div class="upgrade-price">
+                <span class="price-amount">$6</span><span class="price-period">/mo</span>
+                <span class="price-note">billed annually ($9/mo monthly)</span>
+            </div>
+            <div class="confirm-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeUpgradeModal()">Maybe Later</button>
+                <a href="{{ url_for('settings.settings') }}#subscription" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                    Upgrade to Pro
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+    function showUpgradeModal(title, message) {
+        if (title) document.getElementById('upgradeModalTitle').textContent = title;
+        if (message) document.getElementById('upgradeModalMessage').textContent = message;
+        document.getElementById('upgradeModal').classList.add('active');
+    }
+    function closeUpgradeModal() {
+        document.getElementById('upgradeModal').classList.remove('active');
+    }
+    document.getElementById('upgradeModal').addEventListener('click', function(e) {
+        if (e.target === this) closeUpgradeModal();
+    });
+    </script>
+    {% endif %}
 
     <!-- Confirmation Modal -->
     <div class="confirm-modal-overlay" id="confirmModal">

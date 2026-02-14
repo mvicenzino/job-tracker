@@ -280,6 +280,24 @@ def delete_avatar():
     return redirect(url_for('settings.settings'))
 
 
+@bp.route('/settings/upgrade', methods=['POST'])
+@login_required
+def upgrade():
+    """Manual upgrade to Pro (placeholder for future Stripe integration)."""
+    from datetime import datetime
+    db = current_app.extensions['db']
+    session = db.get_session()
+    try:
+        user = session.query(User).get(current_user.id)
+        user.subscription_tier = 'pro'
+        user.subscription_started_at = datetime.utcnow()
+        session.commit()
+        flash('Welcome to Stride Pro! All limits have been removed.', 'success')
+    finally:
+        session.close()
+    return redirect(url_for('settings.settings'))
+
+
 @bp.route('/export/applications')
 @login_required
 def export_applications():

@@ -1,9 +1,10 @@
 """Resume version management routes."""
 import io
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_required
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask_login import login_required, current_user
 
 from ..helpers import get_service
+from ...services.usage_tracker import UsageTracker
 
 bp = Blueprint('resumes', __name__)
 
@@ -62,6 +63,17 @@ def new_resume():
     if request.method == 'POST':
         service, session = get_service()
         try:
+            # Check resume version limits for free users
+            from ...models import User
+            user = session.query(User).get(current_user.id)
+            existing_count = len(service.resume_versions.get_all())
+            tracker = UsageTracker(user, session)
+            allowed, limit_info = tracker.can_add_resume_version(existing_count)
+            if not allowed:
+                session.commit()
+                flash(limit_info['message'], 'warning')
+                return redirect(url_for('resumes.resumes'))
+
             name = request.form.get('name', '').strip()
             content = request.form.get('content', '').strip()
             filename = None
