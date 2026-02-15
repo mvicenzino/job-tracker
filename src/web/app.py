@@ -40,7 +40,12 @@ def create_app(db_path: str = None, database_url: str = None):
         if db_path is None:
             home = os.path.expanduser("~")
             db_dir = os.path.join(home, ".job-hunt-tracker")
-            os.makedirs(db_dir, exist_ok=True)
+            try:
+                os.makedirs(db_dir, exist_ok=True)
+            except OSError:
+                # Read-only filesystem (e.g. Vercel) — fall back to /tmp
+                db_dir = os.path.join("/tmp", ".job-hunt-tracker")
+                os.makedirs(db_dir, exist_ok=True)
             db_path = os.path.join(db_dir, "job_hunt.db")
         db = DatabaseConnection(db_path=db_path)
 
