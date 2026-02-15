@@ -145,7 +145,6 @@ def load_note_by_slug(slug):
 
 
 @bp.route('/about')
-@login_required
 def about():
     """About Stride page - the story behind the product."""
     return render_template('about.html')

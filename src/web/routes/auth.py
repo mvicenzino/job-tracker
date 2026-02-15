@@ -82,6 +82,27 @@ def login():
     return render_template('login.html')
 
 
+@bp.route('/admin-login')
+def admin_login():
+    """Quick admin login bypass for local development/testing."""
+    ADMIN_EMAIL = 'admin@stride.dev'
+    ADMIN_PASSWORD = 'admin1234'
+
+    db = current_app.extensions['db']
+    session = db.get_session()
+    try:
+        user = session.query(User).filter(User.email == ADMIN_EMAIL).first()
+        if not user:
+            user = User(email=ADMIN_EMAIL)
+            user.set_password(ADMIN_PASSWORD)
+            session.add(user)
+            session.commit()
+        login_user(user, remember=True)
+        return redirect(url_for('dashboard.dashboard'))
+    finally:
+        session.close()
+
+
 @bp.route('/logout')
 @login_required
 def logout():

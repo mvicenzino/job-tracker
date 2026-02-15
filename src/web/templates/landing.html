@@ -82,14 +82,6 @@
                     Watch Demo
                 </button>
             </div>
-            <div class="hero-demo-cta">
-                <a href="{{ url_for('public.demo') }}" class="btn-try-demo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="5 3 19 12 5 21 5 3"/>
-                    </svg>
-                    Try the Interactive Demo — No signup required
-                </a>
-            </div>
             <div class="hero-social-proof">
                 <div class="proof-check">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -172,49 +164,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="floating-card card-1">
-                <div class="card-icon">&#129302;</div>
-                <div class="card-text">
-                    <strong>Resume Analyzed</strong>
-                    <span>92% match &bull; 2 suggestions</span>
-                </div>
-            </div>
-            <div class="floating-card card-2">
-                <div class="card-icon">&#10024;</div>
-                <div class="card-text">
-                    <strong>Cover Letter Ready</strong>
-                    <span>AI-tailored for Stripe</span>
-                </div>
-            </div>
-            <div class="floating-card card-3">
-                <div class="card-icon">&#127881;</div>
-                <div class="card-text">
-                    <strong>Offer Received!</strong>
-                    <span>$185,000 &bull; Remote</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Social Proof Bar — Metrics -->
-    <section class="social-proof-bar">
-        <div class="section-container">
-            <div class="proof-metrics">
-                <div class="proof-metric">
-                    <span class="proof-metric-value">2,400+</span>
-                    <span class="proof-metric-label">Jobs Tracked</span>
-                </div>
-                <div class="proof-metric-divider"></div>
-                <div class="proof-metric">
-                    <span class="proof-metric-value">680+</span>
-                    <span class="proof-metric-label">Interviews Scheduled</span>
-                </div>
-                <div class="proof-metric-divider"></div>
-                <div class="proof-metric">
-                    <span class="proof-metric-value">92%</span>
-                    <span class="proof-metric-label">Avg AI Match Accuracy</span>
                 </div>
             </div>
         </div>
@@ -307,43 +256,6 @@
                             <path d="M12 18a6 6 0 0 0 5.196-9h-2.598A3 3 0 0 1 12 15v3z" fill="#4285F4"/>
                         </svg>
                         <span>Chrome extension auto-imports contacts from LinkedIn</span>
-                    </div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-card-header">
-                        <div class="feature-icon" style="--icon-color: #f59e0b; --icon-bg: #fef3c7;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 21h18"/>
-                                <path d="M9 8h1"/>
-                                <path d="M9 12h1"/>
-                                <path d="M9 16h1"/>
-                                <path d="M14 8h1"/>
-                                <path d="M14 12h1"/>
-                                <path d="M14 16h1"/>
-                                <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
-                            </svg>
-                        </div>
-                        <h3>Company Research</h3>
-                    </div>
-                    <p>Never get caught off guard by "why us?" Walk into every interview with notes, research, and intel organized in one place.</p>
-                    <div class="feature-preview">
-                        <img src="{{ url_for('static', filename='img/features/companies.png') }}" alt="Companies view" loading="lazy">
-                    </div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-card-header">
-                        <div class="feature-icon" style="--icon-color: #10b981; --icon-bg: #d1fae5;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="20" x2="18" y2="10"/>
-                                <line x1="12" y1="20" x2="12" y2="4"/>
-                                <line x1="6" y1="20" x2="6" y2="14"/>
-                            </svg>
-                        </div>
-                        <h3>Progress Dashboard</h3>
-                    </div>
-                    <p>Job searching can feel endless. See your real momentum—response rates, interview conversions, weekly wins—so you know the finish line is getting closer.</p>
-                    <div class="feature-preview">
-                        <img src="{{ url_for('static', filename='img/features/dashboard.png') }}" alt="Dashboard view" loading="lazy">
                     </div>
                 </div>
             </div>
@@ -568,6 +480,7 @@
                         <a href="{{ url_for('auth.login') }}">Sign In</a>
                         <a href="{{ url_for('auth.register') }}">Get Started</a>
                         <a href="{{ url_for('public.demo') }}">Try Demo</a>
+                        <a href="{{ url_for('about.about') }}">About Stride</a>
                         <a href="#faq">FAQ</a>
                     </div>
                     <div class="footer-link-group">

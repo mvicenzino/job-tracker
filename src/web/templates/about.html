@@ -1,243 +1,399 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="About Stride - The story behind the job search tracker built for modern job seekers.">
+    <title>About Stride</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+    <style>
+        .about-page {
+            padding: 140px 2rem 6rem;
+            max-width: 640px;
+            margin: 0 auto;
+        }
 
-{% block title %}About Stride{% endblock %}
+        .about-eyebrow {
+            display: inline-block;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #6366f1;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
 
-{% block content %}
-<div class="page-header">
-    <h1>About Stride</h1>
-</div>
+        .about-headline {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 800;
+            color: #0a0a0a;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
 
-<div class="about-container">
-    <div class="about-hero">
-        <div class="about-hero-content">
-            <h2>The job search is a marathon, not a sprint.</h2>
-            <p class="about-tagline">That's why I built Stride — to help you take it one step at a time.</p>
+        .about-subhead {
+            font-size: 1.125rem;
+            color: #6b7280;
+            margin-bottom: 2.5rem;
+        }
+
+        .about-prose {
+            font-size: 1.0625rem;
+            line-height: 1.8;
+            color: #4b5563;
+        }
+
+        .about-prose p {
+            margin-bottom: 1.25rem;
+        }
+
+        .about-prose strong {
+            color: #0a0a0a;
+            font-weight: 600;
+        }
+
+        .about-prose blockquote {
+            margin: 1.5rem 0;
+            padding: 0 0 0 1.25rem;
+            border-left: 3px solid #6366f1;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #6366f1;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .about-prose blockquote p {
+            margin-bottom: 0;
+        }
+
+        .about-prose h2 {
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: #0a0a0a;
+            letter-spacing: -0.01em;
+            margin: 2.5rem 0 1rem;
+        }
+
+        .about-prose h2:first-child {
+            margin-top: 0;
+        }
+
+        .about-values {
+            list-style: none;
+            padding: 0;
+            margin: 0.75rem 0 1.25rem;
+        }
+
+        .about-values li {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.375rem 0;
+            color: #4b5563;
+        }
+
+        .about-values li::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #6366f1;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .about-founder-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.25rem;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+
+        .about-founder-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .about-founder-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .about-founder-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0a0a0a;
+            margin-bottom: 0.25rem;
+        }
+
+        .about-founder-role {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.75rem;
+        }
+
+        .about-founder-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .about-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: #6366f1;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+
+        .about-link:hover {
+            border-color: #c7d2fe;
+            background: #eef2ff;
+        }
+
+        .about-link svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        .about-cta {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .about-cta p {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #0a0a0a;
+            margin-bottom: 1rem;
+        }
+
+        .about-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .about-cta-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .about-cta-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .about-page {
+                padding: 110px 1.5rem 4rem;
+            }
+
+            .about-founder-card {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="landing-body">
+    <!-- Navigation -->
+    <nav class="landing-nav scrolled">
+        <div class="landing-nav-container">
+            <a href="{{ url_for('public.landing') }}" class="landing-brand">
+                <img src="{{ url_for('static', filename='img/stride-logo-transparent.svg') }}" alt="Stride" class="brand-logo">
+            </a>
+            <div class="landing-nav-links">
+                <a href="{{ url_for('public.landing') }}#features">Features</a>
+                <a href="{{ url_for('public.landing') }}#pricing">Pricing</a>
+                <a href="{{ url_for('public.landing') }}#how-it-works">How It Works</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Sign In</a>
+                <a href="{{ url_for('auth.register') }}" class="btn-nav-cta">Get Started Free</a>
+            </div>
+            <button class="landing-menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="landing-mobile-menu" id="mobileMenu">
+        <a href="{{ url_for('public.landing') }}#features">Features</a>
+        <a href="{{ url_for('public.landing') }}#pricing">Pricing</a>
+        <a href="{{ url_for('public.landing') }}#how-it-works">How It Works</a>
+        <a href="{{ url_for('auth.login') }}">Sign In</a>
+        <a href="{{ url_for('auth.register') }}" class="btn-nav-cta">Get Started Free</a>
     </div>
 
-    <div class="about-section">
-        <h3>Why I Built Stride</h3>
-        <div class="about-content">
+    <div class="about-page">
+        <span class="about-eyebrow">About Stride</span>
+        <h1 class="about-headline">The job search is a marathon,<br>not a sprint.</h1>
+        <p class="about-subhead">That's why I built Stride — to help you take it one step at a time.</p>
+
+        <div class="about-prose">
             <p>
-                I've been there — refreshing inboxes, juggling spreadsheets, losing track of which company 
-                I talked to last week. The modern job search is overwhelming. Dozens of applications. 
+                I've been there — refreshing inboxes, juggling spreadsheets, losing track of which company
+                I talked to last week. The modern job search is overwhelming. Dozens of applications.
                 Countless follow-ups. The mental load of keeping it all straight while staying motivated.
             </p>
             <p>
-                After going through the process myself, I realized there had to be a better way. 
-                Not another complicated tool with features you'll never use. Just something simple, 
+                After going through the process myself, I realized there had to be a better way.
+                Not another complicated tool with features you'll never use. Just something simple,
                 focused, and actually helpful.
             </p>
-            <p>
-                <strong>Stride exists to bring order to the chaos.</strong>
-            </p>
-        </div>
-    </div>
 
-    <div class="about-section">
-        <h3>Why "Stride"?</h3>
-        <div class="about-content">
-            <p>
-                Landing your next role isn't about luck — it's about organization, focus, and grit. 
-                It's about showing up every day, taking one step forward, and trusting the process.
-            </p>
-            <p>
-                That's why I named it Stride. Not a sprint. Not a scramble. A steady, confident 
-                stride toward what's next.
-            </p>
-            <p class="about-highlight">
-                One application. One follow-up. One conversation at a time.
-            </p>
-        </div>
-    </div>
+            <blockquote><p>Stride exists to bring order to the chaos.</p></blockquote>
 
-    <div class="about-section">
-        <h3>The Philosophy</h3>
-        <div class="about-content">
+            <h2>Why "Stride"?</h2>
             <p>
-                Stride keeps everything in one place so you can focus on what actually matters: 
+                Landing your next role isn't about luck — it's about <strong>organization</strong>,
+                <strong>focus</strong>, and <strong>grit</strong>. It's about showing up every day,
+                taking one step forward, and trusting the process. Not a sprint. Not a scramble.
+                A steady, confident stride toward what's next.
+            </p>
+
+            <blockquote><p>One application. One follow-up. One conversation at a time.</p></blockquote>
+
+            <h2>The Philosophy</h2>
+            <p>
+                Stride keeps everything in one place so you can focus on what actually matters:
                 telling your story, building relationships, and finding the right fit.
             </p>
-            <ul class="about-list">
+            <ul class="about-values">
                 <li>No more scattered notes</li>
                 <li>No more "wait, did I already apply there?"</li>
                 <li>Just clarity, momentum, and progress you can see</li>
             </ul>
         </div>
-    </div>
 
-    <div class="about-section about-founder">
-        <h3>About the Founder</h3>
-        <div class="about-founder-content">
-            <div class="about-founder-info">
-                <p>
-                    Hi, I'm <strong>Michael Vicenzino</strong> — a designer and developer who's spent 
-                    years building products for companies of all sizes. I built Stride because I 
-                    wanted a tool I'd actually use myself.
-                </p>
-                <p>
-                    If you have feedback, ideas, or just want to say hi, I'd love to hear from you.
-                </p>
+        <div class="about-founder-card">
+            <div class="about-founder-avatar">MV</div>
+            <div class="about-founder-body">
+                <div class="about-founder-name">Michael Vicenzino</div>
+                <div class="about-founder-role">Designer & Developer — Founder of Stride</div>
                 <div class="about-founder-links">
-                    <a href="https://www.linkedin.com/in/mvicenzino/" target="_blank" rel="noopener" class="btn btn-secondary">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <a href="https://www.linkedin.com/in/mvicenzino/" target="_blank" rel="noopener" class="about-link">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                         </svg>
-                        Connect on LinkedIn
+                        LinkedIn
                     </a>
-                    <a href="https://mvicenzino.com" target="_blank" rel="noopener" class="btn btn-secondary">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <a href="https://mvicenzino.com" target="_blank" rel="noopener" class="about-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"/>
                             <line x1="2" y1="12" x2="22" y2="12"/>
                             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                         </svg>
-                        Personal Site
+                        Website
+                    </a>
+                    <a href="mailto:stridejobsapp@gmail.com" class="about-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        Contact
                     </a>
                 </div>
             </div>
         </div>
+
+        <div class="about-cta">
+            <p>Your next chapter starts with a single step.</p>
+            <a href="{{ url_for('auth.register') }}" class="about-cta-btn">
+                Get Started Free
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
     </div>
 
-    <div class="about-cta">
-        <h3>Your next chapter starts with a single step.</h3>
-        <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
-    </div>
-</div>
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="section-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="{{ url_for('public.landing') }}" class="landing-brand">
+                        <img src="{{ url_for('static', filename='img/stride-logo-transparent.svg') }}" alt="Stride" class="brand-logo">
+                    </a>
+                    <p>Stride into your next role</p>
+                </div>
+                <div class="footer-link-groups">
+                    <div class="footer-link-group">
+                        <h4>Product</h4>
+                        <a href="{{ url_for('auth.login') }}">Sign In</a>
+                        <a href="{{ url_for('auth.register') }}">Get Started</a>
+                        <a href="{{ url_for('public.demo') }}">Try Demo</a>
+                        <a href="{{ url_for('about.about') }}">About Stride</a>
+                    </div>
+                    <div class="footer-link-group">
+                        <h4>Support</h4>
+                        <a href="mailto:stridejobsapp@gmail.com">Contact Us</a>
+                    </div>
+                    <div class="footer-link-group">
+                        <h4>Legal</h4>
+                        <a href="{{ url_for('public.privacy') }}">Privacy Policy</a>
+                        <a href="{{ url_for('public.terms') }}">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Stride. Built for job seekers, by job seekers.</p>
+            </div>
+        </div>
+    </footer>
 
-<style>
-.about-container {
-    max-width: 720px;
-    margin: 0 auto;
-}
-
-.about-hero {
-    text-align: center;
-    padding: var(--space-8) 0;
-    margin-bottom: var(--space-6);
-    border-bottom: 1px solid var(--color-border-light);
-}
-
-.about-hero h2 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-bottom: var(--space-3);
-    color: var(--color-text);
-}
-
-.about-tagline {
-    font-size: 1.125rem;
-    color: var(--color-text-secondary);
-}
-
-.about-section {
-    margin-bottom: var(--space-8);
-}
-
-.about-section h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: var(--space-4);
-    color: var(--color-text);
-}
-
-.about-content p {
-    font-size: 1rem;
-    line-height: 1.7;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-4);
-}
-
-.about-content p:last-child {
-    margin-bottom: 0;
-}
-
-.about-highlight {
-    font-size: 1.125rem;
-    font-weight: 500;
-    color: var(--color-primary) !important;
-    font-style: italic;
-}
-
-.about-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.about-list li {
-    position: relative;
-    padding-left: var(--space-6);
-    margin-bottom: var(--space-3);
-    color: var(--color-text-secondary);
-    line-height: 1.6;
-}
-
-.about-list li::before {
-    content: "✓";
-    position: absolute;
-    left: 0;
-    color: var(--color-success);
-    font-weight: 600;
-}
-
-.about-founder-content {
-    display: flex;
-    gap: var(--space-6);
-    align-items: flex-start;
-}
-
-.about-founder-info {
-    flex: 1;
-}
-
-.about-founder-info p {
-    font-size: 1rem;
-    line-height: 1.7;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-4);
-}
-
-.about-founder-links {
-    margin-top: var(--space-4);
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-}
-
-.about-founder-links .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-}
-
-.about-cta {
-    text-align: center;
-    padding: var(--space-8);
-    background: var(--color-bg-subtle);
-    border-radius: var(--radius-lg);
-    margin-top: var(--space-8);
-}
-
-.about-cta h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: var(--space-4);
-    color: var(--color-text);
-}
-
-.btn-lg {
-    padding: var(--space-3) var(--space-6);
-    font-size: 1rem;
-}
-
-@media (max-width: 768px) {
-    .about-hero h2 {
-        font-size: 1.5rem;
-    }
-    
-    .about-founder-content {
-        flex-direction: column;
-    }
-}
-</style>
-{% endblock %}
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
