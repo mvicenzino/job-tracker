@@ -282,29 +282,37 @@ html {
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-accent) 100%);
     min-height: 100vh;
     color: var(--color-text);
     line-height: 1.6;
-    font-size: 14px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: -0.01em;
+}
+
+body:not(.landing-body):not(.auth-body) {
+    background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-accent) 100%);
+    font-size: 14px;
     display: flex;
     flex-direction: column;
 }
 
 /* === Typography === */
-h1, h2, h3, h4, h5, h6 {
+body:not(.landing-body) h1,
+body:not(.landing-body) h2,
+body:not(.landing-body) h3,
+body:not(.landing-body) h4,
+body:not(.landing-body) h5,
+body:not(.landing-body) h6 {
     font-weight: 700;
     line-height: 1.25;
     color: var(--color-text);
     letter-spacing: -0.025em;
 }
 
-h1 { font-size: 1.875rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
+body:not(.landing-body) h1 { font-size: 1.875rem; }
+body:not(.landing-body) h2 { font-size: 1.5rem; }
+body:not(.landing-body) h3 { font-size: 1.25rem; }
 
 a {
     color: var(--color-primary);
@@ -6305,7 +6313,7 @@ body.demo-active .navbar {
     }
 
     /* Add padding to body so content isn't hidden behind tab bar */
-    body {
+    body:not(.landing-body):not(.auth-body) {
         padding-bottom: calc(64px + env(safe-area-inset-bottom, 0));
     }
 
@@ -6741,7 +6749,7 @@ body.demo-active .navbar {
         overflow-x: hidden;
     }
 
-    body {
+    body:not(.landing-body):not(.auth-body) {
         line-height: 1.5;
         overflow-x: hidden;
         position: relative;
@@ -6807,8 +6815,8 @@ body.demo-active .navbar {
         display: none !important;
     }
 
-    /* Constrain brand logo */
-    .brand-logo {
+    /* Constrain brand logo (app only, not landing) */
+    .navbar .brand-logo {
         max-height: 36px;
         width: auto;
     }
@@ -6822,8 +6830,10 @@ body.demo-active .navbar {
         box-sizing: border-box;
     }
 
-    /* --- Force no horizontal overflow on all major containers --- */
-    html, body, main, .container, .dashboard, .pipeline-page, 
+    /* --- Force no horizontal overflow on all major app containers --- */
+    body:not(.landing-body):not(.auth-body),
+    body:not(.landing-body):not(.auth-body) main,
+    .container, .dashboard, .pipeline-page,
     .page-header, .stats-grid, .card, .navbar {
         max-width: 100vw;
         overflow-x: hidden;
