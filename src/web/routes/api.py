@@ -669,10 +669,18 @@ def api_analyze_resume_fit():
             company_name=job.company.name if job.company else None
         )
 
-        # Record usage and save the fit score
+        # Record usage and save the fit score to both Application and Job
         tracker.record_ai_score()
-        if app_id and result.get('match_score') is not None:
-            service.applications.update(app_id, fit_score=result['match_score'])
+        score = result.get('match_score')
+        if score is not None:
+            if app_id:
+                service.applications.update(app_id, fit_score=score)
+            if job:
+                import json as _json
+                from datetime import datetime as _dt
+                job.fit_score = score
+                job.fit_analysis = _json.dumps(result)
+                job.scored_at = _dt.utcnow()
         session.commit()
 
         return jsonify({'success': True, 'analysis': result})

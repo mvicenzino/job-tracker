@@ -357,6 +357,8 @@ Requirements:
                 app.excitement_level = config['excitement']
                 if config.get('fit_score'):
                     app.fit_score = config['fit_score']
+                    # Also set on the Job so pipeline/job list badges render
+                    job.fit_score = config['fit_score']
                 apps.append(app)
 
             # Set offer details on the offer

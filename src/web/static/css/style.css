@@ -3196,6 +3196,7 @@ a:hover {
     letter-spacing: 0.02em;
 }
 
+.fit-badge[data-score="100"],
 .fit-badge[data-score^="9"],
 .fit-badge[data-score^="8"] {
     background: var(--color-success-light);

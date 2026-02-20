@@ -76,6 +76,7 @@
                         <th>Company</th>
                         <th>Position</th>
                         <th>Status</th>
+                        <th class="text-center">Fit</th>
                         <th>Date</th>
                         <th class="text-center">Excitement</th>
                         <th></th>
@@ -121,6 +122,13 @@
                                     {% endfor %}
                                 </div>
                             </div>
+                        </td>
+                        <td class="col-fit text-center">
+                            {% if app.job.fit_score is not none %}
+                            <span class="fit-badge" data-score="{{ app.job.fit_score }}">{{ app.job.fit_score }}%</span>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
                         </td>
                         <td class="col-date">
                             {% if app.date_applied %}
