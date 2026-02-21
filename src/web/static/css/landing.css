@@ -910,54 +910,59 @@
 
 /* Footer */
 .landing-footer {
-    padding: 4rem 2rem 2rem;
-    background: var(--landing-text);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2.5rem 2rem 1.5rem;
+    background: #0f172a;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .footer-content {
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 4rem;
-    padding-bottom: 3rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.footer-brand {
+    flex-shrink: 0;
 }
 
 .footer-brand .landing-brand {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     display: inline-block;
 }
 
 .footer-brand .brand-logo {
-    height: 36px;
+    height: 28px;
     filter: brightness(0) invert(1);
 }
 
 .footer-brand p {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.9375rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8125rem;
 }
 
 .footer-link-groups {
     display: flex;
-    gap: 4rem;
+    gap: 3rem;
 }
 
 .footer-link-group h4 {
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.35);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.625rem;
 }
 
 .footer-link-group a {
     display: block;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.6);
     text-decoration: none;
-    font-size: 0.9375rem;
-    padding: 0.375rem 0;
+    font-size: 0.8125rem;
+    padding: 0.25rem 0;
     transition: color 0.2s;
 }
 
@@ -966,13 +971,13 @@
 }
 
 .footer-bottom {
-    padding-top: 2rem;
-    text-align: center;
+    padding-top: 1.25rem;
+    text-align: left;
 }
 
 .footer-bottom p {
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
 }
 
 /* AI Feature Section */
@@ -1357,11 +1362,12 @@
 
     .footer-content {
         flex-direction: column;
-        gap: 2rem;
+        gap: 1.5rem;
     }
 
     .footer-link-groups {
-        gap: 2rem;
+        gap: 1.5rem;
+        flex-wrap: wrap;
     }
 }
 
@@ -1540,26 +1546,28 @@
     align-items: center;
     gap: 0.5rem;
     padding: 1rem 2rem;
-    background: transparent;
-    color: var(--landing-accent);
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--landing-text);
     font-size: 1.0625rem;
     font-weight: 600;
     border-radius: 12px;
     text-decoration: none;
-    border: 2px solid var(--landing-accent);
+    border: 1px solid var(--landing-border);
     transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .btn-hero-secondary:hover {
-    background: rgba(99, 102, 241, 0.1);
-    border-color: var(--landing-accent);
+    background: #ffffff;
+    border-color: var(--landing-muted);
     transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .btn-hero-secondary svg {
     width: 18px;
     height: 18px;
-    color: var(--landing-accent);
+    color: var(--landing-text);
 }
 
 /* Hero Demo CTA - Prominent Try Demo Button */
@@ -1635,7 +1643,7 @@
 
 .proof-text {
     font-size: 0.9375rem;
-    color: var(--landing-muted);
+    color: rgba(255, 255, 255, 0.8);
 }
 
 /* Hero Visual - App Window */
@@ -1647,12 +1655,12 @@
 }
 
 .app-window {
-    background: white;
+    background: #1a1f2e;
     border-radius: 16px;
-    box-shadow: 
-        0 0 0 1px rgba(0, 0, 0, 0.05),
-        0 25px 50px -12px rgba(0, 0, 0, 0.15),
-        0 0 100px rgba(99, 102, 241, 0.1);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 25px 50px -12px rgba(0, 0, 0, 0.4),
+        0 0 100px rgba(99, 102, 241, 0.15);
     overflow: hidden;
     animation: window-float 6s ease-in-out infinite;
 }
@@ -1667,8 +1675,8 @@
     align-items: center;
     gap: 1rem;
     padding: 0.875rem 1rem;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e5e5e5;
+    background: #141825;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .window-dots {
@@ -1704,7 +1712,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .mock-logo {
@@ -1718,6 +1726,8 @@
 .mock-logo-img {
     height: 28px;
     width: auto;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
 }
 
 .mock-nav-items {
@@ -1727,12 +1737,12 @@
 
 .mock-nav-items span {
     font-size: 0.8125rem;
-    color: #94a3b8;
+    color: rgba(255, 255, 255, 0.4);
     font-weight: 500;
 }
 
 .mock-nav-items span.active {
-    color: #6366f1;
+    color: #818cf8;
 }
 
 /* Mock Dashboard */
@@ -1767,33 +1777,33 @@
 
 .mock-stat {
     flex: 1;
-    background: #f8fafc;
+    background: rgba(255, 255, 255, 0.08);
     padding: 1rem;
     border-radius: 12px;
     text-align: center;
-    border: 1px solid #f1f5f9;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .mock-stat.highlight {
-    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-    border-color: #c7d2fe;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+    border-color: rgba(99, 102, 241, 0.3);
 }
 
 .mock-stat.success {
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-    border-color: #a7f3d0;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%);
+    border-color: rgba(16, 185, 129, 0.3);
 }
 
 .mock-stat .stat-num {
     display: block;
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--landing-text);
+    color: #ffffff;
 }
 
 .mock-stat .stat-label {
     font-size: 0.75rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.7);
     font-weight: 500;
 }
 
@@ -1901,7 +1911,7 @@
     background: none;
     font-size: 1.125rem;
     font-weight: 600;
-    color: var(--landing-text);
+    color: #ffffff;
     margin-bottom: 0.25rem;
 }
 
@@ -1910,7 +1920,7 @@
     height: auto;
     background: none;
     font-size: 0.8125rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 /* Mock Job Cards */
@@ -1921,16 +1931,16 @@
 }
 
 .mock-job-card {
-    background: white;
-    border: 1px solid #e2e8f0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
     padding: 0.75rem;
     transition: all 0.2s ease;
 }
 
 .mock-job-card:hover {
-    border-color: #c7d2fe;
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
 }
 
 .job-card-header {
@@ -1973,7 +1983,7 @@
     display: block;
     font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--landing-text);
+    color: #ffffff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1982,7 +1992,7 @@
 .job-card-info .job-company {
     display: block;
     font-size: 0.6875rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .ai-match-badge {
@@ -2853,7 +2863,7 @@
 }
 
 .hero-social-proof .proof-text strong {
-    color: var(--landing-text);
+    color: #ffffff;
     font-weight: 700;
 }
 
