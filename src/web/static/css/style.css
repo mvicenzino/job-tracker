@@ -7897,3 +7897,44 @@ body.demo-active .navbar {
 .form-group {
     position: relative;
 }
+
+/* === Contact Search Autosuggest === */
+.contact-search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.contact-search-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-border-subtle);
+    transition: background-color 0.15s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contact-search-item:last-child {
+    border-bottom: none;
+}
+
+.contact-search-item:hover,
+.contact-search-item.selected {
+    background-color: var(--color-bg-accent);
+}
+
+.contact-company {
+    font-size: 0.85em;
+    color: var(--color-text-secondary);
+    margin-left: 8px;
+}

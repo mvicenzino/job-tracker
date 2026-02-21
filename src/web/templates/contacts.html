@@ -52,7 +52,8 @@
 
     <div class="filter-bar">
         <form class="search-form" method="get">
-            <input type="text" name="search" placeholder="Search contacts..." value="{{ search or '' }}">
+            <input type="text" name="search" placeholder="Search contacts..." value="{{ search or '' }}" 
+                   data-autosuggest="contact-search">
             <button type="submit" class="btn btn-secondary">Search</button>
         </form>
         <div class="filter-buttons">
