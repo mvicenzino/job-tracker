@@ -434,6 +434,27 @@ def api_create_company():
         session.close()
 
 
+@bp.route('/api/companies/search', methods=['GET'])
+@login_required
+def api_search_companies():
+    """API: Search companies by name (for contact form autocomplete)."""
+    service, session = get_service()
+    try:
+        query = request.args.get('q', '').strip()
+        if not query or len(query) < 2:
+            return jsonify({'companies': []})
+        
+        companies = service.companies.search_by_name(query)
+        return jsonify({
+            'companies': [
+                {'id': c.id, 'name': c.name}
+                for c in companies[:10]  # Limit to 10 results
+            ]
+        })
+    finally:
+        session.close()
+
+
 @bp.route('/api/jobs', methods=['POST', 'OPTIONS'])
 def api_create_job():
     """API: Create a new job listing (for Chrome extension)."""

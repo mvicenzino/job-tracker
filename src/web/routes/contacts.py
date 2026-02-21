@@ -107,9 +107,13 @@ def new_contact():
     try:
         if request.method == 'POST':
             contact_type = ContactType(request.form.get('contact_type', 'networking'))
+            company_id = request.form.get('company_id')
+            company_name = request.form.get('company')
+            
             contact = service.add_contact(
                 name=request.form['name'],
-                company_name=request.form.get('company'),
+                company_id=int(company_id) if company_id else None,
+                company_name=company_name if not company_id else None,
                 email=request.form.get('email'),
                 phone=request.form.get('phone'),
                 title=request.form.get('title'),
@@ -178,6 +182,23 @@ def edit_contact(contact_id):
 
         if request.method == 'POST':
             contact_type = ContactType(request.form.get('contact_type', 'networking'))
+            company_id = request.form.get('company_id')
+            company_name = request.form.get('company')
+            
+            # Handle company update
+            if company_id:
+                company_id = int(company_id)
+            elif company_name:
+                # Create or find company by name
+                companies = service.companies.search_by_name(company_name)
+                if companies:
+                    company_id = companies[0].id
+                else:
+                    company = service.companies.create(name=company_name)
+                    company_id = company.id
+            else:
+                company_id = None
+            
             updates = {
                 'name': request.form.get('name', contact.name),
                 'email': request.form.get('email'),
@@ -187,6 +208,7 @@ def edit_contact(contact_id):
                 'linkedin_url': request.form.get('linkedin_url'),
                 'how_we_met': request.form.get('how_we_met'),
                 'notes': request.form.get('notes'),
+                'company_id': company_id,
             }
 
             relationship_strength = request.form.get('relationship_strength')

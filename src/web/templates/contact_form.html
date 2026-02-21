@@ -37,12 +37,10 @@
         <div class="form-row">
             <div class="form-group">
                 <label for="company">Company</label>
-                <input type="text" id="company" name="company" list="company-list">
-                <datalist id="company-list">
-                    {% for company in companies %}
-                    <option value="{{ company.name }}">
-                    {% endfor %}
-                </datalist>
+                <input type="text" id="company" name="company" 
+                       placeholder="Search or create company..." data-combobox="company">
+                <input type="hidden" id="company_id" name="company_id" 
+                       data-combobox-id="company" value="">
             </div>
             <div class="form-group">
                 <label for="title">Title</label>
