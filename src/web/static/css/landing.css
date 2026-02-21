@@ -1547,27 +1547,29 @@
     gap: 0.5rem;
     padding: 1rem 2rem;
     background: rgba(255, 255, 255, 0.95);
-    color: var(--landing-text);
+    color: var(--landing-accent);
     font-size: 1.0625rem;
     font-weight: 600;
     border-radius: 12px;
     text-decoration: none;
-    border: 1px solid var(--landing-border);
+    border: 1px solid rgba(99, 102, 241, 0.3);
     transition: all 0.2s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .btn-hero-secondary:hover {
     background: #ffffff;
-    border-color: var(--landing-muted);
+    border-color: var(--landing-accent);
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
 }
 
 .btn-hero-secondary svg {
     width: 18px;
     height: 18px;
-    color: var(--landing-text);
+    color: var(--landing-accent);
+    fill: var(--landing-accent);
+    stroke: none;
 }
 
 /* Hero Demo CTA - Prominent Try Demo Button */
