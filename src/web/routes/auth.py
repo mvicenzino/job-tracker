@@ -1,9 +1,12 @@
 """Authentication routes: register, login, logout."""
+import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import current_user, login_user, logout_user, login_required
 from urllib.parse import urlparse
 
 from ...models import User
+
+EMAIL_RE = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
 
 bp = Blueprint('auth', __name__)
 
@@ -21,6 +24,10 @@ def register():
 
         if not email or not password:
             flash('Email and password are required.', 'error')
+            return render_template('register.html')
+
+        if not EMAIL_RE.match(email):
+            flash('Please enter a valid email address.', 'error')
             return render_template('register.html')
 
         if password != confirm_password:

@@ -38,7 +38,7 @@ def feedback_list():
     db = current_app.extensions['db']
     session = db.get_session()
     try:
-        items = session.query(Feedback).order_by(Feedback.created_at.desc()).all()
+        items = session.query(Feedback).filter(Feedback.user_id == current_user.id).order_by(Feedback.created_at.desc()).all()
         return render_template('feedback_list.html', feedback_items=items)
     finally:
         session.close()

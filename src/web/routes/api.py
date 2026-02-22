@@ -11,6 +11,23 @@ from ...services.usage_tracker import UsageTracker
 
 bp = Blueprint('api', __name__)
 
+# Mass assignment protection: only these fields can be set via PATCH
+ALLOWED_APPLICATION_FIELDS = {
+    'status', 'date_applied', 'date_response', 'date_closed',
+    'excitement_level', 'offered_salary', 'offered_bonus', 'offered_equity',
+    'rejection_reason', 'lessons_learned', 'resume_version_id', 'cover_letter',
+    'referral_contact_id', 'fit_score',
+}
+ALLOWED_JOB_FIELDS = {
+    'title', 'description', 'requirements', 'salary_min', 'salary_max',
+    'salary_currency', 'location', 'remote_type', 'job_url', 'source',
+    'is_active', 'is_flagged',
+}
+ALLOWED_COMPANY_FIELDS = {
+    'name', 'website', 'industry', 'size', 'location', 'description',
+    'culture_notes', 'glassdoor_rating', 'linkedin_url',
+}
+
 
 def _get_cors_origin():
     """Return the allowed CORS origin for the current request, or None."""
@@ -58,6 +75,7 @@ def api_update_application(app_id):
     service, session = get_service()
     try:
         data = request.get_json()
+        data = {k: v for k, v in data.items() if k in ALLOWED_APPLICATION_FIELDS}
         app = service.applications.update(app_id, **data)
         session.commit()
         if app:
@@ -98,6 +116,7 @@ def api_update_job(job_id):
     service, session = get_service_for_user(user.id)
     try:
         data = request.get_json()
+        data = {k: v for k, v in data.items() if k in ALLOWED_JOB_FIELDS}
         job = service.jobs.update(job_id, **data)
         session.commit()
         if job:
@@ -146,6 +165,7 @@ def api_update_company(company_id):
     service, session = get_service_for_user(user.id)
     try:
         data = request.get_json()
+        data = {k: v for k, v in data.items() if k in ALLOWED_COMPANY_FIELDS}
         company = service.companies.update(company_id, **data)
         session.commit()
         if company:
@@ -292,74 +312,6 @@ def api_list_contacts():
                 }
                 for c in contacts
             ]
-        })
-        cors_origin = _get_cors_origin()
-        if cors_origin:
-            response.headers['Access-Control-Allow-Origin'] = cors_origin
-        return response
-    except Exception as e:
-        current_app.logger.exception('API error')
-        response = jsonify({'success': False, 'error': 'Internal server error'})
-        cors_origin = _get_cors_origin()
-        if cors_origin:
-            response.headers['Access-Control-Allow-Origin'] = cors_origin
-        return response, 500
-    finally:
-        session.close()
-
-
-@bp.route('/api/contacts/<int:contact_id>', methods=['GET', 'OPTIONS'])
-def api_get_contact(contact_id):
-    """API: Get a single contact by ID."""
-    if request.method == 'OPTIONS':
-        response = jsonify({'status': 'ok'})
-        cors_origin = _get_cors_origin()
-        if cors_origin:
-            response.headers['Access-Control-Allow-Origin'] = cors_origin
-        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
-        return response
-
-    api_key = request.headers.get('X-API-Key')
-    user = get_user_by_api_key(api_key) if api_key else None
-    if not user and current_user.is_authenticated:
-        user = current_user
-    if not user:
-        response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
-        cors_origin = _get_cors_origin()
-        if cors_origin:
-            response.headers['Access-Control-Allow-Origin'] = cors_origin
-        return response, 401
-
-    service, session = get_service_for_user(user.id)
-    try:
-        c = service.contacts.get_by_id(contact_id)
-        if not c:
-            response = jsonify({'success': False, 'error': 'Contact not found'})
-            cors_origin = _get_cors_origin()
-        if cors_origin:
-            response.headers['Access-Control-Allow-Origin'] = cors_origin
-            return response, 404
-
-        response = jsonify({
-            'success': True,
-            'contact': {
-                'id': c.id,
-                'name': c.name,
-                'email': c.email,
-                'phone': c.phone,
-                'linkedinUrl': c.linkedin_url,
-                'title': c.title,
-                'contactType': c.contact_type.value if c.contact_type else None,
-                'companyName': c.company.name if c.company else None,
-                'relationshipStrength': c.relationship_strength,
-                'lastContactDate': c.last_contact_date.isoformat() if c.last_contact_date else None,
-                'nextFollowupDate': c.next_followup_date.isoformat() if c.next_followup_date else None,
-                'notes': c.notes,
-                'howWeMet': c.how_we_met,
-                'createdAt': c.created_at.isoformat() if hasattr(c, 'created_at') and c.created_at else None,
-                'updatedAt': c.updated_at.isoformat() if hasattr(c, 'updated_at') and c.updated_at else None,
-            }
         })
         cors_origin = _get_cors_origin()
         if cors_origin:
@@ -1131,45 +1083,6 @@ def api_interview_prep(app_id):
         session.close()
 
 
-@bp.route('/api/contacts/search')
-def api_contacts_search():
-    """API: Search contacts by name for @mention autocomplete."""
-    api_key = request.headers.get('X-API-Key')
-    user = get_user_by_api_key(api_key) if api_key else None
-    if not user and current_user.is_authenticated:
-        user = current_user
-    if not user:
-        response = jsonify({'success': False, 'error': 'Authentication required.'})
-        cors_origin = _get_cors_origin()
-        if cors_origin:
-            response.headers['Access-Control-Allow-Origin'] = cors_origin
-        return response, 401
-
-    service, session = get_service_for_user(user.id)
-    try:
-        q = request.args.get('q', '').strip()
-        if not q:
-            return jsonify({'success': True, 'contacts': []})
-        contacts = service.contacts.search_by_name(q)
-        response = jsonify({
-            'success': True,
-            'contacts': [
-                {
-                    'id': c.id,
-                    'name': c.name,
-                    'companyName': c.company.name if c.company else None
-                }
-                for c in contacts[:10]
-            ]
-        })
-        cors_origin = _get_cors_origin()
-        if cors_origin:
-            response.headers['Access-Control-Allow-Origin'] = cors_origin
-        return response
-    finally:
-        session.close()
-
-
 @bp.route('/api/followups/due')
 @login_required
 def api_followups_due():
@@ -1236,17 +1149,20 @@ def cron_generate_notifications():
     from flask import current_app
     from ...services.notification_generator import NotificationGenerator
     
-    # Verify cron secret (optional but recommended)
+    # Verify cron secret
     cron_secret = os.environ.get('CRON_SECRET')
     provided_secret = request.headers.get('X-Cron-Secret') or request.args.get('secret')
-    
-    if cron_secret and provided_secret != cron_secret:
+
+    if not cron_secret:
+        if os.environ.get('VERCEL'):
+            return jsonify({'error': 'CRON_SECRET not configured'}), 401
+    elif provided_secret != cron_secret:
         return jsonify({'error': 'Unauthorized'}), 401
-    
+
     try:
         db = current_app.extensions['db']
         session = db.get_session()
-        
+
         try:
             generator = NotificationGenerator(session)
             results = generator.generate_all()
@@ -1281,11 +1197,14 @@ def cron_score_fit():
     from flask import current_app
     from ...models import User, ResumeVersion
 
-    # Verify cron secret (optional but recommended)
+    # Verify cron secret
     cron_secret = os.environ.get('CRON_SECRET')
     provided_secret = request.headers.get('X-Cron-Secret') or request.args.get('secret')
 
-    if cron_secret and provided_secret != cron_secret:
+    if not cron_secret:
+        if os.environ.get('VERCEL'):
+            return jsonify({'error': 'CRON_SECRET not configured'}), 401
+    elif provided_secret != cron_secret:
         return jsonify({'error': 'Unauthorized'}), 401
 
     if not is_ai_parsing_available():

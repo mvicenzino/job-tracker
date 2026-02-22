@@ -45,9 +45,15 @@ def demo():
         if not demo_user:
             demo_user = User(email=DEMO_EMAIL)
             demo_user.set_password(DEMO_PASSWORD)
+            demo_user.subscription_tier = 'pro'
             session.add(demo_user)
             session.commit()
             session.refresh(demo_user)
+
+        # Ensure demo user always has Pro tier
+        if demo_user.subscription_tier != 'pro':
+            demo_user.subscription_tier = 'pro'
+            session.commit()
 
         # Check if demo data needs to be created or refreshed
         service = JobHuntService(session, user_id=demo_user.id)

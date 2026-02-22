@@ -65,9 +65,7 @@ class User(Base, TimestampMixin, UserMixin):
 
     @property
     def is_pro(self) -> bool:
-        """Check if user has Pro subscription (demo users are always Pro)."""
-        if self.email == DEMO_EMAIL:
-            return True
+        """Check if user has Pro subscription."""
         return self.subscription_tier == 'pro'
 
     @property
