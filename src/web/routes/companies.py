@@ -1,4 +1,4 @@
-"""Company routes: list, new, edit."""
+"""Company routes: list, new, edit, delete."""
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 
@@ -78,3 +78,22 @@ def edit_company(company_id):
         return render_template('edit_company.html', company=company)
     finally:
         session.close()
+
+
+@bp.route('/companies/<int:company_id>/delete', methods=['POST'])
+@login_required
+def delete_company(company_id):
+    """Delete a company."""
+    service, session = get_service()
+    try:
+        company = service.companies.get_by_id(company_id)
+        if company:
+            name = company.name
+            service.companies.delete(company_id)
+            session.commit()
+            flash(f'Company {name} deleted.', 'success')
+        else:
+            flash('Company not found.', 'error')
+    finally:
+        session.close()
+    return redirect(url_for('companies.companies'))

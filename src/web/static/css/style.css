@@ -7968,3 +7968,314 @@ body.demo-active .navbar {
     color: var(--color-text-secondary);
     margin-left: 8px;
 }
+
+/* ===== View Toggle ===== */
+.view-toggle {
+    display: inline-flex;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.view-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 32px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: background 0.15s, color 0.15s;
+    padding: 0;
+}
+
+.view-toggle-btn:hover {
+    color: var(--color-text-primary);
+    background: var(--color-bg-hover);
+}
+
+.view-toggle-btn.active {
+    background: var(--color-accent, #6366f1);
+    color: #fff;
+}
+
+.view-toggle-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===== Contact Tile Grid ===== */
+.contact-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-6);
+}
+
+.contact-tile {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    transition: all var(--transition);
+}
+
+.contact-tile:hover {
+    border-color: var(--color-border);
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.08));
+    transform: translateY(-1px);
+}
+
+.contact-tile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.contact-tile-name {
+    font-weight: 600;
+    font-size: var(--text-base);
+    color: var(--color-text);
+}
+
+.contact-tile-email {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+.contact-tile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+}
+
+.contact-tile-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.contact-tile-meta span:not(:last-child)::after {
+    content: "\00b7";
+    margin-left: var(--space-2);
+    color: var(--color-text-muted);
+}
+
+.contact-tile-actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border-light);
+}
+
+/* ===== List View (Contacts / Companies / Jobs) ===== */
+.list-view-container {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.list-view-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-border-light);
+    transition: all var(--transition-fast);
+}
+
+.list-view-item:last-child {
+    border-bottom: none;
+}
+
+.list-view-item:hover {
+    background: var(--color-bg-accent);
+}
+
+.list-view-item:hover .list-view-actions {
+    opacity: 1;
+}
+
+.list-view-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md, 8px);
+    background: var(--color-bg-subtle);
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+}
+
+.list-view-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.list-view-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.list-view-title {
+    font-weight: 600;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-view-subtitle {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-view-meta {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.list-view-actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-shrink: 0;
+    opacity: 0.5;
+    transition: opacity var(--transition-fast);
+}
+
+.list-view-salary {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+/* Flagged / saved indicator on list items */
+.list-view-item.flagged {
+    border-left: 3px solid var(--color-accent, #6366f1);
+}
+
+/* Overdue follow-up highlight */
+.list-view-item.overdue {
+    border-left: 3px solid var(--color-warning, #f59e0b);
+}
+
+/* ===== No Filter Results ===== */
+.no-filter-results {
+    display: none;
+    text-align: center;
+    padding: var(--space-8) var(--space-4);
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+}
+
+/* ===== Page Filter Input ===== */
+.page-filter-wrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 360px;
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 0 var(--space-3);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.page-filter-wrapper:focus-within {
+    border-color: var(--color-accent, #6366f1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.page-filter-wrapper .filter-icon {
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+}
+
+.page-filter-wrapper input {
+    flex: 1;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+    padding: var(--space-2) var(--space-2);
+    font-size: 0.9rem;
+    color: var(--color-text);
+    min-width: 0;
+}
+
+.page-filter-wrapper input:focus,
+.page-filter-wrapper input:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+.page-filter-wrapper input::placeholder {
+    color: var(--color-text-muted);
+}
+
+/* ===== Filter bar with toggle ===== */
+.filter-bar {
+    flex-wrap: wrap;
+}
+
+.filter-bar .view-toggle {
+    margin-left: auto;
+}
+
+@media (max-width: 768px) {
+    .view-toggle {
+        display: none !important;
+    }
+
+    .page-filter-wrapper {
+        max-width: none;
+    }
+
+    .list-view-item {
+        flex-wrap: wrap;
+        padding: var(--space-3) var(--space-4);
+    }
+
+    .list-view-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .list-view-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .list-view-meta {
+        width: 100%;
+        margin-top: var(--space-2);
+    }
+
+    .list-view-actions {
+        width: 100%;
+        margin-top: var(--space-2);
+        opacity: 1;
+    }
+}

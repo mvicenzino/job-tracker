@@ -9,18 +9,65 @@
         <a href="{{ url_for('companies.new_company') }}" class="btn btn-primary">+ Add Company</a>
     </header>
 
-    <form class="search-form" method="get">
-        <input type="text" name="search" placeholder="Search companies..." value="{{ search or '' }}">
-        <button type="submit" class="btn btn-secondary">Search</button>
+    <div class="filter-bar">
+        <div class="page-filter-wrapper">
+            <svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" id="pageFilterInput" placeholder="Search companies..." value="{{ search or '' }}">
+        </div>
         {% if search %}
         <a href="{{ url_for('companies.companies') }}" class="btn btn-link">Clear</a>
         {% endif %}
-    </form>
+        <div class="view-toggle">
+            <button type="button" class="view-toggle-btn" data-view="list" title="List view">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </button>
+            <button type="button" class="view-toggle-btn" data-view="tile" title="Tile view">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            </button>
+        </div>
+    </div>
 
     {% if companies %}
-    <div class="card-grid">
+    {# ===== LIST VIEW ===== #}
+    <div class="list-view-container">
         {% for company in companies %}
-        <div class="card company-card">
+        <div class="list-view-item" data-filter-text="{{ company.name }} {{ company.industry or '' }} {{ company.location or '' }}">
+            <div class="list-view-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>
+                    <path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/>
+                </svg>
+            </div>
+            <div class="list-view-main">
+                <div class="list-view-title">{{ company.name }}</div>
+                <div class="list-view-subtitle">
+                    {% if company.industry %}{{ company.industry }}{% endif %}
+                    {% if company.industry and company.location %} &middot; {% endif %}
+                    {% if company.location %}{{ company.location }}{% endif %}
+                </div>
+            </div>
+            <div class="list-view-meta">
+                <span class="badge">{{ company.jobs|length }} jobs</span>
+                <span class="badge">{{ company.contacts|length }} contacts</span>
+            </div>
+            <div class="list-view-actions">
+                <a href="{{ url_for('companies.edit_company', company_id=company.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                <a href="{{ url_for('applications.new_application', company_id=company.id, company_name=company.name) }}" class="btn btn-sm btn-primary">+ Add Lead</a>
+                <button type="button" class="btn btn-sm btn-ghost btn-danger-text" title="Delete company"
+                        onclick="showConfirmModal('Delete Company', 'Are you sure you want to delete {{ company.name }}? This action cannot be undone.', '{{ url_for('companies.delete_company', company_id=company.id) }}', 'Delete', 'btn-danger')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# ===== TILE VIEW (existing card grid) ===== #}
+    <div class="card-grid tile-view-container">
+        {% for company in companies %}
+        <div class="card company-card" data-filter-text="{{ company.name }} {{ company.industry or '' }} {{ company.location or '' }}">
             <div class="card-body">
                 <h3>{{ company.name }}</h3>
                 {% if company.industry %}
@@ -40,10 +87,17 @@
                 <span class="job-count">{{ company.jobs|length }} jobs</span>
                 <span class="contact-count">{{ company.contacts|length }} contacts</span>
                 <a href="{{ url_for('applications.new_application', company_id=company.id, company_name=company.name) }}" class="btn btn-sm btn-primary">+ Add Lead</a>
+                <button type="button" class="btn btn-sm btn-ghost btn-danger-text" title="Delete company" style="margin-left:auto"
+                        onclick="showConfirmModal('Delete Company', 'Are you sure you want to delete {{ company.name }}? This action cannot be undone.', '{{ url_for('companies.delete_company', company_id=company.id) }}', 'Delete', 'btn-danger')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
             </div>
         </div>
         {% endfor %}
     </div>
+
+    <div class="no-filter-results">No companies match your search.</div>
+
     {% else %}
     <div class="card">
         <div class="card-body">
@@ -70,4 +124,19 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof initListPage === 'function') {
+        initListPage({
+            pageKey: 'companies',
+            listSelector: '.list-view-container',
+            tileSelector: '.tile-view-container',
+            itemSelector: '[data-filter-text]',
+            searchSelector: '#pageFilterInput',
+            toggleSelector: '.view-toggle'
+        });
+    }
+});
+</script>
 {% endblock %}

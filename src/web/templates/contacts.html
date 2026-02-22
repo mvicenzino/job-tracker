@@ -51,19 +51,29 @@
     </header>
 
     <div class="filter-bar">
-        <form class="search-form" method="get">
-            <input type="text" name="search" placeholder="Search contacts..." value="{{ search or '' }}" 
-                   data-autosuggest="contact-search">
-            <button type="submit" class="btn btn-secondary">Search</button>
-        </form>
+        <div class="page-filter-wrapper">
+            <svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" id="pageFilterInput" placeholder="Search contacts..." value="{{ search or '' }}">
+        </div>
         <div class="filter-buttons">
             <a href="{{ url_for('contacts.contacts') }}" class="btn {% if not search and not followup %}btn-primary{% else %}btn-secondary{% endif %}">All</a>
             <a href="{{ url_for('contacts.contacts', followup='true') }}" class="btn {% if followup %}btn-primary{% else %}btn-secondary{% endif %}">Need Follow-up</a>
         </div>
+        <div class="view-toggle">
+            <button type="button" class="view-toggle-btn" data-view="list" title="List view">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </button>
+            <button type="button" class="view-toggle-btn" data-view="tile" title="Tile view">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            </button>
+        </div>
     </div>
 
     {% if contacts %}
-    <div class="table-container">
+    {# ===== LIST VIEW (table) ===== #}
+    <div class="list-view-container">
         <table class="data-table">
             <thead>
                 <tr>
@@ -79,7 +89,7 @@
             </thead>
             <tbody>
                 {% for contact in contacts %}
-                <tr>
+                <tr data-filter-text="{{ contact.name }} {{ contact.email or '' }} {{ contact.company.name if contact.company else '' }} {{ contact.title or '' }} {{ contact.contact_type.value }}">
                     <td>
                         <strong>{{ contact.name }}</strong>
                         {% if contact.email %}
@@ -135,6 +145,54 @@
             </tbody>
         </table>
     </div>
+
+    {# ===== TILE VIEW (cards) ===== #}
+    <div class="contact-card-grid tile-view-container">
+        {% for contact in contacts %}
+        <div class="contact-tile" data-filter-text="{{ contact.name }} {{ contact.email or '' }} {{ contact.company.name if contact.company else '' }} {{ contact.title or '' }} {{ contact.contact_type.value }}">
+            <div class="contact-tile-header">
+                <div>
+                    <div class="contact-tile-name">{{ contact.name }}</div>
+                    {% if contact.email %}
+                    <div class="contact-tile-email">{{ contact.email }}</div>
+                    {% endif %}
+                </div>
+                <span class="badge badge-{{ contact.contact_type.value }}">
+                    {{ contact.contact_type.value|replace('_', ' ')|title }}
+                </span>
+            </div>
+            <div class="contact-tile-meta">
+                {% if contact.company %}
+                <span>{{ contact.company.name }}</span>
+                {% endif %}
+                {% if contact.title %}
+                <span>{{ contact.title }}</span>
+                {% endif %}
+                {% if contact.next_followup_date %}
+                <span>
+                    Follow-up:
+                    {% if contact.next_followup_date <= today %}
+                    <span class="text-warning">{{ contact.next_followup_date.strftime('%b %d') }} ⚠️</span>
+                    {% else %}
+                    {{ contact.next_followup_date.strftime('%b %d') }}
+                    {% endif %}
+                </span>
+                {% endif %}
+            </div>
+            <div class="contact-tile-actions">
+                <a href="{{ url_for('contacts.edit_contact', contact_id=contact.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                <a href="{{ url_for('applications.new_application', referral_contact_id=contact.id, referral_name=contact.name, company_id=contact.company.id if contact.company else '', company_name=contact.company.name if contact.company else '') }}" class="btn btn-sm btn-primary">+ Add Lead</a>
+                <button type="button" class="btn btn-sm btn-ghost btn-danger-text" title="Delete contact" style="margin-left:auto"
+                        onclick="showConfirmModal('Delete Contact', 'Are you sure you want to delete {{ contact.name }}? This action cannot be undone.', '{{ url_for('contacts.delete_contact', contact_id=contact.id) }}', 'Delete', 'btn-danger')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="no-filter-results">No contacts match your search.</div>
+
     {% else %}
     <div class="card">
         <div class="card-body">
@@ -157,4 +215,19 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof initListPage === 'function') {
+        initListPage({
+            pageKey: 'contacts',
+            listSelector: '.list-view-container',
+            tileSelector: '.tile-view-container',
+            itemSelector: '[data-filter-text]',
+            searchSelector: '#pageFilterInput',
+            toggleSelector: '.view-toggle'
+        });
+    }
+});
+</script>
 {% endblock %}
