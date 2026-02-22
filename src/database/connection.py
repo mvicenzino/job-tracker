@@ -152,6 +152,16 @@ class DatabaseConnection:
                         except Exception as e:
                             print(f"[Migration] Failed to add avatar_url: {e}")
 
+                    # Widen avatar_url to TEXT for base64 data URIs (Postgres only; SQLite TEXT is already unlimited)
+                    if is_postgres and 'avatar_url' in columns:
+                        try:
+                            conn.execute(text('ALTER TABLE users ALTER COLUMN avatar_url TYPE TEXT'))
+                            conn.commit()
+                            print("[Migration] Widened avatar_url column to TEXT")
+                        except Exception as e:
+                            # Ignore if already TEXT
+                            pass
+
                     if 'display_name' not in columns:
                         try:
                             conn.execute(text('ALTER TABLE users ADD COLUMN display_name VARCHAR(100)'))

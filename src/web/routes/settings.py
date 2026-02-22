@@ -189,68 +189,52 @@ def save_profile():
 @bp.route('/settings/avatar', methods=['POST'])
 @login_required
 def upload_avatar():
-    """Upload a profile avatar image."""
-    import os
-    import uuid
-    from werkzeug.utils import secure_filename
-    
+    """Upload a profile avatar image (stored as base64 data URI)."""
+    import base64
+
     db = current_app.extensions['db']
     session = db.get_session()
-    
+
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
     MAX_SIZE = 2 * 1024 * 1024  # 2MB
-    
+
     try:
         file = request.files.get('avatar')
         if not file or file.filename == '':
             flash('Please select an image file.', 'error')
             return redirect(url_for('settings.settings'))
-        
+
         # Check extension
         ext = file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else ''
         if ext not in ALLOWED_EXTENSIONS:
             flash('Please upload a valid image (PNG, JPG, GIF, or WebP).', 'error')
             return redirect(url_for('settings.settings'))
-        
+
         # Check file size
         file.seek(0, 2)  # Seek to end
         size = file.tell()
         file.seek(0)  # Seek back to start
-        
+
         if size > MAX_SIZE:
             flash('Image must be under 2MB.', 'error')
             return redirect(url_for('settings.settings'))
-        
-        # Generate unique filename
-        filename = f"avatar_{current_user.id}_{uuid.uuid4().hex[:8]}.{ext}"
-        
-        # Save to static/uploads/avatars
-        upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'avatars')
-        os.makedirs(upload_dir, exist_ok=True)
-        
-        filepath = os.path.join(upload_dir, filename)
-        file.save(filepath)
-        
-        # Update user's avatar URL
+
+        # Read file and encode as base64 data URI
+        data = file.read()
+        b64 = base64.b64encode(data).decode('utf-8')
+        mime = f"image/{ext}" if ext != 'jpg' else 'image/jpeg'
+
         user = session.query(User).get(current_user.id)
-        
-        # Delete old avatar file if exists
-        if user.avatar_url:
-            old_filename = user.avatar_url.split('/')[-1]
-            old_path = os.path.join(upload_dir, old_filename)
-            if os.path.exists(old_path):
-                os.remove(old_path)
-        
-        user.avatar_url = url_for('static', filename=f'uploads/avatars/{filename}')
+        user.avatar_url = f"data:{mime};base64,{b64}"
         session.commit()
-        
+
         flash('Avatar updated!', 'success')
     except Exception as e:
         current_app.logger.exception('Avatar upload error')
         flash('Error uploading avatar. Please try again.', 'error')
     finally:
         session.close()
-    
+
     return redirect(url_for('settings.settings'))
 
 
@@ -258,21 +242,10 @@ def upload_avatar():
 @login_required
 def delete_avatar():
     """Remove profile avatar."""
-    import os
-    
     db = current_app.extensions['db']
     session = db.get_session()
     try:
         user = session.query(User).get(current_user.id)
-        
-        # Delete file if exists
-        if user.avatar_url:
-            filename = user.avatar_url.split('/')[-1]
-            upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'avatars')
-            filepath = os.path.join(upload_dir, filename)
-            if os.path.exists(filepath):
-                os.remove(filepath)
-        
         user.avatar_url = None
         session.commit()
         flash('Avatar removed.', 'success')
