@@ -128,12 +128,23 @@
 
 ---
 
+## Deployments
+
+| Site | URL | Status |
+|------|-----|--------|
+| stride-jobs (primary) | https://stride-jobs.vercel.app | Live — Pass 1 + Pass 2 deployed 2026-02-22 |
+| stride-feature-branch | https://stride-feature-branch.vercel.app | Live — auto-deployed from same push |
+
+Both verified: `/demo` returns 302 → `/dashboard`, demo data renders (Stripe, Notion, Figma, Anthropic).
+
+---
+
 ## Post-Deploy Checklist
 
+- [x] Test demo flow: `GET /demo` and `GET /demo?refresh=1` — both 302 → dashboard
 - [ ] Set `APP_URL` env var on Vercel (e.g., `https://stride-jobs.vercel.app`)
 - [ ] Verify `SECRET_KEY` is set in Vercel env vars (app won't start without it)
 - [ ] Set `CRON_SECRET` env var on Vercel (medium priority — item 12)
-- [ ] Test demo flow: `GET /demo` and `GET /demo?refresh=1`
 - [ ] Test login with `?next=https://evil.com` redirects to dashboard
 - [ ] Verify `/api/health` returns no column names
 - [ ] Verify `POST /settings/upgrade` returns 501
