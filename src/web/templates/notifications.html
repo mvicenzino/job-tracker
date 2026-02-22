@@ -16,9 +16,11 @@
         {% if notifications %}
         <div class="header-actions">
             <form action="{{ url_for('notifications.mark_all_read') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-secondary btn-sm">Mark All Read</button>
             </form>
             <form action="{{ url_for('notifications.clear_read') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-ghost btn-sm">Clear Read</button>
             </form>
         </div>
@@ -79,10 +81,12 @@
                             {% endif %}
                             {% if not notification.is_read %}
                             <form action="{{ url_for('notifications.mark_read', notification_id=notification.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <button type="submit" class="btn btn-sm btn-ghost">Mark Read</button>
                             </form>
                             {% endif %}
                             <form action="{{ url_for('notifications.delete', notification_id=notification.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <button type="submit" class="btn btn-sm btn-ghost text-danger">Dismiss</button>
                             </form>
                         </div>

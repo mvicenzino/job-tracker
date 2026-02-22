@@ -9,6 +9,7 @@
     </header>
 
     <form method="post" class="form card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="form-group mention-container">
             <label for="title">Event Title *</label>
             <input type="text" id="title" name="title" required placeholder="e.g., Coffee chat with @John" autocomplete="off">

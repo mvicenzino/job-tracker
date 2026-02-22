@@ -13,6 +13,7 @@
     </header>
 
     <form method="post" class="form card reflection-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="reflection-intro">
             <p>Regular reflection helps you recognize patterns, celebrate wins, and stay motivated. Be honest with yourself - this is for you.</p>
         </div>

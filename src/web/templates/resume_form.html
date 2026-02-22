@@ -13,6 +13,7 @@
     </header>
 
     <form method="post" class="form card" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="form-group">
             <label for="name">Version Name *</label>
             <input type="text" id="name" name="name" required

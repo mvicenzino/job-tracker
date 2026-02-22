@@ -464,6 +464,7 @@
                             </div>
                             {% if not event.completed %}
                             <form action="{{ url_for('schedule.complete_event', event_id=event.id) }}" method="post" class="inline-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <button type="submit" name="went_well" value="true" class="btn btn-sm btn-success" title="Mark complete">✓</button>
                             </form>
                             {% else %}

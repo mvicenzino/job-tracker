@@ -16,6 +16,7 @@
         <div class="header-actions">
             {% if not event.completed %}
             <form action="{{ url_for('schedule.update_event', event_id=event.id) }}" method="post" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input type="hidden" name="completed" value="true">
                 <input type="hidden" name="went_well" value="true">
                 <button type="submit" class="btn btn-success">✓ Mark Complete</button>
@@ -131,6 +132,7 @@
                 </div>
                 <div class="card-body">
                     <form action="{{ url_for('schedule.update_event', event_id=event.id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <div class="form-group">
                             <label for="outcome_notes">Add or update your notes from this meeting</label>
                             <textarea

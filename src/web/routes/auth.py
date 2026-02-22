@@ -1,6 +1,7 @@
 """Authentication routes: register, login, logout."""
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import current_user, login_user, logout_user, login_required
+from urllib.parse import urlparse
 
 from ...models import User
 
@@ -72,6 +73,11 @@ def login():
             if user and user.check_password(password):
                 login_user(user, remember=True)
                 next_page = request.args.get('next')
+                # Validate next_page is a safe, same-origin relative URL
+                if next_page:
+                    parsed = urlparse(next_page)
+                    if parsed.netloc or parsed.scheme:
+                        next_page = None
                 flash('Logged in successfully!', 'success')
                 return redirect(next_page or url_for('dashboard.dashboard'))
             else:
@@ -80,27 +86,6 @@ def login():
             session.close()
 
     return render_template('login.html')
-
-
-@bp.route('/admin-login')
-def admin_login():
-    """Quick admin login bypass for local development/testing."""
-    ADMIN_EMAIL = 'admin@stride.dev'
-    ADMIN_PASSWORD = 'admin1234'
-
-    db = current_app.extensions['db']
-    session = db.get_session()
-    try:
-        user = session.query(User).filter(User.email == ADMIN_EMAIL).first()
-        if not user:
-            user = User(email=ADMIN_EMAIL)
-            user.set_password(ADMIN_PASSWORD)
-            session.add(user)
-            session.commit()
-        login_user(user, remember=True)
-        return redirect(url_for('dashboard.dashboard'))
-    finally:
-        session.close()
 
 
 @bp.route('/logout')

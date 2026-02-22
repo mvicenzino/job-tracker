@@ -120,6 +120,7 @@
                             <a href="{{ url_for('applications.new_application', referral_contact_id=contact.id, referral_name=contact.name, company_id=contact.company.id if contact.company else '', company_name=contact.company.name if contact.company else '') }}" class="btn btn-sm btn-primary" title="Add lead with this referral">+ Add Lead</a>
                             <a href="{{ url_for('contacts.edit_contact', contact_id=contact.id) }}" class="btn btn-sm btn-secondary" title="Edit contact">Edit</a>
                             <form action="{{ url_for('contacts.log_contact', contact_id=contact.id) }}" method="post" class="inline-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <input type="hidden" name="followup_days" value="14">
                                 <button type="submit" class="btn btn-sm btn-success" title="Log contact, set follow-up in 14 days">Contacted</button>
                             </form>

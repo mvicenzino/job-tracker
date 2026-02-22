@@ -59,6 +59,7 @@
                 </div>
                 {% endif %}
                 <form method="POST" action="{{ url_for('settings.upgrade') }}" style="margin-top: var(--space-4);">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn btn-primary">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
@@ -125,6 +126,7 @@
                     </div>
                     <div class="profile-avatar-actions">
                         <form method="POST" action="{{ url_for('settings.upload_avatar') }}" enctype="multipart/form-data" class="avatar-upload-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <label class="btn btn-secondary btn-sm avatar-upload-btn">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -137,12 +139,14 @@
                         </form>
                         {% if current_user.avatar_url %}
                         <form method="POST" action="{{ url_for('settings.delete_avatar') }}" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Remove your avatar?')">Remove</button>
                         </form>
                         {% endif %}
                     </div>
                 </div>
                 <form method="POST" action="{{ url_for('settings.save_profile') }}" class="profile-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <div class="form-group">
                         <label for="display_name">Display Name</label>
                         <input type="text" id="display_name" name="display_name" 
@@ -176,6 +180,7 @@
                 <pre class="resume-preview">{{ current_user.resume_text[:2000] }}{% if current_user.resume_text|length > 2000 %}…{% endif %}</pre>
             </details>
             <form method="POST" action="{{ url_for('settings.delete_resume') }}" class="mt-4" onsubmit="return confirm('Remove your saved resume?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-danger btn-sm">Remove Resume</button>
             </form>
             {% else %}
@@ -201,6 +206,7 @@
                 </label>
             </div>
             <form method="POST" action="{{ url_for('settings.save_resume') }}" enctype="multipart/form-data" id="resumeForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div id="resumePasteSection">
                     <input type="hidden" name="resume_mode" id="resumeMode" value="paste">
                     <textarea name="resume_text" rows="8" class="resume-textarea" placeholder="Paste your resume text here..."></textarea>
@@ -245,6 +251,7 @@
             {% endif %}
 
             <form method="POST" action="{{ url_for('settings.generate_api_key') }}" class="mt-4">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-primary">
                     {% if current_user.api_key %}Regenerate API Key{% else %}Generate API Key{% endif %}
                 </button>
@@ -293,6 +300,7 @@
             </div>
 
             <form method="POST" action="{{ url_for('settings.save_notifications') }}" class="notification-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="notification-setting">
                     <div class="notification-setting-info">
                         <strong>Email Digest</strong>

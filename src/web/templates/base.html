@@ -895,6 +895,7 @@
             <div class="confirm-modal-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
                 <form id="confirmModalForm" method="post" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn btn-danger" id="confirmModalButton">Confirm</button>
                 </form>
             </div>

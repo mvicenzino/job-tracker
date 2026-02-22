@@ -3,6 +3,7 @@ import os
 from datetime import timedelta
 from flask import Flask, request
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 
 from ..database.connection import DatabaseConnection
 from ..models import User
@@ -17,6 +18,16 @@ def create_app(db_path: str = None, database_url: str = None):
                 template_folder='templates',
                 static_folder='static')
     app.secret_key = os.environ.get('SECRET_KEY', DEFAULT_SECRET_KEY)
+
+    # Enforce SECRET_KEY in production — never use the default on Vercel
+    if os.environ.get('VERCEL') and app.secret_key == DEFAULT_SECRET_KEY:
+        raise RuntimeError(
+            'SECRET_KEY environment variable must be set in production. '
+            'Do not use the default development key.'
+        )
+
+    # CSRF protection for all forms
+    csrf = CSRFProtect(app)
 
     # Session configuration - keep users logged in for 30 days
     is_production = os.environ.get('VERCEL') or os.environ.get('DATABASE_URL')
@@ -273,6 +284,7 @@ def create_app(db_path: str = None, database_url: str = None):
     app.register_blueprint(schedule_bp)
     app.register_blueprint(settings_bp)
     app.register_blueprint(api_bp)
+    csrf.exempt(api_bp)  # API uses API-key auth, not session cookies
     app.register_blueprint(compare_bp)
     app.register_blueprint(digest_bp)
     app.register_blueprint(reflections_bp)

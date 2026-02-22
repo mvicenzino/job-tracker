@@ -10,6 +10,7 @@
     </header>
 
     <form method="post" class="form card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="form-group">
             <label for="application_id">Application *</label>
             <select id="application_id" name="application_id" required>

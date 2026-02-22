@@ -42,6 +42,7 @@
             <div class="app-info-item">
                 <label>Status</label>
                 <form action="{{ url_for('applications.update_status', app_id=details.application.id) }}" method="post" class="inline-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <select name="status" onchange="this.form.submit()" class="status-select-compact" title="Change application status">
                         {% for s in ApplicationStatus %}
                         <option value="{{ s.value }}" {% if s == details.application.status %}selected{% endif %}>
@@ -293,6 +294,7 @@
                     {% for item in details.application.checklist_items|sort(attribute='sort_order') %}
                     <li class="checklist-item {% if item.completed %}completed{% endif %}">
                         <form action="{{ url_for('applications.toggle_checklist', item_id=item.id) }}" method="post" class="inline-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <button type="submit" class="checklist-toggle" title="Toggle">
                                 {% if item.completed %}
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--success)">
@@ -554,6 +556,7 @@
                         </div>
                         {% if not event.completed %}
                         <form action="{{ url_for('schedule.complete_event', event_id=event.id) }}" method="post" class="timeline-action">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <button type="submit" class="btn btn-sm btn-success" title="Mark as complete">✓</button>
                         </form>
                         {% else %}
@@ -576,6 +579,7 @@
             <div class="card-body">
                 <!-- Add Note Form -->
                 <form action="{{ url_for('applications.add_application_note', app_id=details.application.id) }}" method="post" class="note-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <div class="form-group">
                         <input type="text" name="title" placeholder="Note title (optional)" class="note-title-input">
                     </div>
@@ -656,6 +660,7 @@
                         <p>Move this application back to your active pipeline.</p>
                     </div>
                     <form action="{{ url_for('applications.update_status', app_id=details.application.id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="status" value="interested">
                         <button type="submit" class="btn btn-secondary">Restore</button>
                     </form>

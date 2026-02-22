@@ -13,6 +13,7 @@
     </header>
 
     <form method="post" class="form card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="form-group">
             <label for="excitement_level">Excitement Level (1-5)</label>
             <select id="excitement_level" name="excitement_level">

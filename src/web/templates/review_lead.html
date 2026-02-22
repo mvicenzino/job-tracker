@@ -74,7 +74,8 @@
             </div>
             <div class="card-body">
                 <form action="{{ url_for('applications.confirm_lead', app_id=application.id) }}" method="POST" class="fit-assessment-form">
-                    
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
                     <div class="assessment-question">
                         <label>How excited are you about this role?</label>
                         <div class="excitement-scale">

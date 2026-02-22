@@ -113,6 +113,7 @@
                                 <div class="status-dropdown-menu">
                                     {% for s in ApplicationStatus %}
                                     <form action="{{ url_for('applications.update_status', app_id=app.id) }}" method="post">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                         <input type="hidden" name="status" value="{{ s.value }}">
                                         <button type="submit" class="status-dropdown-item {% if s.value == app.status.value %}active{% endif %}">
                                             <span class="status-dot" style="background-color: {{ s.value|status_color }}"></span>
@@ -259,6 +260,7 @@
 <div id="moveMenu" class="move-menu" style="display:none;">
     {% for s in ApplicationStatus %}
     <form action="/applications/0/status" method="post" class="move-menu-form" data-status="{{ s.value }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <input type="hidden" name="status" value="{{ s.value }}">
         <button type="submit" class="move-menu-item">
             <span class="status-dot" style="background-color: {{ s.value|status_color }}"></span>

@@ -246,7 +246,8 @@ def upload_avatar():
         
         flash('Avatar updated!', 'success')
     except Exception as e:
-        flash(f'Error uploading avatar: {str(e)}', 'error')
+        current_app.logger.exception('Avatar upload error')
+        flash('Error uploading avatar. Please try again.', 'error')
     finally:
         session.close()
     
@@ -283,19 +284,8 @@ def delete_avatar():
 @bp.route('/settings/upgrade', methods=['POST'])
 @login_required
 def upgrade():
-    """Manual upgrade to Pro (placeholder for future Stripe integration)."""
-    from datetime import datetime
-    db = current_app.extensions['db']
-    session = db.get_session()
-    try:
-        user = session.query(User).get(current_user.id)
-        user.subscription_tier = 'pro'
-        user.subscription_started_at = datetime.utcnow()
-        session.commit()
-        flash('Welcome to Stride Pro! All limits have been removed.', 'success')
-    finally:
-        session.close()
-    return redirect(url_for('settings.settings'))
+    """Upgrade to Pro — requires payment integration (not yet implemented)."""
+    return jsonify({'error': 'Not implemented. Payment integration required.'}), 501
 
 
 @bp.route('/export/applications')

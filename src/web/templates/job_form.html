@@ -13,6 +13,7 @@
 
     <div class="card">
         <form method="POST" class="form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="form-group">
                 <label for="title">Job Title *</label>
                 <input type="text" id="title" name="title" required placeholder="e.g., Senior Software Engineer">

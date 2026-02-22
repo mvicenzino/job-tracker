@@ -1,6 +1,6 @@
 """Public routes: landing, privacy, terms, demo."""
 from datetime import datetime, date, timedelta
-from flask import Blueprint, render_template, redirect, url_for, current_app
+from flask import Blueprint, render_template, redirect, url_for, current_app, flash
 from flask_login import current_user, login_user
 
 from ...services import JobHuntService
@@ -581,7 +581,8 @@ B.S. Computer Science | UC Berkeley | 2017'''
         return redirect(url_for('dashboard.dashboard'))
     except Exception as e:
         session.rollback()
-        import traceback
-        return f'<pre>Demo error: {str(e)}\n\n{traceback.format_exc()}</pre>', 500
+        current_app.logger.exception('Demo setup failed')
+        flash('Demo setup failed. Please try again.', 'error')
+        return redirect(url_for('public.landing'))
     finally:
         session.close()

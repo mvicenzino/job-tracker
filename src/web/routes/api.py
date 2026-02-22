@@ -1,5 +1,6 @@
 """API routes for AJAX operations and Chrome extension."""
 import logging
+import os
 from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required, current_user
 
@@ -9,6 +10,29 @@ from ...services.ai_parser import is_ai_parsing_available, parse_job_description
 from ...services.usage_tracker import UsageTracker
 
 bp = Blueprint('api', __name__)
+
+
+def _get_cors_origin():
+    """Return the allowed CORS origin for the current request, or None."""
+    allowed = set()
+    # App's own origin (Vercel deployment URL or local dev)
+    app_url = os.environ.get('APP_URL', '').rstrip('/')
+    if app_url:
+        allowed.add(app_url)
+    # Always allow same-origin requests
+    origin = request.headers.get('Origin', '')
+    # Chrome extensions use chrome-extension:// scheme
+    if origin.startswith('chrome-extension://'):
+        return origin
+    # Local development
+    if origin.startswith('http://localhost:') or origin.startswith('http://127.0.0.1:'):
+        return origin
+    if origin in allowed:
+        return origin
+    # Fallback: allow if no Origin header (same-origin requests don't send it)
+    if not origin:
+        return None
+    return None
 
 
 @bp.route('/api/applications/<int:app_id>/status', methods=['PATCH'])
@@ -49,7 +73,9 @@ def api_update_job(job_id):
     # Handle CORS preflight
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'ok'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         response.headers['Access-Control-Allow-Methods'] = 'PATCH, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
         return response
@@ -64,7 +90,9 @@ def api_update_job(job_id):
 
     if not user:
         response = jsonify({'success': False, 'error': 'Authentication required'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 401
 
     service, session = get_service_for_user(user.id)
@@ -74,10 +102,14 @@ def api_update_job(job_id):
         session.commit()
         if job:
             response = jsonify({'success': True})
-            response.headers['Access-Control-Allow-Origin'] = '*'
+            cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
             return response
         response = jsonify({'success': False, 'error': 'Not found'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 404
     finally:
         session.close()
@@ -89,7 +121,9 @@ def api_update_company(company_id):
     # Handle CORS preflight
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'ok'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         response.headers['Access-Control-Allow-Methods'] = 'PATCH, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
         return response
@@ -104,7 +138,9 @@ def api_update_company(company_id):
 
     if not user:
         response = jsonify({'success': False, 'error': 'Authentication required'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 401
 
     service, session = get_service_for_user(user.id)
@@ -114,10 +150,14 @@ def api_update_company(company_id):
         session.commit()
         if company:
             response = jsonify({'success': True})
-            response.headers['Access-Control-Allow-Origin'] = '*'
+            cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
             return response
         response = jsonify({'success': False, 'error': 'Not found'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 404
     finally:
         session.close()
@@ -129,7 +169,9 @@ def api_create_contact():
     # Handle CORS preflight
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'ok'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
         return response
@@ -144,7 +186,9 @@ def api_create_contact():
 
     if not user:
         response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 401
 
     service, session = get_service_for_user(user.id)
@@ -152,7 +196,9 @@ def api_create_contact():
         data = request.get_json()
         if not data or not data.get('name'):
             response = jsonify({'success': False, 'error': 'Name is required'})
-            response.headers['Access-Control-Allow-Origin'] = '*'
+            cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
             return response, 400
 
         contact_type = ContactType(data.get('contact_type', 'networking'))
@@ -174,11 +220,16 @@ def api_create_contact():
                 'company': contact.company.name if contact.company else None
             }
         })
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response
     except Exception as e:
-        response = jsonify({'success': False, 'error': str(e)})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        current_app.logger.exception('API error')
+        response = jsonify({'success': False, 'error': 'Internal server error'})
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 500
     finally:
         session.close()
@@ -189,7 +240,9 @@ def api_list_contacts():
     """API: List all contacts with optional search/followup filter."""
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'ok'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
         return response
@@ -200,7 +253,9 @@ def api_list_contacts():
         user = current_user
     if not user:
         response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 401
 
     service, session = get_service_for_user(user.id)
@@ -238,11 +293,16 @@ def api_list_contacts():
                 for c in contacts
             ]
         })
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response
     except Exception as e:
-        response = jsonify({'success': False, 'error': str(e)})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        current_app.logger.exception('API error')
+        response = jsonify({'success': False, 'error': 'Internal server error'})
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 500
     finally:
         session.close()
@@ -253,7 +313,9 @@ def api_get_contact(contact_id):
     """API: Get a single contact by ID."""
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'ok'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
         return response
@@ -264,7 +326,9 @@ def api_get_contact(contact_id):
         user = current_user
     if not user:
         response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 401
 
     service, session = get_service_for_user(user.id)
@@ -272,7 +336,9 @@ def api_get_contact(contact_id):
         c = service.contacts.get_by_id(contact_id)
         if not c:
             response = jsonify({'success': False, 'error': 'Contact not found'})
-            response.headers['Access-Control-Allow-Origin'] = '*'
+            cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
             return response, 404
 
         response = jsonify({
@@ -295,11 +361,16 @@ def api_get_contact(contact_id):
                 'updatedAt': c.updated_at.isoformat() if hasattr(c, 'updated_at') and c.updated_at else None,
             }
         })
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response
     except Exception as e:
-        response = jsonify({'success': False, 'error': str(e)})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        current_app.logger.exception('API error')
+        response = jsonify({'success': False, 'error': 'Internal server error'})
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 500
     finally:
         session.close()
@@ -310,7 +381,9 @@ def api_delete_contact(contact_id):
     """API: Delete a contact by ID."""
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'ok'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         response.headers['Access-Control-Allow-Methods'] = 'DELETE, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
         return response
@@ -321,7 +394,9 @@ def api_delete_contact(contact_id):
         user = current_user
     if not user:
         response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 401
 
     service, session = get_service_for_user(user.id)
@@ -329,18 +404,25 @@ def api_delete_contact(contact_id):
         c = service.contacts.get_by_id(contact_id)
         if not c:
             response = jsonify({'success': False, 'error': 'Contact not found'})
-            response.headers['Access-Control-Allow-Origin'] = '*'
+            cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
             return response, 404
 
         session.delete(c)
         session.commit()
         response = jsonify({'success': True, 'deleted': contact_id})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response
     except Exception as e:
         session.rollback()
-        response = jsonify({'success': False, 'error': str(e)})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        current_app.logger.exception('API error')
+        response = jsonify({'success': False, 'error': 'Internal server error'})
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 500
     finally:
         session.close()
@@ -352,7 +434,9 @@ def api_create_company():
     # Handle CORS preflight
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'ok'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
         return response
@@ -367,7 +451,9 @@ def api_create_company():
 
     if not user:
         response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 401
 
     service, session = get_service_for_user(user.id)
@@ -375,7 +461,9 @@ def api_create_company():
         data = request.get_json()
         if not data or not data.get('name'):
             response = jsonify({'success': False, 'error': 'Company name is required'})
-            response.headers['Access-Control-Allow-Origin'] = '*'
+            cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
             return response, 400
 
         # Check if company already exists
@@ -424,11 +512,16 @@ def api_create_company():
                     'name': company.name
                 }
             })
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response
     except Exception as e:
-        response = jsonify({'success': False, 'error': str(e)})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        current_app.logger.exception('API error')
+        response = jsonify({'success': False, 'error': 'Internal server error'})
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 500
     finally:
         session.close()
@@ -461,7 +554,9 @@ def api_create_job():
     # Handle CORS preflight
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'ok'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
         return response
@@ -476,7 +571,9 @@ def api_create_job():
 
     if not user:
         response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 401
 
     service, session = get_service_for_user(user.id)
@@ -484,13 +581,17 @@ def api_create_job():
         data = request.get_json()
         if not data or not data.get('title'):
             response = jsonify({'success': False, 'error': 'Job title is required'})
-            response.headers['Access-Control-Allow-Origin'] = '*'
+            cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
             return response, 400
 
         company_name = data.get('company_name', '').strip()
         if not company_name:
             response = jsonify({'success': False, 'error': 'Company name is required'})
-            response.headers['Access-Control-Allow-Origin'] = '*'
+            cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
             return response, 400
 
         # Use service.add_job() which handles find-or-create company and commits
@@ -588,11 +689,16 @@ def api_create_job():
                 'review_url': review_url
             } if application else None
         })
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response
     except Exception as e:
-        response = jsonify({'success': False, 'error': str(e)})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        current_app.logger.exception('API error')
+        response = jsonify({'success': False, 'error': 'Internal server error'})
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 500
     finally:
         session.close()
@@ -617,7 +723,8 @@ def api_parse_job_description():
         parsed = parse_job_description(text)
         return jsonify({'success': True, 'data': parsed})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        current_app.logger.exception('API error')
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 
 @bp.route('/api/analyze-resume-fit', methods=['POST'])
@@ -707,7 +814,8 @@ def api_analyze_resume_fit():
         return jsonify({'success': True, 'analysis': result})
 
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        current_app.logger.exception('API error')
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
     finally:
         session.close()
 
@@ -803,7 +911,8 @@ def api_generate_cover_letter():
         })
 
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        current_app.logger.exception('API error')
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
     finally:
         session.close()
 
@@ -874,7 +983,8 @@ def api_score_batch():
                 tracker.record_ai_score()
                 scored_count += 1
             except Exception as e:
-                errors.append(f"Job {job.id} ({job.title}): {str(e)}")
+                logging.warning(f"Batch scoring failed for job {job.id}: {e}")
+                errors.append(f"Job {job.id} ({job.title}): scoring failed")
 
         session.commit()
 
@@ -890,7 +1000,8 @@ def api_score_batch():
         return jsonify(result)
 
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        current_app.logger.exception('API error')
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
     finally:
         session.close()
 
@@ -979,7 +1090,8 @@ def api_interview_prep(app_id):
             )
         except Exception as e:
             logging.error(f"Interview prep generation failed: {e}")
-            return jsonify({'success': False, 'error': f'AI generation failed: {str(e)}'}), 500
+            current_app.logger.exception('Interview prep generation failed')
+            return jsonify({'success': False, 'error': 'AI generation failed. Please try again.'}), 500
 
         # Check if we should regenerate (delete old) or create new
         regenerate = data.get('regenerate', False)
@@ -1013,7 +1125,8 @@ def api_interview_prep(app_id):
 
     except Exception as e:
         logging.error(f"Interview prep error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+        current_app.logger.exception('API error')
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
     finally:
         session.close()
 
@@ -1027,7 +1140,9 @@ def api_contacts_search():
         user = current_user
     if not user:
         response = jsonify({'success': False, 'error': 'Authentication required.'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response, 401
 
     service, session = get_service_for_user(user.id)
@@ -1047,7 +1162,9 @@ def api_contacts_search():
                 for c in contacts[:10]
             ]
         })
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return response
     finally:
         session.close()
@@ -1081,7 +1198,7 @@ def api_followups_due():
 def api_health():
     """API: Health check endpoint to verify app is running."""
     from flask import current_app
-    from sqlalchemy import inspect, text
+    from sqlalchemy import text
 
     result = {
         'status': 'ok',
@@ -1091,29 +1208,18 @@ def api_health():
     try:
         db = current_app.extensions.get('db')
         if db:
-            result['checks']['database'] = 'connected'
-
+            session = db.get_session()
             try:
-                inspector = inspect(db.engine)
-                # Check users table columns
-                if 'users' in inspector.get_table_names():
-                    columns = [col['name'] for col in inspector.get_columns('users')]
-                    result['checks']['users_columns'] = columns
-                else:
-                    result['checks']['users_table'] = 'missing'
-
-                # Check applications table columns
-                if 'applications' in inspector.get_table_names():
-                    app_columns = [col['name'] for col in inspector.get_columns('applications')]
-                    result['checks']['applications_columns'] = app_columns
-                else:
-                    result['checks']['applications_table'] = 'missing'
-            except Exception as e:
-                result['checks']['schema_check'] = str(e)
+                session.execute(text('SELECT 1'))
+                result['checks']['database'] = 'connected'
+            except Exception:
+                result['checks']['database'] = 'unreachable'
+            finally:
+                session.close()
         else:
             result['checks']['database'] = 'not configured'
-    except Exception as e:
-        result['checks']['database_error'] = str(e)
+    except Exception:
+        result['checks']['database'] = 'error'
 
     return jsonify(result)
 
@@ -1153,9 +1259,10 @@ def cron_generate_notifications():
             session.close()
             
     except Exception as e:
+        current_app.logger.exception('Cron notifications error')
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': 'Internal server error'
         }), 500
 
 
@@ -1244,7 +1351,8 @@ def cron_score_fit():
                             job.scored_with_resume_id = resume_version_id
                         scored_for_user += 1
                     except Exception as e:
-                        summary['errors'].append(f"Job {job.id}: {str(e)}")
+                        logging.warning(f"Cron scoring failed for job {job.id}: {e}")
+                        summary['errors'].append(f"Job {job.id}: scoring failed")
 
                 if scored_for_user > 0:
                     session.commit()
@@ -1259,7 +1367,8 @@ def cron_score_fit():
             session.close()
 
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        current_app.logger.exception('API error')
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 
 @bp.route('/api/notifications/generate', methods=['POST'])
@@ -1294,9 +1403,10 @@ def generate_my_notifications():
             session.close()
             
     except Exception as e:
+        current_app.logger.exception('Cron fit-scores error')
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': 'Internal server error'
         }), 500
 
 
@@ -1391,8 +1501,8 @@ def global_search():
         return jsonify({'results': results[:10]})  # Max 10 total results
 
     except Exception as e:
-        logging.error(f"Global search error: {e}")
-        return jsonify({'results': [], 'error': str(e)}), 500
+        current_app.logger.exception('Global search error')
+        return jsonify({'results': []}), 500
     finally:
         session.close()
 
@@ -1407,7 +1517,9 @@ def _api_key_or_session_auth():
         user = current_user
     if not user:
         response = jsonify({'success': False, 'error': 'Authentication required. Provide X-API-Key header.'})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        cors_origin = _get_cors_origin()
+        if cors_origin:
+            response.headers['Access-Control-Allow-Origin'] = cors_origin
         return None, (response, 401)
     return user, None
 
@@ -1415,14 +1527,18 @@ def _api_key_or_session_auth():
 def _cors_response(data, status=200):
     """Create a JSON response with CORS headers."""
     response = jsonify(data)
-    response.headers['Access-Control-Allow-Origin'] = '*'
+    cors_origin = _get_cors_origin()
+    if cors_origin:
+        response.headers['Access-Control-Allow-Origin'] = cors_origin
     return response, status
 
 
 def _cors_options():
     """Handle CORS preflight for GET endpoints."""
     response = jsonify({'status': 'ok'})
-    response.headers['Access-Control-Allow-Origin'] = '*'
+    cors_origin = _get_cors_origin()
+    if cors_origin:
+        response.headers['Access-Control-Allow-Origin'] = cors_origin
     response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
     return response
@@ -1462,7 +1578,8 @@ def api_get_contact_detail(contact_id):
         }
         return _cors_response({'success': True, 'contact': result})
     except Exception as e:
-        return _cors_response({'success': False, 'error': str(e)}, 500)
+        current_app.logger.exception('API error')
+        return _cors_response({'success': False, 'error': 'Internal server error'}, 500)
     finally:
         session.close()
 
@@ -1491,7 +1608,8 @@ def api_search_contacts():
         } for c in matches]
         return _cors_response({'success': True, 'contacts': items})
     except Exception as e:
-        return _cors_response({'success': False, 'error': str(e)}, 500)
+        current_app.logger.exception('API error')
+        return _cors_response({'success': False, 'error': 'Internal server error'}, 500)
     finally:
         session.close()
 
@@ -1527,7 +1645,8 @@ def api_pipeline():
                 })
         return _cors_response({'success': True, 'pipeline': result})
     except Exception as e:
-        return _cors_response({'success': False, 'error': str(e)}, 500)
+        current_app.logger.exception('API error')
+        return _cors_response({'success': False, 'error': 'Internal server error'}, 500)
     finally:
         session.close()
 
@@ -1592,7 +1711,8 @@ def api_get_applications():
             })
         return _cors_response({'success': True, 'applications': items})
     except Exception as e:
-        return _cors_response({'success': False, 'error': str(e)}, 500)
+        current_app.logger.exception('API error')
+        return _cors_response({'success': False, 'error': 'Internal server error'}, 500)
     finally:
         session.close()
 
@@ -1682,7 +1802,8 @@ def api_get_application_detail(app_id):
         }
         return _cors_response({'success': True, 'application': result})
     except Exception as e:
-        return _cors_response({'success': False, 'error': str(e)}, 500)
+        current_app.logger.exception('API error')
+        return _cors_response({'success': False, 'error': 'Internal server error'}, 500)
     finally:
         session.close()
 
@@ -1716,7 +1837,8 @@ def api_dashboard_stats():
         }
         return _cors_response({'success': True, 'stats': result})
     except Exception as e:
-        return _cors_response({'success': False, 'error': str(e)}, 500)
+        current_app.logger.exception('API error')
+        return _cors_response({'success': False, 'error': 'Internal server error'}, 500)
     finally:
         session.close()
 
@@ -1756,6 +1878,7 @@ def api_upcoming_events():
             })
         return _cors_response({'success': True, 'events': items})
     except Exception as e:
-        return _cors_response({'success': False, 'error': str(e)}, 500)
+        current_app.logger.exception('API error')
+        return _cors_response({'success': False, 'error': 'Internal server error'}, 500)
     finally:
         session.close()

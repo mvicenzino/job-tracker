@@ -41,6 +41,7 @@
                         <h3 class="job-title">{{ job.title }}</h3>
                     </div>
                     <form action="{{ url_for('jobs.toggle_job_flag', job_id=job.id) }}" method="post" class="flag-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="flag-btn {% if job.is_flagged %}active{% endif %}" title="{% if job.is_flagged %}Remove from saved{% else %}Save job{% endif %}">
                             {% if job.is_flagged %}
                             <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
@@ -94,6 +95,7 @@
                 {% endif %}
                 <a href="{{ url_for('applications.new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Add Lead</a>
                 <form action="{{ url_for('jobs.delete_job', job_id=job.id) }}" method="post" class="delete-form" style="margin-left: auto;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn btn-sm btn-ghost btn-danger-text" onclick="return confirm('Delete this job?');" title="Delete job">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"/>
