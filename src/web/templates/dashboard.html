@@ -195,51 +195,6 @@
         <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Lead</a>
     </header>
 
-    <!-- Usage Meter (Free users only) -->
-    {% if not is_pro and usage_data %}
-    <div class="usage-meter-card">
-        <div class="usage-meter-header">
-            <h3>AI Usage This Month</h3>
-            <span class="usage-tier-badge free">Free Plan</span>
-        </div>
-        <div class="usage-meters">
-            <div class="usage-meter">
-                <div class="usage-meter-label">
-                    <span>Fit Scores</span>
-                    <span class="usage-count">{{ usage_data.scores_used }}/{{ usage_data.scores_limit }}</span>
-                </div>
-                <div class="usage-bar-container">
-                    <div class="usage-bar-fill" style="width: {{ (usage_data.scores_used / usage_data.scores_limit * 100)|int if usage_data.scores_limit else 0 }}%"></div>
-                </div>
-            </div>
-            <div class="usage-meter">
-                <div class="usage-meter-label">
-                    <span>Cover Letters</span>
-                    <span class="usage-count">{{ usage_data.letters_used }}/{{ usage_data.letters_limit }}</span>
-                </div>
-                <div class="usage-bar-container">
-                    <div class="usage-bar-fill" style="width: {{ (usage_data.letters_used / usage_data.letters_limit * 100)|int if usage_data.letters_limit else 0 }}%"></div>
-                </div>
-            </div>
-            <div class="usage-meter">
-                <div class="usage-meter-label">
-                    <span>Interview Prep</span>
-                    <span class="usage-pro-badge">PRO</span>
-                </div>
-                <div class="usage-bar-container locked">
-                    <div class="usage-bar-fill" style="width: 0%"></div>
-                </div>
-            </div>
-        </div>
-        <button type="button" class="btn btn-sm btn-primary usage-upgrade-btn" onclick="showUpgradeModal('Upgrade to Pro', 'Get unlimited AI features to supercharge your job search.')">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-            </svg>
-            Upgrade to Pro
-        </button>
-    </div>
-    {% endif %}
-
     {% if not onboarding.show %}
     <!-- Stats Cards (consolidated: 6→4) -->
     <div class="stats-grid">
@@ -737,6 +692,51 @@
         </details>
     </div>
 </div>
+
+<!-- Usage Meter (Free users only) — low priority, shown at bottom -->
+{% if not is_pro and usage_data %}
+<div class="usage-meter-card">
+    <div class="usage-meter-header">
+        <h3>AI Usage This Month</h3>
+        <span class="usage-tier-badge free">Free Plan</span>
+    </div>
+    <div class="usage-meters">
+        <div class="usage-meter">
+            <div class="usage-meter-label">
+                <span>Fit Scores</span>
+                <span class="usage-count">{{ usage_data.scores_used }}/{{ usage_data.scores_limit }}</span>
+            </div>
+            <div class="usage-bar-container">
+                <div class="usage-bar-fill" style="width: {{ (usage_data.scores_used / usage_data.scores_limit * 100)|int if usage_data.scores_limit else 0 }}%"></div>
+            </div>
+        </div>
+        <div class="usage-meter">
+            <div class="usage-meter-label">
+                <span>Cover Letters</span>
+                <span class="usage-count">{{ usage_data.letters_used }}/{{ usage_data.letters_limit }}</span>
+            </div>
+            <div class="usage-bar-container">
+                <div class="usage-bar-fill" style="width: {{ (usage_data.letters_used / usage_data.letters_limit * 100)|int if usage_data.letters_limit else 0 }}%"></div>
+            </div>
+        </div>
+        <div class="usage-meter">
+            <div class="usage-meter-label">
+                <span>Interview Prep</span>
+                <span class="usage-pro-badge">PRO</span>
+            </div>
+            <div class="usage-bar-container locked">
+                <div class="usage-bar-fill" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn btn-sm btn-primary usage-upgrade-btn" onclick="showUpgradeModal('Upgrade to Pro', 'Get unlimited AI features to supercharge your job search.')">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        Upgrade to Pro
+    </button>
+</div>
+{% endif %}
 
 <script>
 function toggleNotes(button) {
