@@ -13,6 +13,7 @@ from .reflection import WeeklyReflection
 from .resume_version import ResumeVersion
 from .notification import Notification
 from .interview_prep import InterviewPrep
+from .project import Project, Resource
 
 __all__ = [
     'Base',
@@ -34,5 +35,7 @@ __all__ = [
     'WeeklyReflection',
     'ResumeVersion',
     'Notification',
-    'InterviewPrep'
+    'InterviewPrep',
+    'Project',
+    'Resource'
 ]

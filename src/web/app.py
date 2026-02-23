@@ -273,6 +273,7 @@ def create_app(db_path: str = None, database_url: str = None):
     from .routes.notifications import bp as notifications_bp
     from .routes.about import bp as about_bp
     from .routes.insights import insights_bp
+    from .routes.projects import bp as projects_bp
 
     app.register_blueprint(public_bp)
     app.register_blueprint(auth_bp)
@@ -285,6 +286,8 @@ def create_app(db_path: str = None, database_url: str = None):
     app.register_blueprint(settings_bp)
     app.register_blueprint(api_bp)
     csrf.exempt(api_bp)  # API uses API-key auth, not session cookies
+    app.register_blueprint(projects_bp)
+    csrf.exempt(projects_bp)  # API uses session auth
     app.register_blueprint(compare_bp)
     app.register_blueprint(digest_bp)
     app.register_blueprint(reflections_bp)
