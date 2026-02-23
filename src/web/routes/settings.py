@@ -189,8 +189,9 @@ def save_profile():
 @bp.route('/settings/avatar', methods=['POST'])
 @login_required
 def upload_avatar():
-    """Upload a profile avatar image (stored as base64 data URI)."""
+    """Upload a profile avatar image (stored as base64 data URI, resized to 256x256)."""
     import base64
+    import io
 
     db = current_app.extensions['db']
     session = db.get_session()
@@ -219,10 +220,22 @@ def upload_avatar():
             flash('Image must be under 2MB.', 'error')
             return redirect(url_for('settings.settings'))
 
-        # Read file and encode as base64 data URI
+        # Read file and resize with Pillow
         data = file.read()
+        try:
+            from PIL import Image
+            img = Image.open(io.BytesIO(data))
+            img = img.convert('RGB')
+            img.thumbnail((256, 256), Image.LANCZOS)
+            buffer = io.BytesIO()
+            img.save(buffer, format='JPEG', quality=85)
+            data = buffer.getvalue()
+            mime = 'image/jpeg'
+        except ImportError:
+            # Pillow not available, use original file
+            mime = f"image/{ext}" if ext != 'jpg' else 'image/jpeg'
+
         b64 = base64.b64encode(data).decode('utf-8')
-        mime = f"image/{ext}" if ext != 'jpg' else 'image/jpeg'
 
         user = session.query(User).get(current_user.id)
         user.avatar_url = f"data:{mime};base64,{b64}"
@@ -230,6 +243,7 @@ def upload_avatar():
 
         flash('Avatar updated!', 'success')
     except Exception as e:
+        session.rollback()
         current_app.logger.exception('Avatar upload error')
         flash('Error uploading avatar. Please try again.', 'error')
     finally:

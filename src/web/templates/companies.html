@@ -6,6 +6,7 @@
 <div class="list-page">
     <header class="page-header">
         <h1>Companies</h1>
+        <p class="subtitle" style="margin: 0;">Research companies and track contacts</p>
         <a href="{{ url_for('companies.new_company') }}" class="btn btn-primary">+ Add Company</a>
     </header>
 
@@ -49,12 +50,12 @@
                 </div>
             </div>
             <div class="list-view-meta">
-                <span class="badge">{{ company.jobs|length }} jobs</span>
+                <a href="{{ url_for('jobs.jobs', company_id=company.id) }}" class="badge" style="text-decoration: none;">{{ company.jobs|length }} jobs</a>
                 <span class="badge">{{ company.contacts|length }} contacts</span>
             </div>
             <div class="list-view-actions">
                 <a href="{{ url_for('companies.edit_company', company_id=company.id) }}" class="btn btn-sm btn-secondary">Edit</a>
-                <a href="{{ url_for('applications.new_application', company_id=company.id, company_name=company.name) }}" class="btn btn-sm btn-primary">+ Add Lead</a>
+                <a href="{{ url_for('applications.new_application', company_id=company.id, company_name=company.name) }}" class="btn btn-sm btn-primary">+ Add to Pipeline</a>
                 <button type="button" class="btn btn-sm btn-ghost btn-danger-text" title="Delete company"
                         onclick="showConfirmModal('Delete Company', 'Are you sure you want to delete {{ company.name }}? This action cannot be undone.', '{{ url_for('companies.delete_company', company_id=company.id) }}', 'Delete', 'btn-danger')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -84,9 +85,9 @@
                 {% endif %}
             </div>
             <div class="card-footer">
-                <span class="job-count">{{ company.jobs|length }} jobs</span>
+                <a href="{{ url_for('jobs.jobs', company_id=company.id) }}" class="job-count" style="text-decoration: none; color: inherit;">{{ company.jobs|length }} jobs</a>
                 <span class="contact-count">{{ company.contacts|length }} contacts</span>
-                <a href="{{ url_for('applications.new_application', company_id=company.id, company_name=company.name) }}" class="btn btn-sm btn-primary">+ Add Lead</a>
+                <a href="{{ url_for('applications.new_application', company_id=company.id, company_name=company.name) }}" class="btn btn-sm btn-primary">+ Add to Pipeline</a>
                 <button type="button" class="btn btn-sm btn-ghost btn-danger-text" title="Delete company" style="margin-left:auto"
                         onclick="showConfirmModal('Delete Company', 'Are you sure you want to delete {{ company.name }}? This action cannot be undone.', '{{ url_for('companies.delete_company', company_id=company.id) }}', 'Delete', 'btn-danger')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>

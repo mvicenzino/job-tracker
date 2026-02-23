@@ -54,8 +54,8 @@
                     {% endif %}
                 </span>
                 <div class="step-content">
-                    <span class="step-title">Add your first lead</span>
-                    <span class="step-desc">Track a job you're interested in or have applied to</span>
+                    <span class="step-title">Add your first job to track</span>
+                    <span class="step-desc">Save a job posting and add it to your pipeline</span>
                 </div>
                 <svg class="step-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </a>
@@ -240,7 +240,8 @@
     </div>
     {% endif %}
 
-    <!-- Stats Cards -->
+    {% if not onboarding.show %}
+    <!-- Stats Cards (consolidated: 6→4) -->
     <div class="stats-grid">
         <a href="{{ url_for('dashboard.pipeline') }}" class="stat-card-link">
             <div class="stat-card">
@@ -252,7 +253,9 @@
                 <div class="stat-content">
                     <div class="stat-value">{{ dashboard.summary.active_applications }}</div>
                     <div class="stat-label">Active Applications</div>
-                    {% if dashboard.summary.active_applications > 0 and dashboard.summary.active_applications < 5 %}
+                    {% if dashboard.summary.apps_awaiting_response > 0 %}
+                    <div class="stat-hint">{{ dashboard.summary.apps_awaiting_response }} awaiting response</div>
+                    {% elif dashboard.summary.active_applications > 0 and dashboard.summary.active_applications < 5 %}
                     <div class="stat-hint">Aim for 8-15 active leads</div>
                     {% endif %}
                 </div>
@@ -296,7 +299,7 @@
             </div>
         </a>
         <a href="{{ url_for('contacts.contacts') }}" class="stat-card-link">
-            <div class="stat-card">
+            <div class="stat-card {% if dashboard.summary.contacts_need_followup > 0 %}warning{% endif %}">
                 <div class="stat-icon stat-icon-info">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -308,43 +311,16 @@
                 <div class="stat-content">
                     <div class="stat-value">{{ dashboard.summary.total_contacts }}</div>
                     <div class="stat-label">Contacts</div>
-                </div>
-            </div>
-        </a>
-        <a href="{{ url_for('contacts.contacts', followup='true') }}" class="stat-card-link">
-            <div class="stat-card {% if dashboard.summary.contacts_need_followup > 0 %}warning{% endif %}">
-                <div class="stat-icon {% if dashboard.summary.contacts_need_followup > 0 %}stat-icon-warning{% else %}stat-icon-muted{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-value">{{ dashboard.summary.contacts_need_followup }}</div>
-                    <div class="stat-label">Need Follow-up</div>
-                </div>
-            </div>
-        </a>
-        <a href="{{ url_for('applications.applications') }}" class="stat-card-link">
-            <div class="stat-card {% if dashboard.summary.apps_awaiting_response > 0 %}warning{% endif %}">
-                <div class="stat-icon {% if dashboard.summary.apps_awaiting_response > 0 %}stat-icon-warning{% else %}stat-icon-muted{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-value">{{ dashboard.summary.apps_awaiting_response }}</div>
-                    <div class="stat-label">Awaiting Response</div>
+                    {% if dashboard.summary.contacts_need_followup > 0 %}
+                    <div class="stat-hint" style="color: var(--color-warning);">{{ dashboard.summary.contacts_need_followup }} need follow-up</div>
+                    {% endif %}
                 </div>
             </div>
         </a>
     </div>
+    {% endif %}
 
-    {% if dashboard.summary.total_applications >= 3 %}
+    {% if not onboarding.show and dashboard.summary.total_applications >= 3 %}
     <!-- Success Metrics -->
     <div class="metrics-bar">
         <div class="metric-item">
@@ -370,6 +346,7 @@
     </div>
     {% endif %}
 
+    {% if not onboarding.show %}
     <!-- Pipeline Summary - Full Width -->
     <section class="card pipeline-card-section">
         <div class="card-header">
@@ -396,6 +373,7 @@
             </div>
         </div>
     </section>
+    {% endif %}
 
     <div class="dashboard-grid">
         <!-- Today's Events -->
@@ -491,11 +469,11 @@
         </section>
 
         <!-- Upcoming Events -->
-        <section class="card">
-            <div class="card-header">
+        <details class="card" open>
+            <summary class="card-header" style="cursor: pointer; list-style: none;">
                 <h2>Coming Up</h2>
-                <a href="{{ url_for('schedule.schedule') }}" class="card-link">View All →</a>
-            </div>
+                <a href="{{ url_for('schedule.schedule') }}" class="card-link" onclick="event.stopPropagation();">View All →</a>
+            </summary>
             <div class="card-body">
                 {% if dashboard.upcoming %}
                     <ul class="event-list compact">
@@ -571,13 +549,13 @@
                 <a href="{{ url_for('schedule.new_event') }}" class="btn btn-ghost">+ Event</a>
                 <a href="{{ url_for('schedule.new_interview') }}" class="btn btn-primary">+ Interview</a>
             </div>
-        </section>
+        </details>
 
         <!-- Needs Attention -->
-        <section class="card">
-            <div class="card-header">
+        <details class="card" open>
+            <summary class="card-header" style="cursor: pointer; list-style: none;">
                 <h2>Needs Attention</h2>
-            </div>
+            </summary>
             <div class="card-body">
                 {% if dashboard.needs_attention.stale_leads or dashboard.needs_attention.stale_applications or dashboard.needs_attention.followup_contacts %}
                     {% if dashboard.needs_attention.stale_leads %}
@@ -649,14 +627,14 @@
                     </div>
                 {% endif %}
             </div>
-        </section>
+        </details>
 
         <!-- Weekly Reflection Widget -->
-        <section class="card reflection-widget">
-            <div class="card-header">
+        <details class="card reflection-widget">
+            <summary class="card-header" style="cursor: pointer; list-style: none;">
                 <h2>Weekly Reflection</h2>
-                <a href="{{ url_for('reflections.reflections') }}" class="card-link">View All →</a>
-            </div>
+                <a href="{{ url_for('reflections.reflections') }}" class="card-link" onclick="event.stopPropagation();">View All →</a>
+            </summary>
             <div class="card-body">
                 {% if reflection.has_current_week %}
                     <div class="reflection-done">
@@ -717,13 +695,13 @@
                 </div>
                 {% endif %}
             </div>
-        </section>
+        </details>
 
         <!-- Quick Stats -->
-        <section class="card">
-            <div class="card-header">
+        <details class="card">
+            <summary class="card-header" style="cursor: pointer; list-style: none;">
                 <h2>Application Stats</h2>
-            </div>
+            </summary>
             <div class="card-body">
                 {% if dashboard.stats.by_status %}
                     <ul class="stats-breakdown">
@@ -756,7 +734,7 @@
                     </div>
                 {% endif %}
             </div>
-        </section>
+        </details>
     </div>
 </div>
 

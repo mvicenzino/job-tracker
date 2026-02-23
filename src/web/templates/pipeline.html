@@ -41,7 +41,7 @@
                     </svg>
                 </button>
             </div>
-            <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary btn-desktop-only">+ Add Lead</a>
+            <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary btn-sm-mobile">+ Add Lead</a>
         </div>
     </header>
 
@@ -60,7 +60,8 @@
         <button type="button"
                 class="pipeline-tab"
                 data-status="{{ status }}"
-                style="--tab-color: {{ status|status_color }}">
+                style="--tab-color: {{ status|status_color }}"
+                title="{{ status|status_description }}">
             <span class="tab-count">{{ pipeline.get(status, [])|length }}</span>
             <span class="tab-name">{{ status|replace('_', ' ')|title }}</span>
         </button>

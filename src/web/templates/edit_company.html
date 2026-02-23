@@ -74,5 +74,35 @@
             <button type="submit" class="btn btn-primary">Save Changes</button>
         </div>
     </form>
+
+    {% if company.jobs %}
+    <div class="card" style="margin-top: var(--space-6);">
+        <div class="card-header">
+            <h2>Jobs at {{ company.name }}</h2>
+            <a href="{{ url_for('jobs.jobs', company_id=company.id) }}" class="card-link">View All →</a>
+        </div>
+        <div class="card-body">
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                {% for job in company.jobs[:10] %}
+                <li style="padding: var(--space-2) 0; border-bottom: 1px solid var(--color-border-light); display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <strong>{{ job.title }}</strong>
+                        {% if job.location %}<span style="color: var(--color-text-muted);"> &middot; {{ job.location }}</span>{% endif %}
+                    </div>
+                    <div style="display: flex; gap: var(--space-2);">
+                        <a href="{{ url_for('jobs.edit_job', job_id=job.id) }}" class="btn btn-sm btn-ghost">Edit</a>
+                        <a href="{{ url_for('applications.new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Add to Pipeline</a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% if company.jobs|length > 10 %}
+            <p style="margin-top: var(--space-3); color: var(--color-text-muted); font-size: 0.875rem;">
+                +{{ company.jobs|length - 10 }} more &mdash; <a href="{{ url_for('jobs.jobs', company_id=company.id) }}">View all</a>
+            </p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

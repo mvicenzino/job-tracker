@@ -78,7 +78,7 @@ def analyze_resume_job_fit(resume_text: str, job_description: str, job_title: st
 
 Provide your analysis as JSON."""
 
-    client = anthropic.Anthropic()
+    client = anthropic.Anthropic(timeout=30.0)
     message = client.messages.create(
         model="claude-3-5-haiku-20241022",
         max_tokens=2048,
@@ -176,7 +176,7 @@ def generate_cover_letter(resume_text: str, job_description: str, job_title: str
 
 Write a compelling cover letter that highlights the candidate's most relevant qualifications."""
 
-    client = anthropic.Anthropic()
+    client = anthropic.Anthropic(timeout=30.0)
     message = client.messages.create(
         model="claude-3-5-haiku-20241022",
         max_tokens=1024,
@@ -310,9 +310,9 @@ def generate_interview_prep(resume_text: str, job_description: str, job_title: s
 
 Analyze the alignment deeply. For every question, map it to specific resume experience. For every talking point, cite specific evidence. Make the prep so personalized that the candidate feels like they have an unfair advantage."""
 
-    client = anthropic.Anthropic()
+    client = anthropic.Anthropic(timeout=30.0)
     message = client.messages.create(
-        model="claude-sonnet-4-5-20250929",
+        model="claude-sonnet-4-5-20250514",
         max_tokens=4096,
         temperature=0.3,
         system=INTERVIEW_PREP_PROMPT,
@@ -401,7 +401,7 @@ def parse_job_description(raw_text: str) -> dict:
     # Truncate to 8000 chars to stay within reasonable limits
     text = raw_text[:8000]
 
-    client = anthropic.Anthropic()
+    client = anthropic.Anthropic(timeout=30.0)
     message = client.messages.create(
         model="claude-3-5-haiku-20241022",
         max_tokens=1024,

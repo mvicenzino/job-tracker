@@ -674,9 +674,25 @@ def api_parse_job_description():
     try:
         parsed = parse_job_description(text)
         return jsonify({'success': True, 'data': parsed})
+    except RuntimeError as e:
+        current_app.logger.warning('AI parse error: %s', e)
+        return jsonify({'success': False, 'error': str(e)}), 502
     except Exception as e:
         current_app.logger.exception('API error')
-        return jsonify({'success': False, 'error': 'Internal server error'}), 500
+        error_msg = 'Internal server error'
+        try:
+            import anthropic
+            if isinstance(e, anthropic.AuthenticationError):
+                error_msg = 'AI authentication failed. Check API key.'
+            elif isinstance(e, anthropic.RateLimitError):
+                error_msg = 'Rate limit reached. Try again in a moment.'
+            elif isinstance(e, anthropic.APIConnectionError):
+                error_msg = 'Could not connect to AI service.'
+            elif isinstance(e, anthropic.APIStatusError):
+                error_msg = f'AI service error: {e.message}'
+        except ImportError:
+            pass
+        return jsonify({'success': False, 'error': error_msg}), 500
 
 
 @bp.route('/api/analyze-resume-fit', methods=['POST'])

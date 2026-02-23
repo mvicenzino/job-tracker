@@ -7,12 +7,19 @@
     <header class="page-header">
         <div>
             <h1>Job Listings</h1>
-            <p class="subtitle">Save interesting roles before you apply</p>
+            <p class="subtitle">Save job postings you find. Add them to your pipeline when ready.</p>
         </div>
         <div class="header-actions">
             <a href="{{ url_for('jobs.new_job') }}" class="btn btn-primary">+ Add Job</a>
         </div>
     </header>
+
+    {% if company_name %}
+    <div class="filtered-banner" style="background: var(--color-bg-subtle); border: 1px solid var(--color-border-light); border-radius: var(--radius); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); display: flex; align-items: center; justify-content: space-between;">
+        <span>Showing jobs at <strong>{{ company_name }}</strong></span>
+        <a href="{{ url_for('jobs.jobs') }}" class="btn btn-sm btn-ghost">Show All Jobs</a>
+    </div>
+    {% endif %}
 
     <div class="filter-bar">
         <div class="page-filter-wrapper">
@@ -49,7 +56,7 @@
             <div class="list-view-main">
                 <div class="list-view-title">{{ job.title }}</div>
                 <div class="list-view-subtitle">
-                    {{ job.company.name }}
+                    <a href="{{ url_for('companies.edit_company', company_id=job.company.id) }}" style="color: inherit; text-decoration: underline dotted;">{{ job.company.name }}</a>
                     {% if job.location %} &middot; {{ job.location }}{% endif %}
                     {% if job.remote_type %} &middot; {{ job.remote_type|title }}{% endif %}
                 </div>
@@ -78,7 +85,7 @@
                 {% if job.job_url %}
                 <a href="{{ job.job_url }}" target="_blank" class="btn btn-sm btn-ghost">View</a>
                 {% endif %}
-                <a href="{{ url_for('applications.new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Add Lead</a>
+                <a href="{{ url_for('applications.new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Add to Pipeline</a>
                 <button type="button" class="btn btn-sm btn-ghost btn-danger-text" title="Delete job"
                         onclick="showConfirmModal('Delete Job', 'Are you sure you want to delete {{ job.title }}? This action cannot be undone.', '{{ url_for('jobs.delete_job', job_id=job.id) }}', 'Delete', 'btn-danger')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -96,7 +103,7 @@
                 <div class="job-card-header">
                     <div class="job-info">
                         <div class="job-company-row">
-                            <span class="job-company">{{ job.company.name }}</span>
+                            <a href="{{ url_for('companies.edit_company', company_id=job.company.id) }}" class="job-company" style="color: inherit; text-decoration: underline dotted;">{{ job.company.name }}</a>
                             {% if job.fit_score %}
                             <span class="fit-badge" data-score="{{ job.fit_score }}">{{ job.fit_score }}%</span>
                             {% endif %}
@@ -156,7 +163,7 @@
                 {% if job.job_url %}
                 <a href="{{ job.job_url }}" target="_blank" class="btn btn-sm btn-ghost">View Posting</a>
                 {% endif %}
-                <a href="{{ url_for('applications.new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Add Lead</a>
+                <a href="{{ url_for('applications.new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Add to Pipeline</a>
                 <button type="button" class="btn btn-sm btn-ghost btn-danger-text" title="Delete job" style="margin-left:auto"
                         onclick="showConfirmModal('Delete Job', 'Are you sure you want to delete {{ job.title }}? This action cannot be undone.', '{{ url_for('jobs.delete_job', job_id=job.id) }}', 'Delete', 'btn-danger')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>

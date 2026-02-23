@@ -15,7 +15,16 @@ def jobs():
     try:
         search = request.args.get('search')
         flagged_only = request.args.get('flagged')
-        if search:
+        company_id = request.args.get('company_id', type=int)
+        company_name = None
+        if company_id:
+            company = service.companies.get_by_id(company_id)
+            if company:
+                company_name = company.name
+                jobs = [j for j in service.jobs.get_all() if j.company_id == company_id]
+            else:
+                jobs = []
+        elif search:
             jobs = service.jobs.search(search)
         elif flagged_only:
             jobs = service.jobs.get_flagged()
@@ -24,7 +33,9 @@ def jobs():
         return render_template('jobs.html',
                              jobs=jobs,
                              search=search,
-                             flagged_only=flagged_only)
+                             flagged_only=flagged_only,
+                             company_id=company_id,
+                             company_name=company_name)
     finally:
         session.close()
 
@@ -98,7 +109,7 @@ def delete_job(job_id):
         if job:
             # Check if job has applications
             if job.applications:
-                flash('Cannot delete job with existing applications. Archive the applications first.', 'error')
+                flash('This job has linked applications. Remove those applications first before deleting.', 'error')
             else:
                 service.jobs.delete(job_id)
                 session.commit()

@@ -8,6 +8,59 @@
 </div>
 
 <div class="settings-grid">
+    <!-- Profile Section (moved to top for discoverability) -->
+    <div class="card" id="profile">
+        <div class="card-header">
+            <h2>Profile</h2>
+        </div>
+        <div class="card-body">
+            <div class="profile-section">
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar-preview">
+                        {% if current_user.avatar_url %}
+                        <img src="{{ current_user.avatar_url }}" alt="Your avatar" class="avatar-image">
+                        {% else %}
+                        <span class="avatar-placeholder">{{ current_user.email[0]|upper }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="profile-avatar-actions">
+                        <form method="POST" action="{{ url_for('settings.upload_avatar') }}" enctype="multipart/form-data" class="avatar-upload-form" id="avatarForm">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <label class="btn btn-secondary btn-sm avatar-upload-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                Upload Photo
+                                <input type="file" name="avatar" accept="image/*" id="avatarInput" hidden>
+                            </label>
+                            <span id="avatarError" style="color: #ef4444; font-size: 0.8rem; display: none;"></span>
+                        </form>
+                        {% if current_user.avatar_url %}
+                        <form method="POST" action="{{ url_for('settings.delete_avatar') }}" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Remove your avatar?')">Remove</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                <form method="POST" action="{{ url_for('settings.save_profile') }}" class="profile-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="form-group">
+                        <label for="display_name">Display Name</label>
+                        <input type="text" id="display_name" name="display_name"
+                               value="{{ current_user.display_name or '' }}"
+                               placeholder="{{ current_user.first_name }}"
+                               class="form-input">
+                        <p class="form-hint">Leave blank to use your email username</p>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Subscription Section -->
     <div class="card" id="subscription">
         <div class="card-header">
@@ -105,58 +158,6 @@
                         Dark
                     </button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Profile Section -->
-    <div class="card" id="profile">
-        <div class="card-header">
-            <h2>Profile</h2>
-        </div>
-        <div class="card-body">
-            <div class="profile-section">
-                <div class="profile-avatar-section">
-                    <div class="profile-avatar-preview">
-                        {% if current_user.avatar_url %}
-                        <img src="{{ current_user.avatar_url }}" alt="Your avatar" class="avatar-image">
-                        {% else %}
-                        <span class="avatar-placeholder">{{ current_user.email[0]|upper }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="profile-avatar-actions">
-                        <form method="POST" action="{{ url_for('settings.upload_avatar') }}" enctype="multipart/form-data" class="avatar-upload-form">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <label class="btn btn-secondary btn-sm avatar-upload-btn">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                    <polyline points="17 8 12 3 7 8"/>
-                                    <line x1="12" y1="3" x2="12" y2="15"/>
-                                </svg>
-                                Upload Photo
-                                <input type="file" name="avatar" accept="image/*" onchange="this.form.submit()" hidden>
-                            </label>
-                        </form>
-                        {% if current_user.avatar_url %}
-                        <form method="POST" action="{{ url_for('settings.delete_avatar') }}" style="display: inline;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Remove your avatar?')">Remove</button>
-                        </form>
-                        {% endif %}
-                    </div>
-                </div>
-                <form method="POST" action="{{ url_for('settings.save_profile') }}" class="profile-form">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <div class="form-group">
-                        <label for="display_name">Display Name</label>
-                        <input type="text" id="display_name" name="display_name" 
-                               value="{{ current_user.display_name or '' }}" 
-                               placeholder="{{ current_user.first_name }}"
-                               class="form-input">
-                        <p class="form-hint">Leave blank to use your email username</p>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save Profile</button>
-                </form>
             </div>
         </div>
     </div>
@@ -425,6 +426,27 @@
 </div>
 
 <script>
+// Avatar client-side validation
+(function() {
+    var avatarInput = document.getElementById('avatarInput');
+    var avatarForm = document.getElementById('avatarForm');
+    var avatarError = document.getElementById('avatarError');
+    if (avatarInput && avatarForm) {
+        avatarInput.addEventListener('change', function() {
+            avatarError.style.display = 'none';
+            if (this.files && this.files[0]) {
+                if (this.files[0].size > 2 * 1024 * 1024) {
+                    avatarError.textContent = 'Image must be under 2MB. Please choose a smaller file.';
+                    avatarError.style.display = 'block';
+                    this.value = '';
+                    return;
+                }
+                avatarForm.submit();
+            }
+        });
+    }
+})();
+
 function toggleResumeMode(mode) {
     document.getElementById('resumeMode').value = mode;
     document.getElementById('resumePasteSection').style.display = mode === 'paste' ? '' : 'none';

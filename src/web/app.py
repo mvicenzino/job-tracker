@@ -38,7 +38,7 @@ def create_app(db_path: str = None, database_url: str = None):
     app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
     app.config['REMEMBER_COOKIE_SECURE'] = bool(is_production)
     app.config['REMEMBER_COOKIE_HTTPONLY'] = True
-    app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB upload limit
+    app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024  # 3 MB upload limit
     app.config['AI_PARSING_ENABLED'] = bool(os.environ.get('ANTHROPIC_API_KEY'))
 
     # Database setup - prefer DATABASE_URL for production
@@ -72,6 +72,11 @@ def create_app(db_path: str = None, database_url: str = None):
 
     # Prevent browsers from caching static files indefinitely
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
+    @app.errorhandler(413)
+    def request_entity_too_large(error):
+        flash('File too large. Please choose a smaller file (under 2MB).', 'error')
+        return redirect(url_for('settings.settings'))
 
     @app.after_request
     def add_cache_headers(response):

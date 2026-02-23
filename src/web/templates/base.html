@@ -154,6 +154,13 @@
                     <div class="profile-menu-header">
                         <span class="profile-menu-email">{{ current_user.email }}</span>
                     </div>
+                    <a href="{{ url_for('settings.settings') }}#profile" class="{% if request.endpoint == 'settings.settings' %}active{% endif %}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Edit Profile
+                    </a>
                     <a href="{{ url_for('settings.settings') }}" class="{% if request.endpoint == 'settings.settings' %}active{% endif %}">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="3"/>
@@ -363,10 +370,10 @@
                     {{ current_user.email[0]|upper }}
                     {% endif %}
                 </div>
-                <div class="sidebar-profile-info">
+                <a href="{{ url_for('settings.settings') }}#profile" class="sidebar-profile-info" style="text-decoration: none; color: inherit;">
                     <span class="sidebar-profile-name">{% if current_user.display_name %}{{ current_user.display_name }}{% elif current_user.first_name %}{{ current_user.first_name }}{% else %}{{ current_user.email.split('@')[0] }}{% endif %}</span>
                     <span class="sidebar-profile-email">{{ current_user.email }}</span>
-                </div>
+                </a>
                 <div class="sidebar-profile-actions">
                     <a href="{{ url_for('notifications.notifications') }}" class="sidebar-profile-btn {% if request.endpoint and request.endpoint.startswith('notifications.') %}active{% endif %}" title="Notifications">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

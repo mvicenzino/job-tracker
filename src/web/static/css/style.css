@@ -1830,6 +1830,27 @@ a:hover {
     color: var(--color-text);
 }
 
+/* Collapsible card sections using <details> */
+details.card > summary.card-header {
+    user-select: none;
+}
+
+details.card > summary.card-header::-webkit-details-marker {
+    display: none;
+}
+
+details.card > summary.card-header::after {
+    content: '▾';
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-left: var(--space-2);
+    transition: transform var(--transition-fast);
+}
+
+details[open].card > summary.card-header::after {
+    transform: rotate(180deg);
+}
+
 .card-header.highlight {
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
     color: white;
@@ -3054,7 +3075,7 @@ a:hover {
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     margin: 0 calc(-1 * var(--space-4));
-    padding: 0 var(--space-4);
+    padding: 0 var(--space-4) var(--space-4);
 }
 
 .pipeline-column {
@@ -6569,6 +6590,17 @@ body.demo-active .navbar {
     /* Hide desktop-only elements */
     .btn-desktop-only {
         display: none !important;
+    }
+
+    /* Compact button for mobile (keeps visible but smaller) */
+    .btn-sm-mobile {
+        font-size: 0.75rem !important;
+        padding: 0.35rem 0.75rem !important;
+    }
+
+    /* Move menu clears bottom tab bar on mobile */
+    .move-menu {
+        margin-bottom: calc(64px + var(--space-2));
     }
 
     /* Mobile tab strip: full-bleed with stacked count + name */
