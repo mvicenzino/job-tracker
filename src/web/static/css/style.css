@@ -624,6 +624,94 @@ a:hover {
     color: white;
 }
 
+/* Sidebar Add dropdown — opens upward */
+.sidebar-add {
+    position: relative;
+    margin-bottom: var(--space-3);
+}
+
+.sidebar-add .sidebar-cta {
+    margin-bottom: 0;
+}
+
+.sidebar-add-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-2) 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
+    z-index: 100;
+}
+
+.sidebar-add.open .sidebar-add-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Header/Dashboard Add dropdown — opens downward */
+.header-add-dropdown,
+.mobile-add-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.header-add-menu,
+.mobile-add-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 200px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-2) 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
+    z-index: 100;
+}
+
+.header-add-dropdown.open .header-add-menu,
+.mobile-add-dropdown.open .mobile-add-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.header-add-menu a,
+.mobile-add-menu a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    text-decoration: none;
+    transition: background var(--transition-fast);
+}
+
+.header-add-menu a:hover,
+.mobile-add-menu a:hover {
+    background: var(--color-bg-subtle);
+}
+
+.header-add-menu a svg,
+.mobile-add-menu a svg {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+}
+
 .sidebar-profile {
     position: relative;
 }

@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize sidebar profile menu
     initSidebarProfileMenu();
 
+    // Initialize sidebar add menu
+    initSidebarAddMenu();
+
+    // Initialize header/dashboard add dropdowns
+    initHeaderAddDropdowns();
+
     // Initialize calendar sync dropdowns
     initCalSyncDropdowns();
 
@@ -144,13 +150,19 @@ function initSidebarProfileMenu() {
         sidebarProfile.classList.toggle('open');
         trigger.setAttribute('aria-expanded', String(!isOpen));
 
-        // Close nav dropdowns when sidebar menu opens
+        // Close nav dropdowns and add menu when sidebar profile opens
         if (!isOpen) {
             document.querySelectorAll('.nav-dropdown.open, .nav-profile.open').forEach(function(d) {
                 d.classList.remove('open');
                 var t = d.querySelector('.nav-dropdown-toggle, .nav-profile-toggle');
                 if (t) t.setAttribute('aria-expanded', 'false');
             });
+            var sidebarAdd = document.getElementById('sidebarAdd');
+            if (sidebarAdd) {
+                sidebarAdd.classList.remove('open');
+                var addTrigger = sidebarAdd.querySelector('.sidebar-cta');
+                if (addTrigger) addTrigger.setAttribute('aria-expanded', 'false');
+            }
         }
     });
 
@@ -188,6 +200,118 @@ function initSidebarProfileMenu() {
     }
 }
 
+// === Sidebar Add Menu ===
+
+function initSidebarAddMenu() {
+    var sidebarAdd = document.getElementById('sidebarAdd');
+    if (!sidebarAdd) return;
+
+    var trigger = sidebarAdd.querySelector('.sidebar-cta');
+    if (!trigger) return;
+
+    trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var isOpen = sidebarAdd.classList.contains('open');
+        sidebarAdd.classList.toggle('open');
+        trigger.setAttribute('aria-expanded', String(!isOpen));
+
+        // Close profile menu when add menu opens
+        if (!isOpen) {
+            var sidebarProfile = document.getElementById('sidebarProfile');
+            if (sidebarProfile) {
+                sidebarProfile.classList.remove('open');
+                var profileTrigger = sidebarProfile.querySelector('.sidebar-profile-trigger');
+                if (profileTrigger) profileTrigger.setAttribute('aria-expanded', 'false');
+            }
+            // Close nav dropdowns
+            document.querySelectorAll('.nav-dropdown.open, .nav-profile.open').forEach(function(d) {
+                d.classList.remove('open');
+                var t = d.querySelector('.nav-dropdown-toggle, .nav-profile-toggle');
+                if (t) t.setAttribute('aria-expanded', 'false');
+            });
+        }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        if (!sidebarAdd.contains(e.target)) {
+            sidebarAdd.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebarAdd.classList.contains('open')) {
+            sidebarAdd.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.focus();
+        }
+    });
+
+    // Close after clicking any menu link
+    sidebarAdd.querySelectorAll('.sidebar-menu-item').forEach(function(item) {
+        if (item.tagName === 'A') {
+            item.addEventListener('click', function() {
+                sidebarAdd.classList.remove('open');
+                trigger.setAttribute('aria-expanded', 'false');
+            });
+        }
+    });
+}
+
+// === Header Add Dropdowns (Dashboard, Mobile Nav) ===
+
+function initHeaderAddDropdowns() {
+    var dropdowns = document.querySelectorAll('.header-add-dropdown, .mobile-add-dropdown');
+    if (!dropdowns.length) return;
+
+    dropdowns.forEach(function(dropdown) {
+        var trigger = dropdown.querySelector('button');
+        if (!trigger) return;
+
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var isOpen = dropdown.classList.contains('open');
+
+            // Close all other header dropdowns
+            dropdowns.forEach(function(other) {
+                if (other !== dropdown) other.classList.remove('open');
+            });
+
+            dropdown.classList.toggle('open');
+            trigger.setAttribute('aria-expanded', String(!isOpen));
+        });
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        dropdowns.forEach(function(dropdown) {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('open');
+                var trigger = dropdown.querySelector('button');
+                if (trigger) trigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            dropdowns.forEach(function(dropdown) {
+                if (dropdown.classList.contains('open')) {
+                    dropdown.classList.remove('open');
+                    var trigger = dropdown.querySelector('button');
+                    if (trigger) {
+                        trigger.setAttribute('aria-expanded', 'false');
+                        trigger.focus();
+                    }
+                }
+            });
+        }
+    });
+}
+
 // === Nav Dropdowns (Network, Insights, Profile) ===
 
 function initNavDropdowns() {
@@ -211,12 +335,18 @@ function initNavDropdowns() {
                 }
             });
 
-            // Close sidebar profile menu when nav dropdown opens
+            // Close sidebar profile menu and add menu when nav dropdown opens
             var sidebarProfile = document.getElementById('sidebarProfile');
             if (sidebarProfile) {
                 sidebarProfile.classList.remove('open');
                 var sidebarTrigger = sidebarProfile.querySelector('.sidebar-profile-trigger');
                 if (sidebarTrigger) sidebarTrigger.setAttribute('aria-expanded', 'false');
+            }
+            var sidebarAdd = document.getElementById('sidebarAdd');
+            if (sidebarAdd) {
+                sidebarAdd.classList.remove('open');
+                var addTrigger = sidebarAdd.querySelector('.sidebar-cta');
+                if (addTrigger) addTrigger.setAttribute('aria-expanded', 'false');
             }
 
             dropdown.classList.toggle('open');

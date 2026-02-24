@@ -192,7 +192,33 @@
             </script>
             {% endif %}
         </div>
-        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Lead</a>
+        <div class="header-add-dropdown" id="dashboardAddDropdown">
+            <button type="button" class="btn btn-primary" aria-expanded="false" aria-haspopup="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Add
+            </button>
+            <div class="header-add-menu">
+                <a href="{{ url_for('applications.new_application') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    Job Opportunity
+                </a>
+                <a href="{{ url_for('companies.new_company') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    Company
+                </a>
+                <a href="{{ url_for('contacts.new_contact') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Contact
+                </a>
+                <a href="{{ url_for('reflections.new_reflection') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    Reflection
+                </a>
+            </div>
+        </div>
     </header>
 
     {% if not onboarding.show %}
