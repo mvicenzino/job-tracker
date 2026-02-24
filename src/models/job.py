@@ -29,8 +29,13 @@ class Job(Base, TimestampMixin):
     scored_at = Column(DateTime)  # When the score was calculated
     scored_with_resume_id = Column(Integer)  # Which resume version was used
 
+    # Workspace support (nullable — NULL means personal data)
+    workspace_id = Column(Integer, ForeignKey('workspaces.id'), nullable=True, index=True)
+    created_by = Column(Integer, ForeignKey('users.id'), nullable=True)
+
     # Relationships
-    user = relationship("User", backref="jobs")
+    user = relationship("User", backref="jobs", foreign_keys=[user_id])
+    created_by_user = relationship("User", foreign_keys=[created_by])
     company = relationship("Company", back_populates="jobs")
     applications = relationship("Application", back_populates="job", cascade="all, delete-orphan")
     notes = relationship("Note", back_populates="job", cascade="all, delete-orphan",

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Review Lead - {{ job.title }} - Stride{% endblock %}
+{% block title %}Review Opportunity - {{ job.title }} - Stride{% endblock %}
 
 {% block content %}
 <div class="review-lead-page">
     <div class="review-header">
-        <span class="review-badge">New Lead</span>
+        <span class="review-badge">New Opportunity</span>
         <h1>Does this role fit your goals?</h1>
         <p class="subtitle">Take a moment to evaluate this opportunity before adding it to your pipeline.</p>
     </div>
@@ -124,7 +124,7 @@
                         <button type="submit" name="action" value="save" class="btn btn-secondary">
                             Save for Later
                         </button>
-                        <button type="submit" name="action" value="delete" class="btn btn-ghost btn-danger-text" onclick="return confirm('Delete this lead?');">
+                        <button type="submit" name="action" value="delete" class="btn btn-ghost btn-danger-text" onclick="return confirm('Delete this opportunity?');">
                             Not a Fit — Delete
                         </button>
                     </div>

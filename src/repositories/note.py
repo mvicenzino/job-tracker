@@ -8,14 +8,33 @@ from ..models import Note
 class NoteRepository(BaseRepository[Note]):
     """Repository for Note operations."""
 
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, user_id: int = None, workspace_id: int = None):
         super().__init__(session, Note)
+        self.user_id = user_id
+        self.workspace_id = workspace_id
+
+    def _base_query(self):
+        """Get base query filtered by workspace or user."""
+        query = self.session.query(Note)
+        if self.workspace_id is not None:
+            query = query.filter(Note.workspace_id == self.workspace_id)
+        elif self.user_id is not None:
+            query = query.filter(Note.user_id == self.user_id, Note.workspace_id.is_(None))
+        return query
+
+    def create(self, **kwargs) -> Note:
+        """Create a new note with user_id and workspace auto-set."""
+        if self.user_id is not None:
+            kwargs.setdefault('user_id', self.user_id)
+        if self.workspace_id is not None:
+            kwargs['workspace_id'] = self.workspace_id
+            kwargs.setdefault('created_by', self.user_id)
+        return super().create(**kwargs)
 
     def get_all_for_user(self, user_id: int, limit: int = 50) -> List[Note]:
         """Get all notes for a user, eager-loading parents."""
-        return self.session.query(Note).filter(
-            Note.user_id == user_id
-        ).options(
+        query = self._base_query() if (self.workspace_id or self.user_id) else self.session.query(Note).filter(Note.user_id == user_id)
+        return query.options(
             joinedload(Note.company),
             joinedload(Note.job),
             joinedload(Note.application),

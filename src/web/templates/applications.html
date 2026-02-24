@@ -10,14 +10,14 @@
         <line x1="12" y1="8" x2="12" y2="12"/>
         <line x1="12" y1="16" x2="12.01" y2="16"/>
     </svg>
-    <span>You're viewing sample data. <a href="{{ url_for('auth.register') }}">Create an account</a> to start tracking your own job search.</span>
+    <span>You're viewing sample data. <a href="{{ url_for('auth.register') }}">Create an account</a> to start tracking your own opportunities.</span>
     <a href="{{ url_for('auth.logout') }}" class="demo-exit-btn">Exit Demo</a>
 </div>
 {% endif %}
 <div class="list-page">
     <header class="page-header">
         <h1>{% if view == 'leads' %}Leads{% elif view == 'applied' %}Applications{% else %}Pipeline{% endif %}</h1>
-        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Job Opportunity</a>
+        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Opportunity</a>
     </header>
 
     <!-- Tabs for Leads vs Applications -->
@@ -93,9 +93,9 @@
         <p>No applications found matching your search</p>
         <a href="{{ url_for('applications.applications') }}" class="btn btn-secondary">Clear Filters</a>
         {% else %}
-        <p class="empty-state-title">Track your job search journey</p>
-        <p class="empty-state-description">Keep all your applications in one place. See your pipeline at a glance and never lose track of where you stand with each company.</p>
-        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Your First Lead</a>
+        <p class="empty-state-title">Track your opportunities</p>
+        <p class="empty-state-description">Keep all your opportunities in one place. See your pipeline at a glance and never lose track of where you stand with each company.</p>
+        <a href="{{ url_for('applications.new_application') }}" class="btn btn-primary">+ Add Your First Opportunity</a>
         {% endif %}
     </div>
     {% endif %}

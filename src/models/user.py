@@ -46,8 +46,10 @@ class User(Base, TimestampMixin, UserMixin):
     ai_interview_preps_used = Column(Integer, default=0, nullable=True)
 
     # Relationships
-    companies = relationship("Company", back_populates="user", cascade="all, delete-orphan")
-    contacts = relationship("Contact", back_populates="user", cascade="all, delete-orphan")
+    companies = relationship("Company", back_populates="user", cascade="all, delete-orphan",
+                            foreign_keys="Company.user_id")
+    contacts = relationship("Contact", back_populates="user", cascade="all, delete-orphan",
+                           foreign_keys="Contact.user_id")
     resume_versions = relationship("ResumeVersion", back_populates="user", cascade="all, delete-orphan")
 
     def set_password(self, password: str) -> None:

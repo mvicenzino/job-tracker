@@ -14,6 +14,7 @@ from .resume_version import ResumeVersion
 from .notification import Notification
 from .interview_prep import InterviewPrep
 from .project import Project, Resource
+from .workspace import Workspace, WorkspaceMember
 
 __all__ = [
     'Base',
@@ -37,5 +38,7 @@ __all__ = [
     'Notification',
     'InterviewPrep',
     'Project',
-    'Resource'
+    'Resource',
+    'Workspace',
+    'WorkspaceMember'
 ]

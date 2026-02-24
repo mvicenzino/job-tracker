@@ -124,7 +124,7 @@ def new_application():
                 resume_version_id=resume_version_id,
                 **job_extras
             )
-            flash(f'Lead added for {app.job.title} at {app.job.company.name}!', 'success')
+            flash(f'Opportunity added for {app.job.title} at {app.job.company.name}!', 'success')
             return redirect(url_for('applications.application_detail', app_id=app.id, new=1))
         finally:
             session.close()
@@ -187,7 +187,7 @@ def confirm_lead(app_id):
             # Delete the lead
             service.applications.delete(app_id)
             session.commit()
-            flash('Lead removed.', 'success')
+            flash('Opportunity removed.', 'success')
             return redirect(url_for('jobs.jobs'))
         
         elif action == 'save':
@@ -219,7 +219,7 @@ def confirm_lead(app_id):
                 session.add(note)
             
             session.commit()
-            flash('Lead added to your pipeline!', 'success')
+            flash('Opportunity added to your pipeline!', 'success')
             return redirect(url_for('applications.application_detail', app_id=app_id))
     
     finally:

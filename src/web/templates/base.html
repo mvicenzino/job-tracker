@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-title" content="Stride">
     <meta name="application-name" content="Stride">
     <meta name="theme-color" content="#6366f1" id="theme-color-meta">
-    <meta name="description" content="Track your job applications, nail interviews, and land offers.">
+    <meta name="description" content="Track opportunities, manage your pipeline, and close deals faster.">
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
@@ -88,7 +88,7 @@
         <div class="nav-center">
             <a href="{{ url_for('dashboard.dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">Dashboard</a>
             <a href="{{ url_for('dashboard.pipeline') }}" class="nav-link {% if request.endpoint == 'dashboard.pipeline' %}active{% endif %}">Pipeline</a>
-            <a href="{{ url_for('applications.applications') }}" class="nav-link {% if request.endpoint and request.endpoint.startswith('applications.') %}active{% endif %}">Applications</a>
+            <a href="{{ url_for('applications.applications') }}" class="nav-link {% if request.endpoint and request.endpoint.startswith('applications.') %}active{% endif %}">Pipeline</a>
             <a href="{{ url_for('schedule.schedule') }}" class="nav-link {% if request.endpoint and request.endpoint.startswith('schedule.') %}active{% endif %}">Schedule</a>
 
             <div class="nav-dropdown{% if network_active %} has-active-child{% endif %}">
@@ -98,7 +98,7 @@
                 <div class="nav-dropdown-menu">
                     <a href="{{ url_for('contacts.contacts') }}" class="{% if request.endpoint and request.endpoint.startswith('contacts.') %}active{% endif %}">Contacts{% if overdue_followups_count %} <span class="nav-badge">{{ overdue_followups_count }}</span>{% endif %}</a>
                     <a href="{{ url_for('companies.companies') }}" class="{% if request.endpoint and request.endpoint.startswith('companies.') %}active{% endif %}">Companies</a>
-                    <a href="{{ url_for('jobs.jobs') }}" class="{% if request.endpoint and request.endpoint.startswith('jobs.') %}active{% endif %}">Jobs</a>
+                    <a href="{{ url_for('jobs.jobs') }}" class="{% if request.endpoint and request.endpoint.startswith('jobs.') %}active{% endif %}">Opportunities</a>
                 </div>
             </div>
 
@@ -184,6 +184,49 @@
                         Feedback
                     </a>
                     <div class="profile-menu-divider"></div>
+                    <a href="{{ url_for('workspaces.workspaces') }}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        Workspaces
+                    </a>
+                    {% if user_workspaces %}
+                    <div style="padding: 0.25rem 0.75rem;">
+                        {% for ws in user_workspaces %}
+                        <form method="post" action="{{ url_for('workspaces.switch_workspace') }}" style="margin: 0;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="workspace_id" value="{{ ws.id }}">
+                            <button type="submit" style="display: flex; align-items: center; gap: 0.5rem; width: 100%; padding: 0.375rem 0.5rem; border: none; background: none; cursor: pointer; border-radius: 4px; font-size: 0.8rem; color: var(--color-text-secondary, #64748b); text-align: left;" onmouseover="this.style.background='var(--color-surface-alt, #f1f5f9)'" onmouseout="this.style.background='none'">
+                                {% if active_workspace_id == ws.id %}
+                                <span style="color: var(--color-primary, #6366f1); font-weight: 600;">&#10003;</span>
+                                {% else %}
+                                <span style="width: 14px;">&nbsp;</span>
+                                {% endif %}
+                                {{ ws.name }}
+                            </button>
+                        </form>
+                        {% endfor %}
+                        {% if active_workspace_id %}
+                        <form method="post" action="{{ url_for('workspaces.switch_workspace') }}" style="margin: 0;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="workspace_id" value="personal">
+                            <button type="submit" style="display: flex; align-items: center; gap: 0.5rem; width: 100%; padding: 0.375rem 0.5rem; border: none; background: none; cursor: pointer; border-radius: 4px; font-size: 0.8rem; color: var(--color-text-secondary, #64748b); text-align: left;" onmouseover="this.style.background='var(--color-surface-alt, #f1f5f9)'" onmouseout="this.style.background='none'">
+                                <span style="width: 14px;">&nbsp;</span>
+                                Personal
+                            </button>
+                        </form>
+                        {% else %}
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.5rem; font-size: 0.8rem; color: var(--color-text-secondary, #64748b);">
+                            <span style="color: var(--color-primary, #6366f1); font-weight: 600;">&#10003;</span>
+                            Personal
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    <div class="profile-menu-divider"></div>
                     {% if current_user.email == 'demo@stride-jobs.com' %}
                     <a href="{{ url_for('auth.logout') }}" class="logout-link">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -219,6 +262,9 @@
             {% if current_user.email == 'demo@stride-jobs.com' %}
             <span class="sidebar-demo-badge">DEMO</span>
             {% endif %}
+            {% if active_workspace %}
+            <span class="sidebar-demo-badge" style="background: var(--color-primary, #6366f1); color: white; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 4px; white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis;">{{ active_workspace.name }}</span>
+            {% endif %}
         </div>
 
         <nav class="sidebar-nav">
@@ -247,7 +293,7 @@
                         <line x1="16" y1="13" x2="8" y2="13"/>
                         <line x1="16" y1="17" x2="8" y2="17"/>
                     </svg>
-                    <span>Applications</span>
+                    <span>Pipeline</span>
                 </a>
                 <a href="{{ url_for('schedule.schedule') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('schedule.') %}active{% endif %}">
                     <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -284,7 +330,7 @@
                         <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
                         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
                     </svg>
-                    <span>Jobs</span>
+                    <span>Opportunities</span>
                 </a>
             </div>
 
@@ -349,7 +395,7 @@
                 <div class="sidebar-add-menu">
                     <a href="{{ url_for('applications.new_application') }}" class="sidebar-menu-item">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                        Job Opportunity
+                        Opportunity
                     </a>
                     <a href="{{ url_for('companies.new_company') }}" class="sidebar-menu-item">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -449,7 +495,7 @@
                 <span class="nav-icon">📋</span> Pipeline
             </a>
             <a href="{{ url_for('applications.applications') }}" class="{% if request.endpoint and request.endpoint.startswith('applications.') %}active{% endif %}">
-                <span class="nav-icon">📄</span> Applications
+                <span class="nav-icon">📄</span> Pipeline
             </a>
             <a href="{{ url_for('schedule.schedule') }}" class="{% if request.endpoint and request.endpoint.startswith('schedule.') %}active{% endif %}">
                 <span class="nav-icon">📅</span> Schedule
@@ -468,7 +514,7 @@
                         <span class="nav-icon">🏢</span> Companies
                     </a>
                     <a href="{{ url_for('jobs.jobs') }}" class="{% if request.endpoint and request.endpoint.startswith('jobs.') %}active{% endif %}">
-                        <span class="nav-icon">💼</span> Jobs
+                        <span class="nav-icon">💼</span> Opportunities
                     </a>
                 </div>
             </div>
@@ -497,7 +543,7 @@
                 <span class="nav-icon">🏢</span> Companies
             </a>
             <a href="{{ url_for('jobs.jobs') }}" class="nav-mobile-only {% if request.endpoint and request.endpoint.startswith('jobs.') %}active{% endif %}">
-                <span class="nav-icon">💼</span> Jobs
+                <span class="nav-icon">💼</span> Opportunities
             </a>
 
             <span class="nav-section-label">Insights</span>
@@ -512,7 +558,7 @@
             <div class="mobile-add-dropdown" id="mobileAddDropdown">
                 <button type="button" class="btn btn-primary" aria-expanded="false" aria-haspopup="true">+ Add</button>
                 <div class="mobile-add-menu">
-                    <a href="{{ url_for('applications.new_application') }}">Job Opportunity</a>
+                    <a href="{{ url_for('applications.new_application') }}">Opportunity</a>
                     <a href="{{ url_for('companies.new_company') }}">Company</a>
                     <a href="{{ url_for('contacts.new_contact') }}">Contact</a>
                     <a href="{{ url_for('reflections.new_reflection') }}">Reflection</a>
@@ -631,7 +677,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 Stride. Built for job seekers, by job seekers.</p>
+                <p>&copy; 2026 Stride. Built for professionals, by professionals.</p>
             </div>
         </div>
     </footer>
@@ -702,7 +748,7 @@
                     <line x1="16" y1="13" x2="8" y2="13"/>
                     <line x1="16" y1="17" x2="8" y2="17"/>
                 </svg>
-                <span>Applications</span>
+                <span>Pipeline</span>
             </a>
             <a href="{{ url_for('contacts.contacts') }}" class="more-menu-item">
                 <svg class="more-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -728,7 +774,7 @@
                     <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
                     <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
                 </svg>
-                <span>Jobs</span>
+                <span>Opportunities</span>
             </a>
             <a href="{{ url_for('resumes.resumes') }}" class="more-menu-item">
                 <svg class="more-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -890,7 +936,7 @@
                 </svg>
             </div>
             <h3 id="upgradeModalTitle">Upgrade to Pro</h3>
-            <p id="upgradeModalMessage">Unlock unlimited AI features and take your job search to the next level.</p>
+            <p id="upgradeModalMessage">Unlock unlimited AI features and take your pipeline to the next level.</p>
             <ul class="upgrade-features">
                 <li>Unlimited AI fit scores</li>
                 <li>Unlimited AI cover letters</li>

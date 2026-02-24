@@ -60,8 +60,13 @@ class Event(Base, TimestampMixin):
     # Reminders
     reminder_minutes = Column(Integer, default=30)  # Minutes before to remind
 
+    # Workspace support (nullable — NULL means personal data)
+    workspace_id = Column(Integer, ForeignKey('workspaces.id'), nullable=True, index=True)
+    created_by = Column(Integer, ForeignKey('users.id'), nullable=True)
+
     # Relationships
-    user = relationship("User", backref="events")
+    user = relationship("User", backref="events", foreign_keys=[user_id])
+    created_by_user = relationship("User", foreign_keys=[created_by])
     application = relationship("Application", back_populates="events")
     contact = relationship("Contact", back_populates="events", foreign_keys=[contact_id])
     notes = relationship("Note", back_populates="event", cascade="all, delete-orphan",

@@ -46,8 +46,13 @@ class Contact(Base, TimestampMixin):
     # Notes
     notes = Column(Text)
 
+    # Workspace support (nullable — NULL means personal data)
+    workspace_id = Column(Integer, ForeignKey('workspaces.id'), nullable=True, index=True)
+    created_by = Column(Integer, ForeignKey('users.id'), nullable=True)
+
     # Relationships
-    user = relationship("User", back_populates="contacts")
+    user = relationship("User", back_populates="contacts", foreign_keys=[user_id])
+    created_by_user = relationship("User", foreign_keys=[created_by])
     company = relationship("Company", back_populates="contacts")
     events = relationship("Event", back_populates="contact", cascade="all, delete-orphan",
                          foreign_keys="Event.contact_id")

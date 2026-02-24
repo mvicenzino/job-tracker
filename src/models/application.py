@@ -55,8 +55,13 @@ class Application(Base, TimestampMixin):
     # AI Analysis
     fit_score = Column(Integer)  # 0-100 score from AI resume fit analysis
 
+    # Workspace support (nullable — NULL means personal data)
+    workspace_id = Column(Integer, ForeignKey('workspaces.id'), nullable=True, index=True)
+    created_by = Column(Integer, ForeignKey('users.id'), nullable=True)
+
     # Relationships
-    user = relationship("User", backref="applications")
+    user = relationship("User", backref="applications", foreign_keys=[user_id])
+    created_by_user = relationship("User", foreign_keys=[created_by])
     job = relationship("Job", back_populates="applications")
     referral_contact = relationship("Contact", foreign_keys=[referral_contact_id])
     resume_version_ref = relationship("ResumeVersion", back_populates="applications",

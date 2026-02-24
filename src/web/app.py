@@ -242,6 +242,38 @@ def create_app(db_path: str = None, database_url: str = None):
         return {'user_tier': 'free', 'is_pro': False, 'usage_data': {}}
 
     @app.context_processor
+    def inject_workspace_data():
+        """Inject workspace data for sidebar switcher."""
+        from flask_login import current_user
+        from flask import session as flask_session
+        try:
+            if current_user.is_authenticated:
+                from ..models import Workspace, WorkspaceMember
+                session = db.get_session()
+                try:
+                    memberships = session.query(WorkspaceMember).filter_by(
+                        user_id=current_user.id
+                    ).all()
+                    ws_ids = [m.workspace_id for m in memberships]
+                    workspaces = session.query(Workspace).filter(
+                        Workspace.id.in_(ws_ids)
+                    ).all() if ws_ids else []
+                    active_ws_id = flask_session.get('active_workspace_id')
+                    active_workspace = None
+                    if active_ws_id:
+                        active_workspace = session.query(Workspace).get(active_ws_id)
+                    return {
+                        'user_workspaces': workspaces,
+                        'active_workspace': active_workspace,
+                        'active_workspace_id': active_ws_id,
+                    }
+                finally:
+                    session.close()
+        except Exception:
+            pass
+        return {'user_workspaces': [], 'active_workspace': None, 'active_workspace_id': None}
+
+    @app.context_processor
     def inject_notification_count():
         """Inject unread notification count for nav badge."""
         from flask_login import current_user
@@ -280,6 +312,7 @@ def create_app(db_path: str = None, database_url: str = None):
     from .routes.notes import bp as notes_bp
     from .routes.insights import insights_bp
     from .routes.projects import bp as projects_bp
+    from .routes.workspaces import bp as workspaces_bp
 
     app.register_blueprint(public_bp)
     app.register_blueprint(auth_bp)
@@ -303,6 +336,7 @@ def create_app(db_path: str = None, database_url: str = None):
     app.register_blueprint(about_bp)
     app.register_blueprint(notes_bp)
     app.register_blueprint(insights_bp)
+    app.register_blueprint(workspaces_bp)
 
     return app
 

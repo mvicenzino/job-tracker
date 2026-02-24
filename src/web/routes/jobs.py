@@ -72,7 +72,7 @@ def new_job():
                     source=request.form.get('source', '').strip(),
                     is_flagged=bool(request.form.get('is_flagged'))
                 )
-                flash('Job added successfully!', 'success')
+                flash('Opportunity added successfully!', 'success')
                 return redirect(url_for('jobs.jobs'))
             else:
                 flash('Please select or enter a company.', 'error')
@@ -109,11 +109,11 @@ def delete_job(job_id):
         if job:
             # Check if job has applications
             if job.applications:
-                flash('This job has linked applications. Remove those applications first before deleting.', 'error')
+                flash('This opportunity has linked pipeline entries. Remove those first before deleting.', 'error')
             else:
                 service.jobs.delete(job_id)
                 session.commit()
-                flash('Job deleted!', 'success')
+                flash('Opportunity deleted!', 'success')
         else:
             flash('Job not found.', 'error')
         return redirect(url_for('jobs.jobs'))
@@ -129,7 +129,7 @@ def edit_job(job_id):
     try:
         job = service.jobs.get_by_id(job_id)
         if not job:
-            flash('Job not found', 'error')
+            flash('Opportunity not found', 'error')
             return redirect(url_for('applications.applications'))
 
         if request.method == 'POST':
@@ -152,7 +152,7 @@ def edit_job(job_id):
 
             service.jobs.update(job_id, **updates)
             session.commit()
-            flash('Job updated!', 'success')
+            flash('Opportunity updated!', 'success')
 
             # Redirect back to application if we came from there
             app_id = request.args.get('app_id')

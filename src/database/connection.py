@@ -353,6 +353,92 @@ class DatabaseConnection:
                             except Exception as e:
                                 print(f"[Migration] Failed to add {col_name}: {e}")
 
+            # --- Workspace tables ---
+            table_names = inspector.get_table_names()
+
+            if 'workspaces' not in table_names:
+                with self.engine.connect() as conn:
+                    try:
+                        if is_postgres:
+                            conn.execute(text("""
+                                CREATE TABLE workspaces (
+                                    id SERIAL PRIMARY KEY,
+                                    name VARCHAR(255) NOT NULL,
+                                    created_by INTEGER NOT NULL REFERENCES users(id),
+                                    invite_code VARCHAR(32) UNIQUE NOT NULL,
+                                    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+                                    updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+                                )
+                            """))
+                        else:
+                            conn.execute(text("""
+                                CREATE TABLE workspaces (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    name VARCHAR(255) NOT NULL,
+                                    created_by INTEGER NOT NULL REFERENCES users(id),
+                                    invite_code VARCHAR(32) UNIQUE NOT NULL,
+                                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+                                )
+                            """))
+                        conn.commit()
+                        print("[Migration] Created workspaces table")
+                    except Exception as e:
+                        print(f"[Migration] Failed to create workspaces table: {e}")
+
+            if 'workspace_members' not in table_names:
+                with self.engine.connect() as conn:
+                    try:
+                        if is_postgres:
+                            conn.execute(text("""
+                                CREATE TABLE workspace_members (
+                                    id SERIAL PRIMARY KEY,
+                                    workspace_id INTEGER NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+                                    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                                    role VARCHAR(20) NOT NULL DEFAULT 'member',
+                                    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+                                    updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
+                                    UNIQUE(workspace_id, user_id)
+                                )
+                            """))
+                        else:
+                            conn.execute(text("""
+                                CREATE TABLE workspace_members (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    workspace_id INTEGER NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+                                    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                                    role VARCHAR(20) NOT NULL DEFAULT 'member',
+                                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                    UNIQUE(workspace_id, user_id)
+                                )
+                            """))
+                        conn.commit()
+                        print("[Migration] Created workspace_members table")
+                    except Exception as e:
+                        print(f"[Migration] Failed to create workspace_members table: {e}")
+
+            # Add workspace_id and created_by to shared entity tables
+            shared_tables = ['companies', 'jobs', 'applications', 'contacts', 'events', 'notes']
+            for tbl in shared_tables:
+                if tbl in table_names:
+                    tbl_columns = [col['name'] for col in inspector.get_columns(tbl)]
+                    with self.engine.connect() as conn:
+                        if 'workspace_id' not in tbl_columns:
+                            try:
+                                conn.execute(text(f'ALTER TABLE {tbl} ADD COLUMN workspace_id INTEGER REFERENCES workspaces(id)'))
+                                conn.commit()
+                                print(f"[Migration] Added workspace_id column to {tbl}")
+                            except Exception as e:
+                                print(f"[Migration] Failed to add workspace_id to {tbl}: {e}")
+                        if 'created_by' not in tbl_columns:
+                            try:
+                                conn.execute(text(f'ALTER TABLE {tbl} ADD COLUMN created_by INTEGER REFERENCES users(id)'))
+                                conn.commit()
+                                print(f"[Migration] Added created_by column to {tbl}")
+                            except Exception as e:
+                                print(f"[Migration] Failed to add created_by to {tbl}: {e}")
+
         except Exception as e:
             print(f"[Migration] Migration check failed: {e}")
 

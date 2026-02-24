@@ -25,15 +25,17 @@ class JobHuntService:
     Provides workflow-oriented methods that may span multiple repositories.
     """
 
-    def __init__(self, session: Session, user_id: int = None):
+    def __init__(self, session: Session, user_id: int = None, workspace_id: int = None):
         self.session = session
         self.user_id = user_id
-        self.companies = CompanyRepository(session, user_id=user_id)
-        self.jobs = JobRepository(session, user_id=user_id)
-        self.applications = ApplicationRepository(session, user_id=user_id)
-        self.contacts = ContactRepository(session, user_id=user_id)
-        self.events = EventRepository(session, user_id=user_id)
-        self.notes = NoteRepository(session)
+        self.workspace_id = workspace_id
+        ws = dict(workspace_id=workspace_id) if workspace_id else {}
+        self.companies = CompanyRepository(session, user_id=user_id, **ws)
+        self.jobs = JobRepository(session, user_id=user_id, **ws)
+        self.applications = ApplicationRepository(session, user_id=user_id, **ws)
+        self.contacts = ContactRepository(session, user_id=user_id, **ws)
+        self.events = EventRepository(session, user_id=user_id, **ws)
+        self.notes = NoteRepository(session, user_id=user_id, **ws)
         self.tags = TagRepository(session)
         self.resume_versions = ResumeVersionRepository(session, user_id=user_id)
 

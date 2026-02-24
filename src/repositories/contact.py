@@ -9,15 +9,18 @@ from ..models import Contact, ContactType
 class ContactRepository(BaseRepository[Contact]):
     """Repository for Contact operations."""
 
-    def __init__(self, session: Session, user_id: int = None):
+    def __init__(self, session: Session, user_id: int = None, workspace_id: int = None):
         super().__init__(session, Contact)
         self.user_id = user_id
+        self.workspace_id = workspace_id
 
     def _base_query(self):
-        """Get base query filtered by user_id if set."""
+        """Get base query filtered by workspace or user."""
         query = self.session.query(Contact)
-        if self.user_id is not None:
-            query = query.filter(Contact.user_id == self.user_id)
+        if self.workspace_id is not None:
+            query = query.filter(Contact.workspace_id == self.workspace_id)
+        elif self.user_id is not None:
+            query = query.filter(Contact.user_id == self.user_id, Contact.workspace_id.is_(None))
         return query
 
     def get_by_id(self, id: int) -> Optional[Contact]:
@@ -29,9 +32,12 @@ class ContactRepository(BaseRepository[Contact]):
         return self._base_query().order_by(Contact.name).offset(offset).limit(limit).all()
 
     def create(self, **kwargs) -> Contact:
-        """Create a new record with user_id auto-set."""
+        """Create a new record with user_id and workspace auto-set."""
         if self.user_id is not None:
             kwargs['user_id'] = self.user_id
+        if self.workspace_id is not None:
+            kwargs['workspace_id'] = self.workspace_id
+            kwargs.setdefault('created_by', self.user_id)
         return super().create(**kwargs)
 
     def search_by_name(self, name: str) -> List[Contact]:

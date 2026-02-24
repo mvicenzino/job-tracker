@@ -47,6 +47,9 @@
                     {% if company.industry %}{{ company.industry }}{% endif %}
                     {% if company.industry and company.location %} &middot; {% endif %}
                     {% if company.location %}{{ company.location }}{% endif %}
+                    {% if active_workspace and company.created_by_user %}
+                    <span style="opacity: 0.7;"> &middot; by {{ company.created_by_user.display_name or company.created_by_user.email.split('@')[0] }}</span>
+                    {% endif %}
                 </div>
             </div>
             <div class="list-view-meta">

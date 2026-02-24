@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Job - Stride{% endblock %}
+{% block title %}Edit Opportunity - Stride{% endblock %}
 
 {% block content %}
 <div class="form-page">
     <header class="page-header">
-        <h1>Edit Job</h1>
+        <h1>Edit Opportunity</h1>
         <p class="subtitle">{{ job.title }} at {{ job.company.name }}</p>
     </header>
 
     <form method="post" class="form card">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="form-group">
-            <label for="title">Job Title *</label>
+            <label for="title">Title *</label>
             <input type="text" id="title" name="title" required value="{{ job.title }}">
         </div>
 
@@ -47,7 +47,7 @@
         </div>
 
         <div class="form-group">
-            <label for="job_url">Job Posting URL</label>
+            <label for="job_url">Posting URL</label>
             <input type="url" id="job_url" name="job_url"
                    value="{{ job.job_url or '' }}" placeholder="https://...">
         </div>
@@ -63,7 +63,7 @@
         </div>
 
         <div class="form-group">
-            <label for="description">Job Description</label>
+            <label for="description">Description</label>
             <textarea id="description" name="description" rows="6"
                       placeholder="Paste the job description">{{ job.description or '' }}</textarea>
         </div>
@@ -79,7 +79,7 @@
             <button type="submit" class="btn btn-primary">Save Changes</button>
             {% if not job.applications %}
             <button type="button" class="btn btn-ghost btn-danger-text" style="margin-left: auto;"
-                    onclick="showConfirmModal('Delete Job', 'Are you sure you want to delete {{ job.title }}? This action cannot be undone.', '{{ url_for('jobs.delete_job', job_id=job.id) }}', 'Delete', 'btn-danger')">
+                    onclick="showConfirmModal('Delete Opportunity', 'Are you sure you want to delete {{ job.title }}? This action cannot be undone.', '{{ url_for('jobs.delete_job', job_id=job.id) }}', 'Delete', 'btn-danger')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 Delete
             </button>

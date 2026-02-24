@@ -19,8 +19,13 @@ class Company(Base, TimestampMixin):
     glassdoor_rating = Column(String(10))
     linkedin_url = Column(String(500))
 
+    # Workspace support (nullable — NULL means personal data)
+    workspace_id = Column(Integer, ForeignKey('workspaces.id'), nullable=True, index=True)
+    created_by = Column(Integer, ForeignKey('users.id'), nullable=True)
+
     # Relationships
-    user = relationship("User", back_populates="companies")
+    user = relationship("User", back_populates="companies", foreign_keys=[user_id])
+    created_by_user = relationship("User", foreign_keys=[created_by])
     jobs = relationship("Job", back_populates="company", cascade="all, delete-orphan")
     contacts = relationship("Contact", back_populates="company", cascade="all, delete-orphan")
     notes = relationship("Note", back_populates="company", cascade="all, delete-orphan",

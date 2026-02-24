@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Workspaces - Stride{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <header class="page-header">
+        <h1>Workspaces</h1>
+        <p class="subtitle">Collaborate with your team on shared CRM data.</p>
+    </header>
+
+    <div style="display: grid; gap: 1.5rem; max-width: 800px;">
+
+        <!-- Current workspace indicator -->
+        <div class="card" style="padding: 1.25rem; border-left: 4px solid var(--color-primary, #6366f1);">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+                <div>
+                    <strong>Active:</strong>
+                    {% if active_workspace_id %}
+                        {% for ws in workspaces %}
+                            {% if ws.id == active_workspace_id %}
+                                {{ ws.name }}
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        Personal
+                    {% endif %}
+                </div>
+                {% if active_workspace_id %}
+                <form method="post" action="{{ url_for('workspaces.switch_workspace') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="workspace_id" value="personal">
+                    <button type="submit" class="btn btn-secondary btn-sm">Switch to Personal</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Your workspaces -->
+        {% if workspaces %}
+        <div class="card" style="padding: 1.25rem;">
+            <h2 style="margin: 0 0 1rem 0; font-size: 1.1rem;">Your Workspaces</h2>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% for ws in workspaces %}
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; border-radius: 8px; background: var(--color-surface-alt, #f8fafc); gap: 0.75rem; flex-wrap: wrap;">
+                    <div>
+                        <strong>{{ ws.name }}</strong>
+                        <span class="badge" style="margin-left: 0.5rem; font-size: 0.75rem;">{{ role_map.get(ws.id, 'member') }}</span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        {% if active_workspace_id != ws.id %}
+                        <form method="post" action="{{ url_for('workspaces.switch_workspace') }}" style="margin: 0;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="workspace_id" value="{{ ws.id }}">
+                            <button type="submit" class="btn btn-primary btn-sm">Switch</button>
+                        </form>
+                        {% else %}
+                        <span class="badge badge-success" style="font-size: 0.75rem;">Active</span>
+                        {% endif %}
+                        <a href="{{ url_for('workspaces.workspace_settings', workspace_id=ws.id) }}" class="btn btn-secondary btn-sm">Settings</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Create workspace -->
+        <div class="card" style="padding: 1.25rem;">
+            <h2 style="margin: 0 0 1rem 0; font-size: 1.1rem;">Create a Workspace</h2>
+            <form method="post" action="{{ url_for('workspaces.create_workspace') }}" style="display: flex; gap: 0.75rem; align-items: end; flex-wrap: wrap;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                    <label for="ws-name">Workspace Name</label>
+                    <input type="text" id="ws-name" name="name" required placeholder="e.g., Acme Consulting">
+                </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </form>
+        </div>
+
+        <!-- Join workspace -->
+        <div class="card" style="padding: 1.25rem;">
+            <h2 style="margin: 0 0 1rem 0; font-size: 1.1rem;">Join a Workspace</h2>
+            <p style="font-size: 0.875rem; color: var(--color-text-secondary, #64748b); margin: 0 0 0.75rem 0;">
+                Enter the invite code shared by your team.
+            </p>
+            <form method="post" action="{{ url_for('workspaces.join_workspace') }}" style="display: flex; gap: 0.75rem; align-items: end; flex-wrap: wrap;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                    <label for="invite-code">Invite Code</label>
+                    <input type="text" id="invite-code" name="invite_code" required placeholder="e.g., a1b2c3d4e5f6">
+                </div>
+                <button type="submit" class="btn btn-primary">Join</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

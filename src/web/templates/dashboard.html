@@ -21,7 +21,7 @@
             </div>
             <div class="onboarding-intro">
                 <h2>Welcome to Stride!</h2>
-                <p>Let's get your job search organized. Complete these steps to get started.</p>
+                <p>Let's get organized. Complete these steps to get started.</p>
             </div>
         </div>
         <div class="onboarding-progress">
@@ -112,7 +112,7 @@
             <line x1="12" y1="8" x2="12" y2="12"/>
             <line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
-        <span>You're viewing sample data. <a href="{{ url_for('auth.register') }}">Create an account</a> to start tracking your own job search.</span>
+        <span>You're viewing sample data. <a href="{{ url_for('auth.register') }}">Create an account</a> to start tracking your own opportunities.</span>
         <a href="{{ url_for('auth.logout') }}" class="demo-exit-btn">Exit Demo</a>
     </div>
     {% endif %}
@@ -121,10 +121,10 @@
         <div class="greeting">
             {% if onboarding.show %}
             <h1>Let's get started</h1>
-            <p class="subtitle">Your job search command center</p>
+            <p class="subtitle">Your command center</p>
             {% else %}
             <h1 id="greeting-text">Welcome back{% if current_user.display_name %}, {{ current_user.display_name }}{% elif current_user.first_name %}, {{ current_user.first_name }}{% endif %}</h1>
-            <p class="subtitle" id="greeting-subtitle">Here's what's happening with your job search</p>
+            <p class="subtitle" id="greeting-subtitle">Here's what's happening with your pipeline</p>
             <script>
             (function() {
                 var name = "{% if current_user.display_name %}{{ current_user.display_name }}{% elif current_user.first_name %}{{ current_user.first_name }}{% endif %}";
@@ -203,7 +203,7 @@
             <div class="header-add-menu">
                 <a href="{{ url_for('applications.new_application') }}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                    Job Opportunity
+                    Opportunity
                 </a>
                 <a href="{{ url_for('companies.new_company') }}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -755,7 +755,7 @@
             </div>
         </div>
     </div>
-    <button type="button" class="btn btn-sm btn-primary usage-upgrade-btn" onclick="showUpgradeModal('Upgrade to Pro', 'Get unlimited AI features to supercharge your job search.')">
+    <button type="button" class="btn btn-sm btn-primary usage-upgrade-btn" onclick="showUpgradeModal('Upgrade to Pro', 'Get unlimited AI features to supercharge your pipeline.')">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
         </svg>

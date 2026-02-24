@@ -133,6 +133,10 @@ def demo():
                 {'name': 'Airtable', 'industry': 'Productivity', 'size': '500-1000', 'location': 'San Francisco, CA', 'website': 'https://airtable.com', 'description': 'Low-code platform for building apps'},
                 {'name': 'Webflow', 'industry': 'Design Tools', 'size': '500-1000', 'location': 'San Francisco, CA', 'website': 'https://webflow.com', 'description': 'Visual web development platform'},
                 {'name': 'Scale AI', 'industry': 'AI/ML', 'size': '500-1000', 'location': 'San Francisco, CA', 'website': 'https://scale.com', 'description': 'Data platform for AI'},
+                {'name': 'McKinsey & Company', 'industry': 'Management Consulting', 'size': '10000+', 'location': 'New York, NY', 'website': 'https://mckinsey.com', 'description': 'Global management consulting firm'},
+                {'name': 'Deloitte Digital', 'industry': 'Technology Consulting', 'size': '10000+', 'location': 'New York, NY', 'website': 'https://deloittedigital.com', 'description': 'Digital transformation consulting'},
+                {'name': 'Bain & Company', 'industry': 'Management Consulting', 'size': '10000+', 'location': 'Boston, MA', 'website': 'https://bain.com', 'description': 'Strategy consulting firm'},
+                {'name': 'Accenture', 'industry': 'Technology Consulting', 'size': '10000+', 'location': 'Chicago, IL', 'website': 'https://accenture.com', 'description': 'Professional services and digital transformation'},
             ]
 
             companies = []
@@ -318,6 +322,15 @@ Requirements:
                 {'company': companies[12], 'title': 'Platform Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 185000, 'salary_max': 255000, 'source': 'Indeed'},
                 {'company': companies[13], 'title': 'Senior Full Stack Engineer', 'location': 'Remote', 'remote_type': 'remote', 'salary_min': 175000, 'salary_max': 245000, 'source': 'LinkedIn'},
                 {'company': companies[14], 'title': 'ML Platform Engineer', 'location': 'San Francisco, CA', 'remote_type': 'hybrid', 'salary_min': 210000, 'salary_max': 290000, 'source': 'Recruiter'},
+                # Consulting opportunities
+                {'company': companies[15], 'title': 'Digital Strategy Engagement', 'location': 'New York, NY', 'remote_type': 'hybrid', 'salary_min': 500000, 'salary_max': 800000, 'source': 'Referral',
+                 'description': 'Lead digital transformation strategy for a Fortune 100 retailer. 12-week engagement covering technology roadmap, organizational change management, and implementation planning.'},
+                {'company': companies[16], 'title': 'Cloud Migration Assessment', 'location': 'Remote', 'remote_type': 'remote', 'salary_min': 300000, 'salary_max': 450000, 'source': 'Networking',
+                 'description': 'Assess and plan enterprise cloud migration for a mid-market financial services firm. Deliverables include architecture review, cost-benefit analysis, and migration roadmap.'},
+                {'company': companies[17], 'title': 'Growth Strategy Project', 'location': 'Boston, MA', 'remote_type': 'onsite', 'salary_min': 600000, 'salary_max': 900000, 'source': 'Company Website',
+                 'description': 'Help a PE-backed SaaS company develop go-to-market strategy for international expansion. 8-week engagement with potential for follow-on work.'},
+                {'company': companies[18], 'title': 'AI Readiness Workshop Series', 'location': 'Chicago, IL', 'remote_type': 'hybrid', 'salary_min': 150000, 'salary_max': 250000, 'source': 'LinkedIn',
+                 'description': 'Design and deliver AI readiness workshops for C-suite executives at a healthcare conglomerate. 4-session series over 6 weeks.'},
             ]
 
             jobs = []

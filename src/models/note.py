@@ -42,8 +42,13 @@ class Note(Base, TimestampMixin):
     content = Column(Text, nullable=False)
     note_type = Column(String(50))  # e.g., "research", "preparation", "followup", "general"
 
+    # Workspace support (nullable — NULL means personal data)
+    workspace_id = Column(Integer, ForeignKey('workspaces.id'), nullable=True, index=True)
+    created_by = Column(Integer, ForeignKey('users.id'), nullable=True)
+
     # Relationships
     user = relationship("User", foreign_keys=[user_id])
+    created_by_user = relationship("User", foreign_keys=[created_by])
     company = relationship("Company", back_populates="notes", foreign_keys=[company_id])
     job = relationship("Job", back_populates="notes", foreign_keys=[job_id])
     application = relationship("Application", back_populates="notes", foreign_keys=[application_id])

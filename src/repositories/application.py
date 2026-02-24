@@ -9,15 +9,18 @@ from ..models import Application, ApplicationStatus, Job, Company
 class ApplicationRepository(BaseRepository[Application]):
     """Repository for Application operations."""
 
-    def __init__(self, session: Session, user_id: int = None):
+    def __init__(self, session: Session, user_id: int = None, workspace_id: int = None):
         super().__init__(session, Application)
         self.user_id = user_id
+        self.workspace_id = workspace_id
 
     def _base_query(self):
-        """Get base query filtered by user_id if set."""
+        """Get base query filtered by workspace or user."""
         query = self.session.query(Application)
-        if self.user_id is not None:
-            query = query.filter(Application.user_id == self.user_id)
+        if self.workspace_id is not None:
+            query = query.filter(Application.workspace_id == self.workspace_id)
+        elif self.user_id is not None:
+            query = query.filter(Application.user_id == self.user_id, Application.workspace_id.is_(None))
         return query
 
     def get_by_id(self, id: int) -> Optional[Application]:
@@ -29,9 +32,12 @@ class ApplicationRepository(BaseRepository[Application]):
         return self._base_query().offset(offset).limit(limit).all()
 
     def create(self, **kwargs) -> Application:
-        """Create a new record with user_id auto-set."""
+        """Create a new record with user_id and workspace auto-set."""
         if self.user_id is not None:
             kwargs['user_id'] = self.user_id
+        if self.workspace_id is not None:
+            kwargs['workspace_id'] = self.workspace_id
+            kwargs.setdefault('created_by', self.user_id)
         return super().create(**kwargs)
 
     def get_by_status(self, status: ApplicationStatus) -> List[Application]:
@@ -124,8 +130,10 @@ class ApplicationRepository(BaseRepository[Application]):
         ).join(
             Company, Job.company_id == Company.id
         )
-        if self.user_id is not None:
-            query = query.filter(Application.user_id == self.user_id)
+        if self.workspace_id is not None:
+            query = query.filter(Application.workspace_id == self.workspace_id)
+        elif self.user_id is not None:
+            query = query.filter(Application.user_id == self.user_id, Application.workspace_id.is_(None))
         return query.order_by(desc(Application.updated_at)).all()
 
     def search_with_company_info(
@@ -144,8 +152,10 @@ class ApplicationRepository(BaseRepository[Application]):
         ).join(
             Company, Job.company_id == Company.id
         )
-        if self.user_id is not None:
-            query = query.filter(Application.user_id == self.user_id)
+        if self.workspace_id is not None:
+            query = query.filter(Application.workspace_id == self.workspace_id)
+        elif self.user_id is not None:
+            query = query.filter(Application.user_id == self.user_id, Application.workspace_id.is_(None))
 
         if search:
             search_term = f"%{search}%"
@@ -165,7 +175,9 @@ class ApplicationRepository(BaseRepository[Application]):
             Application.resume_version.isnot(None),
             Application.resume_version != ''
         )
-        if self.user_id is not None:
-            query = query.filter(Application.user_id == self.user_id)
+        if self.workspace_id is not None:
+            query = query.filter(Application.workspace_id == self.workspace_id)
+        elif self.user_id is not None:
+            query = query.filter(Application.user_id == self.user_id, Application.workspace_id.is_(None))
         results = query.order_by(Application.resume_version).all()
         return [r[0] for r in results if r[0]]

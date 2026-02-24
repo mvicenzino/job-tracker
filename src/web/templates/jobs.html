@@ -1,23 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}Job Listings - Stride{% endblock %}
+{% block title %}Opportunities - Stride{% endblock %}
 
 {% block content %}
 <div class="list-page">
     <header class="page-header">
         <div>
-            <h1>Job Listings</h1>
-            <p class="subtitle">Save job postings you find. Add them to your pipeline when ready.</p>
+            <h1>Opportunities</h1>
+            <p class="subtitle">Save opportunities you find. Add them to your pipeline when ready.</p>
         </div>
         <div class="header-actions">
-            <a href="{{ url_for('jobs.new_job') }}" class="btn btn-primary">+ Add Job</a>
+            <a href="{{ url_for('jobs.new_job') }}" class="btn btn-primary">+ Add Opportunity</a>
         </div>
     </header>
 
     {% if company_name %}
     <div class="filtered-banner" style="background: var(--color-bg-subtle); border: 1px solid var(--color-border-light); border-radius: var(--radius); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); display: flex; align-items: center; justify-content: space-between;">
-        <span>Showing jobs at <strong>{{ company_name }}</strong></span>
-        <a href="{{ url_for('jobs.jobs') }}" class="btn btn-sm btn-ghost">Show All Jobs</a>
+        <span>Showing opportunities at <strong>{{ company_name }}</strong></span>
+        <a href="{{ url_for('jobs.jobs') }}" class="btn btn-sm btn-ghost">Show All</a>
     </div>
     {% endif %}
 
@@ -26,7 +26,7 @@
             <svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
             </svg>
-            <input type="text" id="pageFilterInput" placeholder="Search jobs..." value="{{ search or '' }}">
+            <input type="text" id="pageFilterInput" placeholder="Search opportunities..." value="{{ search or '' }}">
         </div>
         <div class="filter-buttons">
             <a href="{{ url_for('jobs.jobs') }}" class="btn {% if not flagged_only %}btn-primary{% else %}btn-secondary{% endif %}">All</a>
@@ -59,6 +59,9 @@
                     <a href="{{ url_for('companies.edit_company', company_id=job.company.id) }}" style="color: inherit; text-decoration: underline dotted;">{{ job.company.name }}</a>
                     {% if job.location %} &middot; {{ job.location }}{% endif %}
                     {% if job.remote_type %} &middot; {{ job.remote_type|title }}{% endif %}
+                    {% if active_workspace and job.created_by_user %}
+                    <span style="opacity: 0.7;"> &middot; by {{ job.created_by_user.display_name or job.created_by_user.email.split('@')[0] }}</span>
+                    {% endif %}
                 </div>
             </div>
             <div class="list-view-meta">
@@ -87,7 +90,7 @@
                 {% endif %}
                 <a href="{{ url_for('applications.new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Add to Pipeline</a>
                 <button type="button" class="btn btn-sm btn-ghost btn-danger-text" title="Delete job"
-                        onclick="showConfirmModal('Delete Job', 'Are you sure you want to delete {{ job.title }}? This action cannot be undone.', '{{ url_for('jobs.delete_job', job_id=job.id) }}', 'Delete', 'btn-danger')">
+                        onclick="showConfirmModal('Delete Opportunity', 'Are you sure you want to delete {{ job.title }}? This action cannot be undone.', '{{ url_for('jobs.delete_job', job_id=job.id) }}', 'Delete', 'btn-danger')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </button>
             </div>
@@ -165,7 +168,7 @@
                 {% endif %}
                 <a href="{{ url_for('applications.new_application') }}?job_id={{ job.id }}" class="btn btn-sm btn-primary">Add to Pipeline</a>
                 <button type="button" class="btn btn-sm btn-ghost btn-danger-text" title="Delete job" style="margin-left:auto"
-                        onclick="showConfirmModal('Delete Job', 'Are you sure you want to delete {{ job.title }}? This action cannot be undone.', '{{ url_for('jobs.delete_job', job_id=job.id) }}', 'Delete', 'btn-danger')">
+                        onclick="showConfirmModal('Delete Opportunity', 'Are you sure you want to delete {{ job.title }}? This action cannot be undone.', '{{ url_for('jobs.delete_job', job_id=job.id) }}', 'Delete', 'btn-danger')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </button>
             </div>
@@ -173,7 +176,7 @@
         {% endfor %}
     </div>
 
-    <div class="no-filter-results">No jobs match your search.</div>
+    <div class="no-filter-results">No opportunities match your search.</div>
 
     {% else %}
     <div class="card">
@@ -185,10 +188,10 @@
                         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
                     </svg>
                 </div>
-                <p>{% if search %}No jobs found for "{{ search }}"{% elif flagged_only %}No saved jobs yet{% else %}Build your job wishlist{% endif %}</p>
-                <span class="empty-hint">{% if flagged_only %}Flag jobs you want to revisit later{% else %}Jobs are auto-created when you add applications. Use this page to browse and save interesting roles before applying.{% endif %}</span>
+                <p>{% if search %}No opportunities found for "{{ search }}"{% elif flagged_only %}No saved opportunities yet{% else %}Build your opportunity pipeline{% endif %}</p>
+                <span class="empty-hint">{% if flagged_only %}Flag opportunities you want to revisit later{% else %}Opportunities are auto-created when you add to the pipeline. Use this page to browse and save interesting ones.{% endif %}</span>
                 <div class="empty-actions">
-                    <a href="{{ url_for('jobs.new_job') }}" class="btn btn-primary">+ Add Your First Job</a>
+                    <a href="{{ url_for('jobs.new_job') }}" class="btn btn-primary">+ Add Your First Opportunity</a>
                 </div>
             </div>
         </div>
