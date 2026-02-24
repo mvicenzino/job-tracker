@@ -36,6 +36,7 @@
                                 <input type="file" name="avatar" accept="image/*" id="avatarInput" hidden>
                             </label>
                             <span id="avatarError" style="color: #ef4444; font-size: 0.8rem; display: none;"></span>
+                            <span class="form-hint" style="margin-top: 4px;">Max file size: 2MB</span>
                         </form>
                         {% if current_user.avatar_url %}
                         <form method="POST" action="{{ url_for('settings.delete_avatar') }}" style="display: inline;">
