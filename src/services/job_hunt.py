@@ -453,6 +453,7 @@ class JobHuntService:
         note = self.notes.create(
             content=content,
             title=title,
+            user_id=self.user_id,
             company_id=company_id,
             job_id=job_id,
             application_id=application_id,
@@ -464,6 +465,35 @@ class JobHuntService:
         self._sync_mentions(note)
         self.session.commit()
         return note
+
+    def update_note(self, note_id: int, content: str = None,
+                    title: str = None, note_type: str = None) -> Optional[Note]:
+        """Update a note with ownership check."""
+        note = self.notes.get_by_id_for_user(note_id, self.user_id)
+        if not note:
+            return None
+        if content is not None:
+            note.content = content
+        if title is not None:
+            note.title = title
+        if note_type is not None:
+            note.note_type = note_type
+        self._sync_mentions(note)
+        self.session.commit()
+        return note
+
+    def delete_note(self, note_id: int) -> bool:
+        """Delete a note with ownership check."""
+        note = self.notes.get_by_id_for_user(note_id, self.user_id)
+        if not note:
+            return False
+        self.session.delete(note)
+        self.session.commit()
+        return True
+
+    def get_all_user_notes(self, limit: int = 50) -> List[Note]:
+        """Get all notes for the current user."""
+        return self.notes.get_all_for_user(self.user_id, limit=limit)
 
     def _sync_mentions(self, note: Note):
         """Parse @Name mentions from note content and sync NoteMention records."""

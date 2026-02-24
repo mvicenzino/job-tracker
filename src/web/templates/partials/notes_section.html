@@ -1,0 +1,74 @@
+{# Reusable notes section for entity detail pages.
+   Parameters:
+     notes     - list of Note objects
+     add_url   - URL to POST new notes to
+     entity_type - "application", "contact", "company", "job" (for redirect_url)
+#}
+
+<!-- Add Note Form -->
+<form action="{{ add_url }}" method="post" class="note-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="form-group">
+        <input type="text" name="title" placeholder="Note title (optional)" class="note-title-input">
+    </div>
+    <div class="form-group" style="position: relative;">
+        <textarea name="content" required placeholder="Add a note... Type @ to mention a contact" rows="3" class="note-content-input"></textarea>
+    </div>
+    <div class="form-row-inline">
+        <select name="note_type" class="note-type-select">
+            <option value="general">General</option>
+            <option value="research">Research</option>
+            <option value="preparation">Preparation</option>
+            <option value="followup">Follow-up</option>
+            <option value="interview">Interview</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Add Note</button>
+    </div>
+</form>
+
+{% if notes %}
+<ul class="notes-list">
+    {% for note in notes %}
+    <li class="note-item">
+        <div class="note-header">
+            {% if note.title %}<strong>{{ note.title }}</strong>{% endif %}
+            <span class="note-type-badge">{{ note.note_type or 'general' }}</span>
+            <div class="note-actions">
+                <button type="button" class="btn btn-sm btn-ghost note-edit-btn" data-note-id="{{ note.id }}" title="Edit">&#9998;</button>
+                <form action="{{ url_for('notes.delete_note', note_id=note.id) }}" method="post" style="display:inline;" onsubmit="return confirm('Delete this note?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="redirect_url" value="{{ request.url }}"/>
+                    <button type="submit" class="btn btn-sm btn-ghost btn-danger-ghost" title="Delete">&times;</button>
+                </form>
+            </div>
+        </div>
+        <div class="note-content-display" id="note-display-{{ note.id }}">
+            <p class="note-content-rendered">{{ note.content }}</p>
+        </div>
+        <form action="{{ url_for('notes.edit_note', note_id=note.id) }}" method="post" class="note-inline-edit" id="note-edit-{{ note.id }}" style="display:none;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="redirect_url" value="{{ request.url }}"/>
+            <input type="text" name="title" value="{{ note.title or '' }}" placeholder="Title (optional)" class="note-title-input">
+            <textarea name="content" rows="3" class="note-content-input" required>{{ note.content }}</textarea>
+            <div class="form-row-inline">
+                <select name="note_type" class="note-type-select">
+                    {% for nt in ['general', 'research', 'preparation', 'followup', 'interview'] %}
+                    <option value="{{ nt }}" {% if note.note_type == nt %}selected{% endif %}>{{ nt|title }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                <button type="button" class="btn btn-secondary btn-sm note-edit-cancel" data-note-id="{{ note.id }}">Cancel</button>
+            </div>
+        </form>
+        {% if note.mentioned_contacts %}
+        <div class="note-mentions">
+            {% for m in note.mentioned_contacts %}
+            <a href="{{ url_for('contacts.edit_contact', contact_id=m.contact.id) }}" class="mention-badge">@{{ m.contact.name }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <span class="note-date">{{ note.created_at.strftime('%b %d, %Y at %-I:%M %p') }}</span>
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}

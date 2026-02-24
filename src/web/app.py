@@ -277,6 +277,7 @@ def create_app(db_path: str = None, database_url: str = None):
     from .routes.resumes import bp as resumes_bp
     from .routes.notifications import bp as notifications_bp
     from .routes.about import bp as about_bp
+    from .routes.notes import bp as notes_bp
     from .routes.insights import insights_bp
     from .routes.projects import bp as projects_bp
 
@@ -300,6 +301,7 @@ def create_app(db_path: str = None, database_url: str = None):
     app.register_blueprint(resumes_bp)
     app.register_blueprint(notifications_bp)
     app.register_blueprint(about_bp)
+    app.register_blueprint(notes_bp)
     app.register_blueprint(insights_bp)
 
     return app

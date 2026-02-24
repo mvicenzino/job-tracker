@@ -309,6 +309,34 @@ class DatabaseConnection:
                     except Exception as e:
                         print(f"[Migration] Failed to create note_mentions table: {e}")
 
+            # Add user_id to notes table
+            if 'notes' in inspector.get_table_names():
+                note_columns = [col['name'] for col in inspector.get_columns('notes')]
+                if 'user_id' not in note_columns:
+                    with self.engine.connect() as conn:
+                        try:
+                            conn.execute(text('ALTER TABLE notes ADD COLUMN user_id INTEGER REFERENCES users(id)'))
+                            conn.commit()
+                            print("[Migration] Added user_id column to notes")
+                            # Backfill user_id from parent entities
+                            try:
+                                conn.execute(text("""
+                                    UPDATE notes SET user_id = (
+                                        SELECT COALESCE(
+                                            (SELECT user_id FROM applications WHERE applications.id = notes.application_id),
+                                            (SELECT user_id FROM contacts WHERE contacts.id = notes.contact_id),
+                                            (SELECT user_id FROM companies WHERE companies.id = notes.company_id),
+                                            (SELECT user_id FROM jobs WHERE jobs.id = notes.job_id)
+                                        )
+                                    ) WHERE user_id IS NULL
+                                """))
+                                conn.commit()
+                                print("[Migration] Backfilled user_id on existing notes")
+                            except Exception as e:
+                                print(f"[Migration] Failed to backfill notes user_id: {e}")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add user_id to notes: {e}")
+
             # Add new columns to interview_preps if they exist
             if 'interview_preps' in inspector.get_table_names():
                 prep_columns = [col['name'] for col in inspector.get_columns('interview_preps')]

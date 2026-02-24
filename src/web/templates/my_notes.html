@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}My Notes - Stride{% endblock %}
+
+{% block content %}
+<div class="list-page">
+    <header class="page-header">
+        <div>
+            <h1>My Notes</h1>
+            <p class="subtitle">All your notes across jobs, contacts, and companies</p>
+        </div>
+    </header>
+
+    <!-- Add Standalone Note -->
+    <div class="card" style="margin-bottom: var(--space-6);">
+        <div class="card-body">
+            <form action="{{ url_for('notes.create_standalone_note') }}" method="post" class="note-form" style="margin-bottom:0; padding-bottom:0; border-bottom:none;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="form-group">
+                    <input type="text" name="title" placeholder="Note title (optional)" class="note-title-input">
+                </div>
+                <div class="form-group">
+                    <textarea name="content" required placeholder="Write a note..." rows="3" class="note-content-input"></textarea>
+                </div>
+                <div class="form-row-inline">
+                    <select name="note_type" class="note-type-select">
+                        <option value="general">General</option>
+                        <option value="research">Research</option>
+                        <option value="preparation">Preparation</option>
+                        <option value="followup">Follow-up</option>
+                        <option value="interview">Interview</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">+ Add Note</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if notes %}
+    <div class="notes-aggregate-list">
+        {% for note in notes %}
+        <div class="card note-aggregate-card">
+            <div class="card-body">
+                <div class="note-header">
+                    <div class="note-breadcrumb">
+                        <span class="note-parent-icon">{{ note.parent_icon }}</span>
+                        {% if note.parent_url %}
+                        <a href="{{ note.parent_url }}" class="note-parent-link">{{ note.parent_label }}</a>
+                        {% else %}
+                        <span class="note-parent-label">{{ note.parent_label }}</span>
+                        {% endif %}
+                    </div>
+                    <div style="display:flex; align-items:center; gap:var(--space-2);">
+                        <span class="note-type-badge">{{ note.note_type or 'general' }}</span>
+                        <div class="note-actions">
+                            <button type="button" class="btn btn-sm btn-ghost note-edit-btn" data-note-id="{{ note.id }}" title="Edit">&#9998;</button>
+                            <form action="{{ url_for('notes.delete_note', note_id=note.id) }}" method="post" style="display:inline;" onsubmit="return confirm('Delete this note?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-sm btn-ghost btn-danger-ghost" title="Delete">&times;</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% if note.title %}
+                <strong style="display:block; margin-bottom:var(--space-1);">{{ note.title }}</strong>
+                {% endif %}
+                <div class="note-content-display" id="note-display-{{ note.id }}">
+                    <p class="note-content-rendered note-content-truncated">{{ note.content }}</p>
+                </div>
+                <form action="{{ url_for('notes.edit_note', note_id=note.id) }}" method="post" class="note-inline-edit" id="note-edit-{{ note.id }}" style="display:none;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="redirect_url" value="{{ url_for('notes.my_notes') }}"/>
+                    <input type="text" name="title" value="{{ note.title or '' }}" placeholder="Title (optional)" class="note-title-input">
+                    <textarea name="content" rows="3" class="note-content-input" required>{{ note.content }}</textarea>
+                    <div class="form-row-inline">
+                        <select name="note_type" class="note-type-select">
+                            {% for nt in ['general', 'research', 'preparation', 'followup', 'interview'] %}
+                            <option value="{{ nt }}" {% if note.note_type == nt %}selected{% endif %}>{{ nt|title }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                        <button type="button" class="btn btn-secondary btn-sm note-edit-cancel" data-note-id="{{ note.id }}">Cancel</button>
+                    </div>
+                </form>
+                {% if note.mentioned_contacts %}
+                <div class="note-mentions">
+                    {% for m in note.mentioned_contacts %}
+                    <a href="{{ url_for('contacts.edit_contact', contact_id=m.contact.id) }}" class="mention-badge">@{{ m.contact.name }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <span class="note-date">{{ note.updated_at.strftime('%b %d, %Y at %-I:%M %p') }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body" style="text-align:center; padding:var(--space-12);">
+            <p style="color:var(--color-text-muted); font-size:var(--text-lg); margin-bottom:var(--space-2);">No notes yet</p>
+            <p style="color:var(--color-text-muted);">Notes you add to jobs, contacts, and companies will appear here.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Edit button toggles inline edit form
+    document.querySelectorAll('.note-edit-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var noteId = this.dataset.noteId;
+            var display = document.getElementById('note-display-' + noteId);
+            var edit = document.getElementById('note-edit-' + noteId);
+            if (display) display.style.display = 'none';
+            if (edit) edit.style.display = 'block';
+        });
+    });
+    // Cancel button hides inline edit form
+    document.querySelectorAll('.note-edit-cancel').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var noteId = this.dataset.noteId;
+            var display = document.getElementById('note-display-' + noteId);
+            var edit = document.getElementById('note-edit-' + noteId);
+            if (display) display.style.display = '';
+            if (edit) edit.style.display = 'none';
+        });
+    });
+});
+</script>
+{% endblock %}

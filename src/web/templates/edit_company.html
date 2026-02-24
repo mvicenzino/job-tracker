@@ -75,6 +75,18 @@
         </div>
     </form>
 
+    <!-- Entity Notes -->
+    <div class="card" style="margin-top: var(--space-6);">
+        <div class="card-header">
+            <h2>Notes</h2>
+        </div>
+        <div class="card-body">
+            {% with notes=company.notes, add_url=url_for('notes.add_company_note', company_id=company.id) %}
+                {% include "partials/notes_section.html" %}
+            {% endwith %}
+        </div>
+    </div>
+
     {% if company.jobs %}
     <div class="card" style="margin-top: var(--space-6);">
         <div class="card-header">
@@ -105,4 +117,27 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.note-edit-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var noteId = this.dataset.noteId;
+            var display = document.getElementById('note-display-' + noteId);
+            var edit = document.getElementById('note-edit-' + noteId);
+            if (display) display.style.display = 'none';
+            if (edit) edit.style.display = 'block';
+        });
+    });
+    document.querySelectorAll('.note-edit-cancel').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var noteId = this.dataset.noteId;
+            var display = document.getElementById('note-display-' + noteId);
+            var edit = document.getElementById('note-edit-' + noteId);
+            if (display) display.style.display = '';
+            if (edit) edit.style.display = 'none';
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -1,5 +1,5 @@
-from typing import List
-from sqlalchemy.orm import Session
+from typing import List, Optional
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import desc
 from .base import BaseRepository
 from ..models import Note
@@ -10,6 +10,26 @@ class NoteRepository(BaseRepository[Note]):
 
     def __init__(self, session: Session):
         super().__init__(session, Note)
+
+    def get_all_for_user(self, user_id: int, limit: int = 50) -> List[Note]:
+        """Get all notes for a user, eager-loading parents."""
+        return self.session.query(Note).filter(
+            Note.user_id == user_id
+        ).options(
+            joinedload(Note.company),
+            joinedload(Note.job),
+            joinedload(Note.application),
+            joinedload(Note.contact),
+            joinedload(Note.event),
+            joinedload(Note.mentioned_contacts),
+        ).order_by(desc(Note.updated_at)).limit(limit).all()
+
+    def get_by_id_for_user(self, note_id: int, user_id: int) -> Optional[Note]:
+        """Get a note by ID with ownership check."""
+        return self.session.query(Note).filter(
+            Note.id == note_id,
+            Note.user_id == user_id
+        ).first()
 
     def get_by_company(self, company_id: int) -> List[Note]:
         """Get all notes for a company."""

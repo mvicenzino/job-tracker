@@ -577,49 +577,9 @@
                 <h2>Notes</h2>
             </div>
             <div class="card-body">
-                <!-- Add Note Form -->
-                <form action="{{ url_for('applications.add_application_note', app_id=details.application.id) }}" method="post" class="note-form">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <div class="form-group">
-                        <input type="text" name="title" placeholder="Note title (optional)" class="note-title-input">
-                    </div>
-                    <div class="form-group" style="position: relative;">
-                        <textarea name="content" required placeholder="Add a note... Type @ to mention a contact" rows="3" class="note-content-input" id="note-content-input"></textarea>
-                        <div id="mention-dropdown" class="mention-dropdown" style="display:none;"></div>
-                    </div>
-                    <div class="form-row-inline">
-                        <select name="note_type" class="note-type-select">
-                            <option value="general">General</option>
-                            <option value="research">Research</option>
-                            <option value="preparation">Preparation</option>
-                            <option value="followup">Follow-up</option>
-                            <option value="interview">Interview</option>
-                        </select>
-                        <button type="submit" class="btn btn-primary">Add Note</button>
-                    </div>
-                </form>
-
-                {% if details.notes %}
-                <ul class="notes-list">
-                    {% for note in details.notes %}
-                    <li class="note-item">
-                        <div class="note-header">
-                            {% if note.title %}<strong>{{ note.title }}</strong>{% endif %}
-                            <span class="note-type-badge">{{ note.note_type or 'general' }}</span>
-                        </div>
-                        <p class="note-content-rendered">{{ note.content }}</p>
-                        {% if note.mentioned_contacts %}
-                        <div class="note-mentions">
-                            {% for m in note.mentioned_contacts %}
-                            <a href="{{ url_for('contacts.edit_contact', contact_id=m.contact.id) }}" class="mention-badge">@{{ m.contact.name }}</a>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                        <span class="note-date">{{ note.created_at.strftime('%b %d, %Y at %-I:%M %p') }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
+                {% with notes=details.notes, add_url=url_for('applications.add_application_note', app_id=details.application.id) %}
+                    {% include "partials/notes_section.html" %}
+                {% endwith %}
             </div>
         </section>
 
@@ -2035,5 +1995,25 @@ function copyAllPrep() {
             '<span class="inline-mention">@$1</span>');
     });
 })();
+
+// Note edit/delete toggle
+document.querySelectorAll('.note-edit-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var noteId = this.dataset.noteId;
+        var display = document.getElementById('note-display-' + noteId);
+        var edit = document.getElementById('note-edit-' + noteId);
+        if (display) display.style.display = 'none';
+        if (edit) edit.style.display = 'block';
+    });
+});
+document.querySelectorAll('.note-edit-cancel').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var noteId = this.dataset.noteId;
+        var display = document.getElementById('note-display-' + noteId);
+        var edit = document.getElementById('note-edit-' + noteId);
+        if (display) display.style.display = '';
+        if (edit) edit.style.display = 'none';
+    });
+});
 </script>
 {% endblock %}
