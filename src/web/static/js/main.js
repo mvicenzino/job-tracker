@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize nav dropdowns
     initNavDropdowns();
 
+    // Initialize sidebar profile menu
+    initSidebarProfileMenu();
+
     // Initialize calendar sync dropdowns
     initCalSyncDropdowns();
 
@@ -126,6 +129,65 @@ function initMobileMenu() {
     });
 }
 
+// === Sidebar Profile Menu ===
+
+function initSidebarProfileMenu() {
+    var sidebarProfile = document.getElementById('sidebarProfile');
+    if (!sidebarProfile) return;
+
+    var trigger = sidebarProfile.querySelector('.sidebar-profile-trigger');
+    if (!trigger) return;
+
+    trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var isOpen = sidebarProfile.classList.contains('open');
+        sidebarProfile.classList.toggle('open');
+        trigger.setAttribute('aria-expanded', String(!isOpen));
+
+        // Close nav dropdowns when sidebar menu opens
+        if (!isOpen) {
+            document.querySelectorAll('.nav-dropdown.open, .nav-profile.open').forEach(function(d) {
+                d.classList.remove('open');
+                var t = d.querySelector('.nav-dropdown-toggle, .nav-profile-toggle');
+                if (t) t.setAttribute('aria-expanded', 'false');
+            });
+        }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        if (!sidebarProfile.contains(e.target)) {
+            sidebarProfile.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebarProfile.classList.contains('open')) {
+            sidebarProfile.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.focus();
+        }
+    });
+
+    // Close after clicking any menu link
+    sidebarProfile.querySelectorAll('.sidebar-menu-item').forEach(function(item) {
+        if (item.tagName === 'A') {
+            item.addEventListener('click', function() {
+                sidebarProfile.classList.remove('open');
+                trigger.setAttribute('aria-expanded', 'false');
+            });
+        }
+    });
+
+    // Set initial theme label
+    var themeLabel = sidebarProfile.querySelector('.sidebar-theme-label');
+    if (themeLabel) {
+        themeLabel.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? 'Light Mode' : 'Dark Mode';
+    }
+}
+
 // === Nav Dropdowns (Network, Insights, Profile) ===
 
 function initNavDropdowns() {
@@ -148,6 +210,14 @@ function initNavDropdowns() {
                     if (otherToggle) otherToggle.setAttribute('aria-expanded', 'false');
                 }
             });
+
+            // Close sidebar profile menu when nav dropdown opens
+            var sidebarProfile = document.getElementById('sidebarProfile');
+            if (sidebarProfile) {
+                sidebarProfile.classList.remove('open');
+                var sidebarTrigger = sidebarProfile.querySelector('.sidebar-profile-trigger');
+                if (sidebarTrigger) sidebarTrigger.setAttribute('aria-expanded', 'false');
+            }
 
             dropdown.classList.toggle('open');
             toggle.setAttribute('aria-expanded', String(!isOpen));

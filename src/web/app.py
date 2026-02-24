@@ -1,7 +1,7 @@
 """Flask web application for Job Hunt Tracker."""
 import os
 from datetime import timedelta
-from flask import Flask, request
+from flask import Flask, request, redirect, url_for, flash
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 

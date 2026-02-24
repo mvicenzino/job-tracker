@@ -625,12 +625,31 @@ a:hover {
 }
 
 .sidebar-profile {
+    position: relative;
+}
+
+.sidebar-profile-trigger {
     display: flex;
     align-items: center;
     gap: var(--space-3);
+    width: 100%;
     padding: var(--space-3);
     background: var(--color-bg-subtle);
+    border: none;
     border-radius: var(--radius);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+    text-align: left;
+    color: inherit;
+    font-family: inherit;
+}
+
+.sidebar-profile-trigger:hover {
+    background: var(--color-surface);
+}
+
+.sidebar-profile.open .sidebar-profile-trigger {
+    background: var(--color-surface);
 }
 
 .sidebar-profile-avatar {
@@ -669,73 +688,110 @@ a:hover {
     text-overflow: ellipsis;
 }
 
-.sidebar-profile-email {
+.sidebar-profile-tier {
     display: block;
+    font-size: var(--text-xxs);
+    color: var(--color-text-muted);
+}
+
+.sidebar-profile-chevron {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+    transition: transform var(--transition-fast);
+}
+
+.sidebar-profile.open .sidebar-profile-chevron {
+    transform: rotate(180deg);
+}
+
+/* Sidebar profile popup menu — opens upward */
+.sidebar-profile-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-2) 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
+    z-index: 100;
+}
+
+.sidebar-profile.open .sidebar-profile-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.sidebar-menu-header {
+    padding: var(--space-2) var(--space-4);
+}
+
+.sidebar-menu-email {
     font-size: var(--text-xxs);
     color: var(--color-text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: block;
 }
 
-.sidebar-profile-actions {
-    display: flex;
-    gap: var(--space-1);
-    flex-shrink: 0;
+.sidebar-menu-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: var(--space-2) 0;
 }
 
-.sidebar-profile-btn {
+.sidebar-menu-item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: var(--radius-sm);
-    color: var(--color-text-muted);
-    transition: all var(--transition-fast);
-}
-
-.sidebar-profile-btn:hover {
-    background: var(--color-surface);
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
     color: var(--color-text);
-}
-
-.sidebar-profile-btn.active {
-    color: var(--color-primary);
-}
-
-.sidebar-profile-btn {
-    position: relative;
-}
-
-.sidebar-notification-dot {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 8px;
-    height: 8px;
-    background: var(--color-danger);
-    border-radius: 50%;
-    border: 2px solid var(--color-bg-subtle);
-}
-
-/* Sidebar theme toggle */
-.sidebar-theme-toggle {
+    text-decoration: none;
     border: none;
     background: none;
     cursor: pointer;
+    font-family: inherit;
+    transition: background var(--transition-fast);
+    text-align: left;
 }
 
-.sidebar-theme-toggle .theme-icon-dark {
+.sidebar-menu-item:hover {
+    background: var(--color-bg-subtle);
+}
+
+.sidebar-menu-item svg {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+}
+
+.sidebar-menu-logout {
+    color: var(--color-danger);
+}
+
+.sidebar-menu-logout svg {
+    color: var(--color-danger);
+}
+
+/* Sidebar menu theme icon show/hide */
+#sidebarMenuThemeToggle .theme-icon-dark {
     display: none;
 }
 
-[data-theme="dark"] .sidebar-theme-toggle .theme-icon-light {
+[data-theme="dark"] #sidebarMenuThemeToggle .theme-icon-light {
     display: none;
 }
 
-[data-theme="dark"] .sidebar-theme-toggle .theme-icon-dark {
-    display: block;
+[data-theme="dark"] #sidebarMenuThemeToggle .theme-icon-dark {
+    display: inline;
 }
 
 /* === Navbar === */
