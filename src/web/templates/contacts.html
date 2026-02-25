@@ -46,7 +46,7 @@
                 </div>
             </div>
             {% endif %}
-            <a href="{{ url_for('contacts.new_contact') }}" class="btn btn-primary">+ Add Contact</a>
+            {% include 'partials/header_notifications.html' %}
         </div>
     </header>
 

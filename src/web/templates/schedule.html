@@ -27,8 +27,7 @@
     <header class="page-header">
         <h1>Schedule</h1>
         <div class="header-actions">
-            <a href="{{ url_for('schedule.new_event') }}" class="btn btn-secondary">+ Add Event</a>
-            <a href="{{ url_for('schedule.new_interview') }}" class="btn btn-primary">+ Schedule Interview</a>
+            {% include 'partials/header_notifications.html' %}
         </div>
     </header>
 

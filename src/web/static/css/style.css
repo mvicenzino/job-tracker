@@ -2053,6 +2053,172 @@ details[open].card > summary.card-header::after {
 .header-actions {
     display: flex;
     gap: var(--space-3);
+    align-items: center;
+}
+
+/* === Header Notification Bell === */
+.header-notif-bell {
+    position: relative;
+}
+
+.header-notif-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s ease;
+}
+
+.header-notif-btn:hover {
+    background: var(--color-bg-subtle);
+    color: var(--color-text);
+    border-color: var(--color-border-focus);
+}
+
+.notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--color-danger);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+}
+
+.header-notif-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 360px;
+    max-height: 420px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.header-notif-dropdown.open {
+    display: block;
+}
+
+.notif-dropdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.notif-dropdown-title {
+    font-weight: 700;
+    font-size: var(--text-md-sm, 15px);
+    color: var(--color-text);
+}
+
+.notif-dropdown-viewall {
+    font-size: var(--text-sm, 13px);
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.notif-dropdown-viewall:hover {
+    text-decoration: underline;
+}
+
+.notif-dropdown-list {
+    overflow-y: auto;
+    max-height: 340px;
+}
+
+.notif-dropdown-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    text-decoration: none;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border-light);
+    transition: background 0.1s ease;
+}
+
+.notif-dropdown-item:hover {
+    background: var(--color-bg-subtle);
+}
+
+.notif-dropdown-item.unread {
+    background: var(--color-primary-subtle, #eef2ff);
+}
+
+.notif-dropdown-item.unread:hover {
+    background: var(--color-primary-light, #e0e7ff);
+}
+
+.notif-item-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-top: 2px;
+}
+
+.notif-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notif-item-title {
+    font-size: var(--text-sm, 13px);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notif-item-time {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+.notif-dropdown-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8) var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm, 13px);
+}
+
+.notif-dropdown-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6) var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm, 13px);
 }
 
 /* === Stats Grid === */
@@ -7218,8 +7384,8 @@ body.demo-active .navbar {
 
     /* --- Page Headers --- */
     .page-header {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
         gap: var(--space-4);
         padding: var(--space-4) 0;
     }
@@ -7227,10 +7393,16 @@ body.demo-active .navbar {
     .page-header h1 {
         font-size: var(--text-2xl);
         line-height: 1.2;
+        flex: 1;
     }
 
     .page-header .btn {
         display: none; /* Hide header buttons - use bottom tab instead */
+    }
+
+    .header-notif-dropdown {
+        width: calc(100vw - 32px);
+        right: -8px;
     }
 
     .dashboard-header {

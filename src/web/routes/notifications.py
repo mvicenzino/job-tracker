@@ -92,6 +92,34 @@ def clear_read():
         session.close()
 
 
+@bp.route('/recent')
+@login_required
+def recent():
+    """Get recent notifications for dropdown (JSON)."""
+    session = get_db_session()
+    try:
+        repo = NotificationRepository(session)
+        notifications = repo.get_for_user(current_user.id, limit=5)
+        unread_count = repo.get_unread_count(current_user.id)
+        return jsonify({
+            'notifications': [
+                {
+                    'id': n.id,
+                    'title': n.title,
+                    'message': n.message,
+                    'notification_type': n.notification_type,
+                    'link_url': n.link_url,
+                    'is_read': n.is_read,
+                    'created_at': n.created_at.isoformat() if n.created_at else None
+                }
+                for n in notifications
+            ],
+            'unread_count': unread_count
+        })
+    finally:
+        session.close()
+
+
 @bp.route('/count')
 @login_required
 def count():

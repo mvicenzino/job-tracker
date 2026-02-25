@@ -1,0 +1,125 @@
+{# Notification bell dropdown for page headers #}
+<div class="header-notif-bell">
+    <button type="button" class="header-notif-btn" id="headerNotifBtn" aria-label="Notifications">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        {% if unread_notifications_count is defined and unread_notifications_count > 0 %}
+        <span class="notification-badge" id="headerNotifBadge">{{ unread_notifications_count }}</span>
+        {% else %}
+        <span class="notification-badge" id="headerNotifBadge" style="display:none;"></span>
+        {% endif %}
+    </button>
+    <div class="header-notif-dropdown" id="headerNotifDropdown">
+        <div class="notif-dropdown-header">
+            <span class="notif-dropdown-title">Notifications</span>
+            <a href="{{ url_for('notifications.notifications') }}" class="notif-dropdown-viewall">View All</a>
+        </div>
+        <div class="notif-dropdown-list" id="notifDropdownList">
+            <div class="notif-dropdown-loading">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    var btn = document.getElementById('headerNotifBtn');
+    var dropdown = document.getElementById('headerNotifDropdown');
+    var list = document.getElementById('notifDropdownList');
+    var badge = document.getElementById('headerNotifBadge');
+    var isOpen = false;
+    var loaded = false;
+
+    function timeAgo(dateStr) {
+        var now = new Date();
+        var date = new Date(dateStr);
+        var diff = Math.floor((now - date) / 1000);
+        if (diff < 60) return 'just now';
+        if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+        if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+        if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function typeIcon(type) {
+        switch(type) {
+            case 'reminder': return '\u23F0';
+            case 'application_update': return '\uD83D\uDCCB';
+            case 'job_added': return '\uD83D\uDCBC';
+            case 'interview': return '\uD83C\uDFA4';
+            default: return '\uD83D\uDD14';
+        }
+    }
+
+    function renderItems(items) {
+        if (!items || items.length === 0) {
+            list.innerHTML = '<div class="notif-dropdown-empty">' +
+                '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.4;margin-bottom:8px;">' +
+                '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>' +
+                '<span>No notifications yet</span></div>';
+            return;
+        }
+        var html = '';
+        items.forEach(function(n) {
+            var unreadClass = n.is_read ? '' : ' unread';
+            var link = n.link_url || '/notifications';
+            html += '<a href="' + link + '" class="notif-dropdown-item' + unreadClass + '" data-id="' + n.id + '">' +
+                '<span class="notif-item-icon">' + typeIcon(n.notification_type) + '</span>' +
+                '<div class="notif-item-content">' +
+                '<div class="notif-item-title">' + (n.title || '') + '</div>' +
+                '<div class="notif-item-time">' + timeAgo(n.created_at) + '</div>' +
+                '</div></a>';
+        });
+        list.innerHTML = html;
+
+        list.querySelectorAll('.notif-dropdown-item.unread').forEach(function(item) {
+            item.addEventListener('click', function() {
+                var id = this.dataset.id;
+                if (id) {
+                    fetch('/notifications/mark-read/' + id, {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                }
+            });
+        });
+    }
+
+    function fetchNotifications() {
+        fetch('/notifications/recent', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            renderItems(data.notifications);
+            if (data.unread_count !== undefined) {
+                if (data.unread_count > 0) {
+                    badge.textContent = data.unread_count;
+                    badge.style.display = '';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+            loaded = true;
+        })
+        .catch(function() {
+            list.innerHTML = '<div class="notif-dropdown-empty"><span>Could not load notifications</span></div>';
+        });
+    }
+
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        isOpen = !isOpen;
+        dropdown.classList.toggle('open', isOpen);
+        if (isOpen) fetchNotifications();
+    });
+
+    document.addEventListener('click', function(e) {
+        if (isOpen && !dropdown.contains(e.target) && e.target !== btn) {
+            isOpen = false;
+            dropdown.classList.remove('open');
+        }
+    });
+})();
+</script>
