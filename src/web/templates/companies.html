@@ -16,9 +16,10 @@
             </svg>
             <input type="text" id="pageFilterInput" placeholder="Search companies..." value="{{ search or '' }}">
         </div>
-        {% if search %}
-        <a href="{{ url_for('companies.companies') }}" class="btn btn-link">Clear</a>
-        {% endif %}
+        <div class="filter-buttons">
+            <a href="{{ url_for('companies.companies') }}" class="btn {% if not flagged_only %}btn-primary{% else %}btn-secondary{% endif %}">All</a>
+            <a href="{{ url_for('companies.companies', flagged='true') }}" class="btn {% if flagged_only %}btn-primary{% else %}btn-secondary{% endif %}">Saved</a>
+        </div>
         <div class="view-toggle">
             <button type="button" class="view-toggle-btn" data-view="list" title="List view">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
@@ -33,7 +34,7 @@
     {# ===== LIST VIEW ===== #}
     <div class="list-view-container">
         {% for company in companies %}
-        <div class="list-view-item" data-filter-text="{{ company.name }} {{ company.industry or '' }} {{ company.location or '' }}">
+        <div class="list-view-item{% if company.is_flagged %} flagged{% endif %}" data-filter-text="{{ company.name }} {{ company.industry or '' }} {{ company.location or '' }}">
             <div class="list-view-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>
@@ -54,6 +55,9 @@
             <div class="list-view-meta">
                 <a href="{{ url_for('jobs.jobs', company_id=company.id) }}" class="badge" style="text-decoration: none;">{{ company.jobs|length }} jobs</a>
                 <span class="badge">{{ company.contacts|length }} contacts</span>
+                {% if company.is_flagged %}
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--color-accent,#6366f1)"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                {% endif %}
             </div>
             <div class="list-view-actions">
                 <a href="{{ url_for('companies.edit_company', company_id=company.id) }}" class="btn btn-sm btn-secondary">Edit</a>
@@ -70,9 +74,25 @@
     {# ===== TILE VIEW (existing card grid) ===== #}
     <div class="card-grid tile-view-container">
         {% for company in companies %}
-        <div class="card company-card" data-filter-text="{{ company.name }} {{ company.industry or '' }} {{ company.location or '' }}">
+        <div class="card company-card{% if company.is_flagged %} flagged{% endif %}" data-filter-text="{{ company.name }} {{ company.industry or '' }} {{ company.location or '' }}">
             <div class="card-body">
-                <h3>{{ company.name }}</h3>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+                    <h3>{{ company.name }}</h3>
+                    <form action="{{ url_for('companies.toggle_company_flag', company_id=company.id) }}" method="post" class="flag-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="flag-btn {% if company.is_flagged %}active{% endif %}" title="{% if company.is_flagged %}Remove from saved{% else %}Save company{% endif %}">
+                            {% if company.is_flagged %}
+                            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            {% else %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
                 {% if company.industry %}
                 <p class="company-industry">{{ company.industry }}</p>
                 {% endif %}
@@ -117,8 +137,8 @@
                         <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
                     </svg>
                 </div>
-                <p>{% if search %}No companies found for "{{ search }}"{% else %}Research your target companies{% endif %}</p>
-                <span class="empty-hint">{% if search %}Try a different search term{% else %}Keep notes on company culture, interview processes, and key contacts. Companies are auto-created when you add applications.{% endif %}</span>
+                <p>{% if search %}No companies found for "{{ search }}"{% elif flagged_only %}No saved companies yet{% else %}Research your target companies{% endif %}</p>
+                <span class="empty-hint">{% if flagged_only %}Flag companies you want to revisit later{% elif search %}Try a different search term{% else %}Keep notes on company culture, interview processes, and key contacts. Companies are auto-created when you add applications.{% endif %}</span>
                 <div class="empty-actions">
                     <a href="{{ url_for('companies.new_company') }}" class="btn btn-primary">+ Add Your First Company</a>
                 </div>

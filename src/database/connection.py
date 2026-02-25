@@ -281,6 +281,18 @@ class DatabaseConnection:
                         except Exception as e:
                             print(f"[Migration] Failed to add scored_with_resume_id: {e}")
 
+            # Add is_flagged to companies table
+            if 'companies' in inspector.get_table_names():
+                company_columns = [col['name'] for col in inspector.get_columns('companies')]
+                if 'is_flagged' not in company_columns:
+                    with self.engine.connect() as conn:
+                        try:
+                            conn.execute(text('ALTER TABLE companies ADD COLUMN is_flagged BOOLEAN DEFAULT FALSE'))
+                            conn.commit()
+                            print("[Migration] Added is_flagged column to companies")
+                        except Exception as e:
+                            print(f"[Migration] Failed to add is_flagged to companies: {e}")
+
             # Create note_mentions table if it doesn't exist
             if 'note_mentions' not in inspector.get_table_names():
                 with self.engine.connect() as conn:

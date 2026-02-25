@@ -14,8 +14,30 @@ def companies():
     service, session = get_service()
     try:
         search = request.args.get('search')
-        companies = service.find_companies(search=search)
-        return render_template('companies.html', companies=companies, search=search)
+        flagged_only = request.args.get('flagged')
+        if search:
+            companies = service.find_companies(search=search)
+        elif flagged_only:
+            companies = service.companies.get_flagged()
+        else:
+            companies = service.find_companies()
+        return render_template('companies.html', companies=companies, search=search, flagged_only=flagged_only)
+    finally:
+        session.close()
+
+
+@bp.route('/companies/<int:company_id>/flag', methods=['POST'])
+@login_required
+def toggle_company_flag(company_id):
+    """Toggle the flagged/saved status of a company."""
+    service, session = get_service()
+    try:
+        company = service.companies.toggle_flag(company_id)
+        session.commit()
+        if company:
+            status = 'saved' if company.is_flagged else 'unsaved'
+            flash(f'Company {status}!', 'success')
+        return redirect(request.referrer or url_for('companies.companies'))
     finally:
         session.close()
 

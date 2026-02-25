@@ -3220,6 +3220,29 @@ details[open].card > summary.card-header::after {
     -webkit-overflow-scrolling: touch;
     margin: 0 calc(-1 * var(--space-4));
     padding: 0 var(--space-4) var(--space-4);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) var(--color-bg-subtle);
+}
+
+.pipeline-board::-webkit-scrollbar {
+    height: 10px;
+    display: block;
+}
+
+.pipeline-board::-webkit-scrollbar-track {
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-full);
+    margin: 0 var(--space-4);
+}
+
+.pipeline-board::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-bg-subtle);
+}
+
+.pipeline-board::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
 }
 
 .pipeline-column {
@@ -4735,11 +4758,13 @@ details[open].card > summary.card-header::after {
     height: 20px;
 }
 
-.job-card.flagged {
+.job-card.flagged,
+.company-card.flagged {
     border-color: var(--color-warning);
 }
 
-.job-card.flagged::before {
+.job-card.flagged::before,
+.company-card.flagged::before {
     content: '';
     position: absolute;
     top: 0;

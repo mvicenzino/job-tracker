@@ -63,6 +63,18 @@ class CompanyRepository(BaseRepository[Company]):
             Company.contacts.any()
         ).all()
 
+    def get_flagged(self) -> List[Company]:
+        """Get all flagged/saved companies."""
+        return self._base_query().filter(Company.is_flagged == True).order_by(Company.created_at.desc()).all()
+
+    def toggle_flag(self, company_id: int) -> Optional[Company]:
+        """Toggle the flagged status of a company."""
+        company = self.get_by_id(company_id)
+        if company:
+            company.is_flagged = not company.is_flagged
+            self.session.flush()
+        return company
+
     def count(self) -> int:
         """Get total count of records for user."""
         return self._base_query().count()

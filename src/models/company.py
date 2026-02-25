@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base, TimestampMixin
 
@@ -18,6 +18,7 @@ class Company(Base, TimestampMixin):
     culture_notes = Column(Text)  # Your notes about company culture
     glassdoor_rating = Column(String(10))
     linkedin_url = Column(String(500))
+    is_flagged = Column(Boolean, default=False)
 
     # Workspace support (nullable — NULL means personal data)
     workspace_id = Column(Integer, ForeignKey('workspaces.id'), nullable=True, index=True)
