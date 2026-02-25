@@ -1,15 +1,28 @@
 {% extends "base.html" %}
 
-{% block title %}Add Opportunity - Stride{% endblock %}
+{% block title %}Opportunity - Stride{% endblock %}
 
 {% block content %}
 <div class="form-page">
     <header class="page-header">
-        <h1>Add Opportunity</h1>
-        <p class="subtitle">Save an opportunity to your pipeline to track it from interest through close.</p>
+        <h1>Opportunity</h1>
+        <p class="subtitle">Save an opportunity to your pipeline and track it from interest through close.</p>
     </header>
 
-    <div class="linkedin-tip">
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <button type="button" id="tab-job" class="opp-type-tab active"
+                onclick="switchOpportunityType('job')"
+                style="padding: 0.5rem 1.25rem; border-radius: 999px; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: 1px solid var(--color-border, #e2e8f0); background: var(--color-primary, #6366f1); color: #fff; transition: all 0.15s ease;">
+            Job Application
+        </button>
+        <button type="button" id="tab-consulting" class="opp-type-tab"
+                onclick="switchOpportunityType('consulting')"
+                style="padding: 0.5rem 1.25rem; border-radius: 999px; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: 1px solid var(--color-border, #e2e8f0); background: var(--color-surface, #fff); color: var(--color-text-secondary, #64748b); transition: all 0.15s ease;">
+            Consulting Project
+        </button>
+    </div>
+
+    <div class="linkedin-tip" id="linkedin-tip">
         <span class="linkedin-tip-icon">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="#0a66c2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
         </span>
@@ -19,7 +32,7 @@
     </div>
 
     {% if ai_parsing_enabled %}
-    <div class="card" style="margin-bottom: 1.5rem; border: 1px dashed var(--color-border, #e2e8f0); padding: 1.25rem;">
+    <div id="ai-parsing-card" class="card" style="margin-bottom: 1.5rem; border: 1px dashed var(--color-border, #e2e8f0); padding: 1.25rem;">
         <h3 style="margin: 0 0 0.75rem 0; font-size: 1rem;">Paste & Parse Description</h3>
         <p style="margin: 0 0 0.75rem 0; font-size: 0.875rem; color: var(--color-text-secondary, #64748b);">
             Paste a description below and let AI extract the details for you.
@@ -35,8 +48,9 @@
     </div>
     {% endif %}
 
-    <form method="post" class="form card">
+    <form method="post" class="form card" id="opp-form" onsubmit="prepareSubmit()">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="opportunity_type" id="opportunity_type" value="job">
         {% if prefill and prefill.company_id %}
         <input type="hidden" name="company_id" value="{{ prefill.company_id }}">
         {% endif %}
@@ -65,6 +79,12 @@
             <input type="text" id="title" name="title" required placeholder="e.g., Senior Software Engineer">
         </div>
 
+        <div class="form-group" id="project-description-group" style="display: none;">
+            <label for="project_description">Project Description</label>
+            <textarea id="project_description" rows="5" placeholder="Describe the project scope, deliverables, timeline, etc."
+                      style="width: 100%; resize: vertical;"></textarea>
+        </div>
+
         {% if resume_version_objects %}
         <div class="form-group">
             <label for="resume_select">Resume Version</label>
@@ -85,7 +105,7 @@
         </button>
 
         <div class="details-section" id="detailsSection">
-            <div class="form-group">
+            <div class="form-group" id="url-field-group">
                 <label for="url">Job Posting URL</label>
                 <input type="url" id="url" name="url" placeholder="https://...">
             </div>
@@ -172,6 +192,48 @@ function toggleDetails() {
     var toggle = document.querySelector('.details-toggle');
     var isExpanded = section.classList.toggle('expanded');
     toggle.classList.toggle('expanded', isExpanded);
+}
+
+function switchOpportunityType(type) {
+    var jobTab = document.getElementById('tab-job');
+    var consultingTab = document.getElementById('tab-consulting');
+    var linkedinTip = document.getElementById('linkedin-tip');
+    var aiCard = document.getElementById('ai-parsing-card');
+    var projectGroup = document.getElementById('project-description-group');
+    var urlGroup = document.getElementById('url-field-group');
+
+    document.getElementById('opportunity_type').value = type;
+
+    if (type === 'consulting') {
+        jobTab.style.background = 'var(--color-surface, #fff)';
+        jobTab.style.color = 'var(--color-text-secondary, #64748b)';
+        consultingTab.style.background = 'var(--color-primary, #6366f1)';
+        consultingTab.style.color = '#fff';
+
+        if (linkedinTip) linkedinTip.style.display = 'none';
+        if (aiCard) aiCard.style.display = 'none';
+        projectGroup.style.display = '';
+        urlGroup.style.display = 'none';
+    } else {
+        consultingTab.style.background = 'var(--color-surface, #fff)';
+        consultingTab.style.color = 'var(--color-text-secondary, #64748b)';
+        jobTab.style.background = 'var(--color-primary, #6366f1)';
+        jobTab.style.color = '#fff';
+
+        if (linkedinTip) linkedinTip.style.display = '';
+        if (aiCard) aiCard.style.display = '';
+        projectGroup.style.display = 'none';
+        urlGroup.style.display = '';
+    }
+}
+
+function prepareSubmit() {
+    if (document.getElementById('opportunity_type').value === 'consulting') {
+        var textarea = document.getElementById('project_description');
+        if (textarea && textarea.value.trim()) {
+            document.getElementById('description').value = textarea.value.trim();
+        }
+    }
 }
 </script>
 {% if ai_parsing_enabled %}
