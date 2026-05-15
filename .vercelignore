@@ -1,0 +1,27 @@
+.env
+.env.local
+.env.production
+.env.development
+.venv-reset
+.venv
+venv
+Stride Business Plan
+*.mp4
+*.webm
+*.mp3
+record-demo*.py
+take_screenshots.py
+voiceover-parts
+synced
+nowhite
+intro
+logo-concepts
+logos-banners
+docs
+tests
+chrome-extension
+api_backup.py
+dashboard_backup.html
+force_update.py
+migrate_*.py
+output.log
